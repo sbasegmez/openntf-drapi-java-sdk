@@ -1,0 +1,2 @@
+org.openntf.drapi.util.ServiceRegistryTest$AnotherTestServiceImpl
+org.openntf.drapi.util.ServiceRegistryTest$AnotherTestServiceSecondImpl
