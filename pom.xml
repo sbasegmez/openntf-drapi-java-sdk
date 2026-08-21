@@ -1,0 +1,128 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.openntf.drapi</groupId>
+    <artifactId>drapi-sdk-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>OpenNTF Java SDK for HCL Domino REST API :: Parent</name>
+    <description>Common features, dependencies and configuration for Domino REST API Java SDK</description>
+    <inceptionYear>2026</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Serdar Basegmez</name>
+            <url>https://lotusnotus.com</url>
+        </developer>
+    </developers>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- General -->
+        <license-developers>Serdar Basegmez</license-developers>
+        <license-year>2026</license-year>
+
+        <!-- Versions -->
+        <junit.version>6.1.3</junit.version>
+
+        <!-- Plugin versions -->
+        <maven-enforcer.version>3.6.3</maven-enforcer.version>
+        <license-maven-plugin.version>5.1.1</license-maven-plugin.version>
+    </properties>
+
+    <modules>
+        <module>drapi-sdk-core</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer.version}</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven-and-java</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>3.0.1</version>
+                                    </requireMavenVersion>
+                                    <requireJavaVersion>
+                                        <version>17</version>
+                                    </requireJavaVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>${license-maven-plugin.version}</version>
+                    <configuration>
+                        <aggregate>true</aggregate>
+                        <properties>
+                            <owner>${license-developers}</owner>
+                            <copyrightYear>${license-year}</copyrightYear>
+                        </properties>
+                        <licenseSets>
+                            <licenseSet>
+                                <header>LicenseTemplate.txt</header>
+                                <excludes>
+                                    <exclude>**/pom.xml</exclude>
+                                    <exclude>**/README.*</exclude>
+                                    <exclude>src/test/resources/**</exclude>
+                                    <exclude>src/main/resources/**</exclude>
+                                    <exclude>**/build.properties</exclude>
+                                    <exclude>**/LICENSE.*</exclude>
+                                    <exclude>**/NOTICE.*</exclude>
+
+                                    <exclude>docs/**</exclude>
+                                </excludes>
+                            </licenseSet>
+                        </licenseSets>
+
+                        <mapping>
+                            <xsp-config>XML_STYLE</xsp-config>
+                        </mapping>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
