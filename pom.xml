@@ -47,6 +47,7 @@
 
     <modules>
         <module>drapi-sdk-core</module>
+        <module>drapi-sdk-json-jakarta</module>
     </modules>
 
     <dependencyManagement>
