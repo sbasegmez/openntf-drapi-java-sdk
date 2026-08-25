@@ -13,11 +13,15 @@ This SDK targets Java 17 and above, and is designed to be modular and extensible
 _(Class names and SDK structure are not final...)_
 
 ```java
-// Build once and share: the client caches the bearer tokes, and refresh as needed.
-DominoRestClient client = DominoRestClient.builder()
+// Build a DrapiConfig first
+DrapiConfig config = DrapiConfig.builder()
         .baseUrl("https://demo.example.com:8880")
         .basicAuth("Doctor notes", password)
         .build();
+
+// Build once and share: the client caches the bearer tokes, and refresh as needed.
+DrapiClient client = DrapiClient.builder(config)
+                                .build();
 
 DrapiDocument contact = client.scope("demo")
                               .documents()
