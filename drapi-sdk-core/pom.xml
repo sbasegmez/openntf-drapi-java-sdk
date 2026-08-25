@@ -29,6 +29,19 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <environmentVariables>
+                        <!-- Test environment variables for DrapiConfigBuilder tests -->
+                        <DRAPI_BASEURL>http://localhost:8089</DRAPI_BASEURL>
+                        <DRAPI_TOKEN>some-token-value</DRAPI_TOKEN>
+                    </environmentVariables>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 
 class TypeUtilsTest {
 
@@ -119,6 +120,18 @@ class TypeUtilsTest {
         assertEquals("bar", TypeUtils.defaultIfBlank(" ", "bar"));
         assertEquals("bar", TypeUtils.defaultIfBlank("", "bar"));
         assertEquals("bar", TypeUtils.defaultIfBlank(null, "bar"));
+    }
+
+    @Test
+    void startsWithIgnoreCaseTest() {
+        assertTrue(TypeUtils.startsWithIgnoreCase(null, null), "Both null should return true");
+        assertFalse(TypeUtils.startsWithIgnoreCase(null, "a"), "Null string should not start with any non-null prefix");
+        assertTrue(TypeUtils.startsWithIgnoreCase("", ""), "Both empty return true");
+        assertFalse(TypeUtils.startsWithIgnoreCase("testing", null), "Any string should not start with null prefix");
+        assertTrue(TypeUtils.startsWithIgnoreCase("testing", ""), "String 'testing' should start with prefix ''");
+        assertTrue(TypeUtils.startsWithIgnoreCase("testing", "test"), "String 'testing' should start with prefix 'test'");
+        assertTrue(TypeUtils.startsWithIgnoreCase("TESTING", "test"), "String 'TESTING' should start with prefix 'test' ignoring case");
+        assertTrue(TypeUtils.startsWithIgnoreCase("Istanbul", "ist"), "Turkish dotless-i test: 'Istanbul' starts with ist");
     }
 
 }

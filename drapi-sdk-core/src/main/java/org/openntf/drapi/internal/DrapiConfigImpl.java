@@ -1,6 +1,7 @@
 package org.openntf.drapi.internal;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.util.TypeUtils;
 
@@ -34,40 +35,41 @@ public class DrapiConfigImpl implements DrapiConfig {
     private final int requestTimeoutSecs;
 
     DrapiConfigImpl(DrapiConfigBuilder builder) {
-        validateConfig(builder);
-
-        this.baseUrl = builder.baseUrl;
+        this.baseUrl = TypeUtils.requireNonBlank(builder.baseUrl, "Base URL must not be blank");
         this.authScope = builder.authScope;
-        this.authType = builder.authType;
+        this.authType = resolveAndValidateAuthType(builder);
         this.username = builder.username;
         this.password = builder.password;
         this.token = builder.token;
         this.appId = builder.appId;
         this.appSecret = builder.appSecret;
 
-        this.userAgent = TypeUtils.defaultIfBlank(builder.userAgent, DEFAULT_USER_AGENT) + "/" + Version.get();
+        this.userAgent = TypeUtils.defaultIfBlank(builder.userAgent, DEFAULT_USER_AGENT + "/" + Version.get());
         this.connectTimeoutSecs = builder.connectTimeoutSecs == 0 ? DEFAULT_CONNECT_TIMEOUT_SECS : builder.connectTimeoutSecs;
         this.requestTimeoutSecs = builder.requestTimeoutSecs == 0 ? DEFAULT_REQUEST_TIMEOUT_SECS : builder.requestTimeoutSecs;
     }
 
-    private void validateConfig(DrapiConfigBuilder builder) {
-        TypeUtils.requireNonBlank(builder.baseUrl, "Base URL must not be blank");
+    private static AuthType resolveAndValidateAuthType(DrapiConfigBuilder builder) {
+        List<AuthType> detectedTypes = new ArrayList<>();
 
-        switch(Objects.requireNonNull(builder.authType, "Auth type must not be null")) {
-            case BASIC:
-                TypeUtils.requireNonBlank(builder.username, "Username must not be blank for BASIC auth");
-                TypeUtils.requireNonBlank(builder.password, "Password must not be blank for BASIC auth");
-                break;
-            case TOKEN:
-                TypeUtils.requireNonBlank(builder.token, "Token must not be blank for TOKEN auth");
-                break;
-            case OAUTH:
-                TypeUtils.requireNonBlank(builder.appId, "App ID must not be blank for OAUTH auth");
-                TypeUtils.requireNonBlank(builder.appSecret, "App Secret must not be blank for OAUTH auth");
-                break;
-            default:
-                // Dead code, but just in case
-                throw new IllegalArgumentException("Unsupported auth type: " + builder.authType);
+        if (TypeUtils.isAllNonEmpty(builder.username, builder.password)) {
+            detectedTypes.add(AuthType.BASIC);
+        }
+
+        if (TypeUtils.isNotEmpty(builder.token)) {
+            detectedTypes.add(AuthType.TOKEN);
+        }
+
+        if (TypeUtils.isAllNonEmpty(builder.appId, builder.appSecret)) {
+            detectedTypes.add(AuthType.OAUTH);
+        }
+
+        if (detectedTypes.isEmpty()) {
+            throw new IllegalArgumentException("No valid authentication method provided. Please provide either BASIC, TOKEN, or OAUTH credentials.");
+        } else if (detectedTypes.size() == 1) {
+            return detectedTypes.get(0);
+        } else {
+            throw new IllegalArgumentException("Multiple authentication methods provided. Please provide only one: BASIC, TOKEN, or OAUTH.");
         }
     }
 

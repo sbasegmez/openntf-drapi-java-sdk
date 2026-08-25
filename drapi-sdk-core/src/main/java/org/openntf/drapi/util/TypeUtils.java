@@ -2,6 +2,7 @@ package org.openntf.drapi.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -166,6 +167,17 @@ public class TypeUtils {
     }
 
     /**
+     * Check if all provided strings are non-empty.
+     *
+     * @param strArgs the strings to check
+     * @return true if all provided strings are non-empty
+     */
+    public static boolean isAllNonEmpty(String... strArgs) {
+        return Arrays.stream(strArgs)
+                     .allMatch(TypeUtils::isNotEmpty);
+    }
+
+    /**
      * Check if any of the provided strings are empty.
      *
      * @param strArgs the strings to check
@@ -257,4 +269,25 @@ public class TypeUtils {
         return obj.toString();
     }
 
+    /**
+     * Check if a string starts with a given prefix, ignoring case.
+     * @param key the string to check.
+     * @param prefix the prefix to check for.
+     * @return true if the string starts with the prefix, ignoring case; false otherwise
+     */
+    public static boolean startsWithIgnoreCase(String key, String prefix) {
+        if(null == key) {
+            return null == prefix;
+        }
+
+        if(key.isEmpty()) {
+            return prefix.isEmpty();
+        }
+
+        if(prefix == null) {
+            return false;
+        }
+
+        return key.toLowerCase(Locale.ENGLISH).startsWith(prefix.toLowerCase(Locale.ENGLISH));
+    }
 }

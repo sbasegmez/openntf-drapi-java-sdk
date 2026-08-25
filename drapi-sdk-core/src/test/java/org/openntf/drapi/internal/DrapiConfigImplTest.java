@@ -31,6 +31,18 @@ class DrapiConfigImplTest {
     }
 
     @Test
+    @DisplayName("Custom user agent should not append version tag")
+    void testCustomUserAgentWithVersion() {
+        DrapiConfig config = DrapiConfig.builder()
+                                        .baseUrl("https://example.com")
+                                        .basic("username", "password")
+                                        .userAgent("MyApp/1.8.8569")
+                                        .build();
+
+        assertEquals("MyApp/1.8.8569", config.userAgent(), "User agent should not append version tag when customized");
+    }
+
+    @Test
     @DisplayName("Test DrapiConfigImpl with TOKEN auth")
     void testTokenAuthConfig() {
         DrapiConfig config = DrapiConfig.builder()
@@ -59,26 +71,26 @@ class DrapiConfigImplTest {
     @DisplayName("Test DrapiConfigImpl with invalid config")
     void testInvalidConfig() {
         assertThrows(IllegalArgumentException.class, () -> DrapiConfig.builder()
-                                                                  .build(), "Expected IllegalArgumentException for missing base URL");
-
-        assertThrows(NullPointerException.class, () -> DrapiConfig.builder()
-                                                                  .baseUrl("https://example.com")
-                                                                  .build(), "Expected NullPointerException for missing auth type");
+                                                                      .build(), "Expected IllegalArgumentException for missing base URL");
 
         assertThrows(IllegalArgumentException.class, () -> DrapiConfig.builder()
-                                                                  .baseUrl("https://example.com")
-                                                                  .basic(null, "password")
-                                                                  .build(), "Expected IllegalArgumentException for missing username");
+                                                                      .baseUrl("https://example.com")
+                                                                      .build(), "Expected IllegalArgumentException for not providing any authentication method");
 
         assertThrows(IllegalArgumentException.class, () -> DrapiConfig.builder()
-                                                                  .baseUrl("https://example.com")
-                                                                  .basic("username", "")
-                                                                  .build(), "Expected IllegalArgumentException for blank password");
+                                                                      .baseUrl("https://example.com")
+                                                                      .basic(null, "password")
+                                                                      .build(), "Expected IllegalArgumentException for missing username");
 
         assertThrows(IllegalArgumentException.class, () -> DrapiConfig.builder()
-                                                                  .baseUrl("https://example.com")
-                                                                  .oauth("app-id", "")
-                                                                  .build(), "Expected IllegalArgumentException for blank app secret");
+                                                                      .baseUrl("https://example.com")
+                                                                      .basic("username", "")
+                                                                      .build(), "Expected IllegalArgumentException for blank password");
+
+        assertThrows(IllegalArgumentException.class, () -> DrapiConfig.builder()
+                                                                      .baseUrl("https://example.com")
+                                                                      .oauth("app-id", "")
+                                                                      .build(), "Expected IllegalArgumentException for blank app secret");
 
     }
 
