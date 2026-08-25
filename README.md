@@ -30,6 +30,11 @@ DrapiDocument contact = client.scope("demo")
 
 ```
 
+## Documentation
+
+- [Configuration](docs/configuration.md)
+
+
 ## JSON Serialization
 
 The SDK uses a JSON abstraction and it does not depend on a specific Json library. The initial provide Jakarta Json API (Json-b and Json-p) implementation for serialization and deserialization, but the SDK is designed to be flexible and allow for other JSON libraries to be used if desired. Jackson support is also planned in a later stage.
