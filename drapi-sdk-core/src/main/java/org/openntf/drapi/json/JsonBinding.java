@@ -4,9 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.openntf.drapi.util.ServiceRegistry;
 
 /**
@@ -33,15 +31,12 @@ public interface JsonBinding {
     }
 
     default Map<String, Object> fromJson(String jsonString) {
-        Objects.requireNonNull(jsonString, "JSON string cannot be null");
         return fromJson(
             new ByteArrayInputStream(jsonString.getBytes(StandardCharsets.UTF_8))
         );
     }
 
     default <T> T fromJson(String jsonString, Class<T> valueType) {
-        Objects.requireNonNull(jsonString, "JSON string cannot be null");
-        Objects.requireNonNull(valueType, "Value type cannot be null");
         return fromJson(
             new ByteArrayInputStream(jsonString.getBytes(StandardCharsets.UTF_8)),
             valueType
@@ -49,7 +44,6 @@ public interface JsonBinding {
     }
 
     default String toJson(Object objectValue) {
-        Objects.requireNonNull(objectValue, "Object value cannot be null");
         var outputStream = new java.io.ByteArrayOutputStream();
         toJson(objectValue, outputStream);
         return outputStream.toString(StandardCharsets.UTF_8);

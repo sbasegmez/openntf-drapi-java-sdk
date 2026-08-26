@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.openntf.drapi.exception.JsonBindingException;
 import org.openntf.drapi.json.JsonBinding;
 
@@ -38,8 +37,6 @@ public class JakartaJsonBinding implements JsonBinding {
 
     @Override
     public Map<String, Object> fromJson(InputStream jsonStream) {
-        Objects.requireNonNull(jsonStream, "Input stream cannot be null");
-
         try (JsonReader reader = Json.createReader(jsonStream)) {
             JsonValue value = reader.readValue();
             if (!(value instanceof JsonObject object)) {
@@ -53,8 +50,6 @@ public class JakartaJsonBinding implements JsonBinding {
 
     @Override
     public <T> T fromJson(InputStream jsonStream, Class<T> valueType) {
-        Objects.requireNonNull(jsonStream, "Input stream cannot be null");
-        Objects.requireNonNull(valueType, "Value type cannot be null");
         try {
             return jsonb.fromJson(jsonStream, valueType);
         } catch (Exception e) {
@@ -64,8 +59,6 @@ public class JakartaJsonBinding implements JsonBinding {
 
     @Override
     public void toJson(Object objectValue, OutputStream outputStream) {
-        Objects.requireNonNull(objectValue, "Object value cannot be null");
-        Objects.requireNonNull(outputStream, "Output stream cannot be null");
         try {
             jsonb.toJson(objectValue, outputStream);
         } catch (Exception e) {
