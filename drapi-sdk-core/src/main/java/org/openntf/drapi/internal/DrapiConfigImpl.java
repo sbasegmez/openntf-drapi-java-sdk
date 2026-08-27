@@ -1,5 +1,6 @@
 package org.openntf.drapi.internal;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.openntf.drapi.DrapiConfig;
@@ -12,7 +13,7 @@ public class DrapiConfigImpl implements DrapiConfig {
     public static final int DEFAULT_REQUEST_TIMEOUT_SECS = 15;
 
     // Baseline
-    private final String baseUrl;
+    private final URI baseUrl;
     private final String authScope;
     private final AuthType authType;
 
@@ -35,7 +36,7 @@ public class DrapiConfigImpl implements DrapiConfig {
     private final int requestTimeoutSecs;
 
     DrapiConfigImpl(DrapiConfigBuilder builder) {
-        this.baseUrl = TypeUtils.requireNonBlank(builder.baseUrl, "Base URL must not be blank");
+        this.baseUrl = builder.baseUrl;
         this.authScope = builder.authScope;
         this.authType = resolveAndValidateAuthType(builder);
         this.username = builder.username;
@@ -74,7 +75,7 @@ public class DrapiConfigImpl implements DrapiConfig {
     }
 
     @Override
-    public String baseUrl() {
+    public URI baseUrl() {
         return baseUrl;
     }
 

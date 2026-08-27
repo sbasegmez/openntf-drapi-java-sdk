@@ -1,10 +1,11 @@
 package org.openntf.drapi;
 
+import java.net.URI;
 import org.openntf.drapi.internal.DrapiConfigBuilder;
 
 public interface DrapiConfig {
 
-    String baseUrl();
+    URI baseUrl();
     String authScope();
     AuthType authType();
 

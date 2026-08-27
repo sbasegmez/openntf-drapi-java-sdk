@@ -15,12 +15,12 @@ class DrapiConfigImplTest {
     @DisplayName("Test DrapiConfigImpl with BASIC auth")
     void testBasicAuthConfig() {
         DrapiConfig config = DrapiConfig.builder()
-                                        .baseUrl("https://example.com")
+                                        .baseUrl("https://example.com:8089/")
                                         .basic("username", "password")
                                         .build();
 
         assertNotNull(config, "Config should not be null");
-        assertEquals("https://example.com", config.baseUrl(), "Base URL should match");
+        assertEquals("https://example.com:8089/", config.baseUrl().toString(), "Base URL should match");
         assertEquals(DrapiConfig.AuthType.BASIC, config.authType(), "Auth type should be BASIC");
         assertEquals("username", config.username(), "Username should match");
         assertEquals("password", config.password(), "Password should match");
@@ -65,6 +65,20 @@ class DrapiConfigImplTest {
         assertEquals(DrapiConfig.AuthType.OAUTH, config.authType(), "Auth type should be OAUTH");
         assertEquals("app-id", config.appId(), "App ID should match");
         assertEquals("app-secret", config.appSecret(), "App Secret should match");
+    }
+
+    @Test
+    @DisplayName("Test invalid URI")
+    void testInvaliURI() {
+        assertThrows(NullPointerException.class, () -> DrapiConfig.builder()
+                                                                  .baseUrl((String) null)
+                                                                  .build(),
+                     "Null URL should generate NullPointerException");
+
+        assertThrows(IllegalArgumentException.class, () -> DrapiConfig.builder()
+                                                                  .baseUrl("-")
+                                                                  .build(),
+                     "Invalid URL should generate IllegalArgumentException");
     }
 
     @Test

@@ -36,7 +36,7 @@ class DrapiConfigBuilderTest {
                                         .applyResourceFile("config/example.properties")
                                         .build();
 
-        assertEquals("https://api.example.com", config.baseUrl(), "Base URL should match the properties file");
+        assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the properties file");
         assertEquals("$DATA", config.authScope(), "Auth scope should match the properties file");
         assertEquals(DrapiConfig.AuthType.BASIC, config.authType(), "Auth type should match the properties file");
         assertEquals("your_username", config.username(), "Username should match the properties file");
@@ -59,7 +59,7 @@ class DrapiConfigBuilderTest {
                                         ), null)
                                         .build();
 
-        assertEquals("https://api.example.com", config.baseUrl(), "Base URL should match the map");
+        assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the map");
         assertEquals(DrapiConfig.AuthType.BASIC, config.authType(), "Auth type should match the map");
         assertEquals("your_username", config.username(), "Username should match the map");
         assertEquals("your_password", config.password(), "Password should match the map");
@@ -83,7 +83,7 @@ class DrapiConfigBuilderTest {
                                 .build();
 
         assertEquals(AuthType.OAUTH, config.authType(), "Auth type should be OAUTH");
-        assertEquals("https://api.example.com", config.baseUrl(), "Base URL should match the map");
+        assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the map");
         assertEquals("$DATA", config.authScope(), "Auth scope should match the map");
         assertEquals("your_ap_id", config.appId(), "App ID should match the map");
         assertEquals("your_secret", config.appSecret(), "App Secret should match the map");

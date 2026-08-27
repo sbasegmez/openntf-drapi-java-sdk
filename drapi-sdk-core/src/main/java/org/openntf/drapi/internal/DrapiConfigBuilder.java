@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.util.TypeUtils;
@@ -14,7 +16,7 @@ import org.openntf.drapi.util.TypeUtils;
 public class DrapiConfigBuilder {
 
     // Baseline
-    String baseUrl;
+    URI baseUrl;
     String authScope;
 
     // BASIC auth
@@ -34,7 +36,12 @@ public class DrapiConfigBuilder {
     int requestTimeoutSecs = 0;
 
     public DrapiConfigBuilder baseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+        this.baseUrl = URI.create(Objects.requireNonNull(baseUrl));
+        return this;
+    }
+
+    public DrapiConfigBuilder baseUrl(URI baseUrl) {
+        this.baseUrl = Objects.requireNonNull(baseUrl);
         return this;
     }
 
