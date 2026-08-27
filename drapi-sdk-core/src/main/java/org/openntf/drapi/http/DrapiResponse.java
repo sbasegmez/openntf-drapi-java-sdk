@@ -32,7 +32,10 @@ public final class DrapiResponse implements AutoCloseable {
 
         // Deep copy of headers to ensure immutability and case-insensitivity.
         this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        givenHeaders.forEach((key, value) -> this.headers.put(key, List.copyOf(value)));
+
+        if( givenHeaders != null) {
+            givenHeaders.forEach((key, value) -> this.headers.put(key, List.copyOf(value)));
+        }
     }
 
     public int statusCode() {

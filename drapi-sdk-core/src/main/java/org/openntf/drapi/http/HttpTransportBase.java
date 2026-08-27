@@ -11,7 +11,7 @@ public abstract class HttpTransportBase implements HttpTransport {
 
     protected HttpTransportBase(DrapiConfig config, Executor executor) {
         this.config = Objects.requireNonNull(config, "config must not be null");
-        this.executor = Objects.requireNonNull(executor, "executor must not be null");
+        this.executor = executor;
     }
 
     protected DrapiConfig config() {
