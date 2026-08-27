@@ -3,7 +3,7 @@ package org.openntf.drapi.internal;
 import java.util.Objects;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiContext;
-import org.openntf.drapi.auth.AuthenticationProvider;
+import org.openntf.drapi.internal.auth.AuthenticationProvider;
 import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.json.JsonBinding;
 

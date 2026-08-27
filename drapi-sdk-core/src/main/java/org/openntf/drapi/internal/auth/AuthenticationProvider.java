@@ -1,11 +1,8 @@
-package org.openntf.drapi.auth;
+package org.openntf.drapi.internal.auth;
 
 import org.openntf.drapi.DrapiConfig;
-import org.openntf.drapi.internal.auth.BasicAuthenticationProvider;
-import org.openntf.drapi.internal.auth.OAuthAuthenticationProvider;
-import org.openntf.drapi.internal.auth.TokenAuthenticationProvider;
 
-public interface AuthenticationProvider {
+public sealed interface AuthenticationProvider permits AuthenticationProviderBase {
 
     /**
      * Acquires a token for the given context.
@@ -14,7 +11,7 @@ public interface AuthenticationProvider {
      * @return the token, never {@code null}
      * @throws org.openntf.drapi.exception.AuthenticationException if a token could not be obtained
      */
-    JwtToken acquireToken(Object context);
+    BearerToken acquireToken(Object context);
 
     /**
      * Reports whether asking again after a 401 is worthwhile.
@@ -26,7 +23,7 @@ public interface AuthenticationProvider {
      */
     boolean supportsRefresh();
 
-    static AuthenticationProvider get(DrapiConfig config) {
+    static AuthenticationProvider create(DrapiConfig config) {
         return switch (config.authType()) {
             case BASIC -> new BasicAuthenticationProvider(config);
             case TOKEN -> new TokenAuthenticationProvider(config);

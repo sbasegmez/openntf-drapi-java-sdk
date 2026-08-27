@@ -1,11 +1,9 @@
 package org.openntf.drapi.internal.auth;
 
 import org.openntf.drapi.DrapiConfig;
-import org.openntf.drapi.auth.AuthenticationProvider;
-import org.openntf.drapi.auth.JwtToken;
 import org.openntf.drapi.exception.AuthenticationException;
 
-public class BasicAuthenticationProvider extends AbstractAuthenticationProvider {
+public final class BasicAuthenticationProvider extends AuthenticationProviderBase {
 
     public BasicAuthenticationProvider(DrapiConfig config) {
         super(config);
@@ -19,7 +17,7 @@ public class BasicAuthenticationProvider extends AbstractAuthenticationProvider 
      * @throws AuthenticationException if a token could not be obtained
      */
     @Override
-    public JwtToken acquireToken(Object context) {
+    public BearerToken acquireToken(Object context) {
         return null;
     }
 

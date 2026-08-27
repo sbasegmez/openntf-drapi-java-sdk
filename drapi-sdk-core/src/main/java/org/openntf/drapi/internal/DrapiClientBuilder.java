@@ -5,7 +5,7 @@ import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiContext;
-import org.openntf.drapi.auth.AuthenticationProvider;
+import org.openntf.drapi.internal.auth.AuthenticationProvider;
 import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.json.JsonBinding;
 
@@ -52,7 +52,7 @@ public class DrapiClientBuilder {
 
         if (authenticationProvider == null) {
             // Fallback to default authentication provider if not provided
-            authenticationProvider = AuthenticationProvider.get(config);
+            authenticationProvider = AuthenticationProvider.create(config);
         }
 
         DrapiContext context = new DrapiContextImpl(config, jsonBinding, httpTransport, authenticationProvider);

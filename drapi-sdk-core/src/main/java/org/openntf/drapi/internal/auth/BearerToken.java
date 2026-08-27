@@ -1,4 +1,4 @@
-package org.openntf.drapi.auth;
+package org.openntf.drapi.internal.auth;
 
 import java.time.Instant;
 import java.util.Map;
@@ -10,9 +10,9 @@ import org.openntf.drapi.util.TypeUtils;
  * @param bearer
  * @param claims
  */
-public record JwtToken(String bearer, Map<String, Object> claims) {
+public record BearerToken(String bearer, Map<String, Object> claims) {
 
-    public JwtToken {
+    public BearerToken {
         TypeUtils.requireNonEmpty(bearer, "bearer must not be null or empty");
         claims = claims == null ? Map.of() : Map.copyOf(claims);
     }
@@ -63,6 +63,6 @@ public record JwtToken(String bearer, Map<String, Object> claims) {
      */
     @Override
     public String toString() {
-        return "AccessToken[bearer=<redacted>, expiresAt=" + getExpiresAt().orElse(null) + "]";
+        return "BearerToken[bearer=<redacted>, expiresAt=" + getExpiresAt().orElse(null) + "]";
     }
 }
