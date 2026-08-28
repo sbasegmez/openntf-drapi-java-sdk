@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import org.openntf.drapi.util.Parameter;
 
 public final class DrapiRequest {
 
@@ -15,7 +16,7 @@ public final class DrapiRequest {
     private final String path;
 
     // HTTP allows "a=1&b=2&a=3" style query parameters, so we need to support multiple values for the same key.
-    private final List<QueryParameter> queryParams;
+    private final List<Parameter> queryParams;
 
     // Headers are stored in a case-insensitive manner, as HTTP headers are case-insensitive.
     private final Map<String, List<String>> headers;
@@ -69,7 +70,7 @@ public final class DrapiRequest {
         return path;
     }
 
-    public List<QueryParameter> queryParams() {
+    public List<Parameter> queryParams() {
         return List.copyOf(queryParams);
     }
 
@@ -81,7 +82,7 @@ public final class DrapiRequest {
 
     public DrapiRequest queryParam(String key, String value) {
         if (value != null) {
-            this.queryParams.add(new QueryParameter(key, value));
+            this.queryParams.add(new Parameter(key, value));
         }
         return this;
     }
@@ -89,7 +90,7 @@ public final class DrapiRequest {
     public DrapiRequest queryParams(Map<String, List<String>> queryParams) {
         queryParams.forEach((key, values) -> {
             for (String value : values) {
-                this.queryParams.add(new QueryParameter(key, value));
+                this.queryParams.add(new Parameter(key, value));
             }
         });
         return this;
@@ -117,10 +118,6 @@ public final class DrapiRequest {
     public DrapiRequest body(RequestBody body) {
         this.body = Objects.requireNonNull(body, "Request body cannot be null");
         return this;
-    }
-
-    public record QueryParameter(String key, String value) {
-
     }
 
 }
