@@ -1,6 +1,7 @@
 package org.openntf.drapi.http;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiConfig;
 
@@ -18,8 +19,8 @@ public abstract class HttpTransportBase implements HttpTransport {
         return config;
     }
 
-    protected Executor executor() {
-        return executor;
+    protected Optional<Executor> executor() {
+        return Optional.ofNullable(executor);
     }
 
 }
