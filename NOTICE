@@ -7,6 +7,9 @@ OpenNTF Alliance (http://www.OpenNTF.org/)
 
 This product is licensed under the terms of the Apache 2.0 license.
 
+Certain APIs and design patterns in this project were inspired by the design and
+structure of SLF4J (Simple Logging Facade for Java).
+
 The project contains the following third-party code:
 -
 -
