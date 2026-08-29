@@ -74,10 +74,30 @@ public final class DrapiRequest {
         return List.copyOf(queryParams);
     }
 
+    public boolean containsQueryParam(String key) {
+        return queryParams.stream().anyMatch(param -> param.key().equals(key));
+    }
+
+    public boolean containsQueryParam(String key, String value) {
+        return queryParams.stream()
+                          .filter(param -> param.key().equals(key))
+                          .map(Parameter::value)
+                          .anyMatch(v -> v.equals(value));
+    }
+
     public Map<String, List<String>> headers() {
         Map<String, List<String>> copy = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         headers.forEach((key, value) -> copy.put(key, List.copyOf(value)));
         return copy;
+    }
+
+    public boolean containsHeader(String key) {
+        return headers.containsKey(key);
+    }
+
+    public boolean containsHeader(String key, String value) {
+        List<String> values = headers.get(key);
+        return values != null && values.contains(value);
     }
 
     public DrapiRequest queryParam(String key, String value) {

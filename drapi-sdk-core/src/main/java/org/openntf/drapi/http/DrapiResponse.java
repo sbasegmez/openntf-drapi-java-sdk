@@ -3,6 +3,7 @@ package org.openntf.drapi.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +55,21 @@ public final class DrapiResponse implements AutoCloseable {
         return bodyStream;
     }
 
+    public byte[] bodyAsBytes() {
+        if (bodyStream == null) {
+            return new byte[0];
+        }
+        try {
+            return bodyStream.readAllBytes();
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to read response body", e);
+        }
+    }
+
+    public String bodyAsString() {
+        return new String(bodyAsBytes(), StandardCharsets.UTF_8);
+    }
+
     public boolean containsHeader(String headerName) {
         if (TypeUtils.isBlank(headerName)) {
             return false;
@@ -61,7 +77,7 @@ public final class DrapiResponse implements AutoCloseable {
         return headers.containsKey(headerName);
     }
 
-    public boolean containsHeaderValue(String headerName, String value) {
+    public boolean containsHeader(String headerName, String value) {
         if (TypeUtils.isBlank(headerName) || TypeUtils.isBlank(value)) {
             return false;
         }
