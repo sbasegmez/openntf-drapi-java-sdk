@@ -3,12 +3,14 @@ package org.openntf.drapi.http;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Streaming {
 
-    InputStream createStream() throws IOException;
+    String contentType();
+    InputStream createStream();
 
     /**
      * Create a RequestBody from a byte array.
@@ -17,7 +19,7 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
      *
      * @param data the byte array containing the request body data
      */
-    record Bytes(byte[] data) implements RequestBody {
+    record Bytes(String contentType, byte[] data) implements RequestBody {
 
         @Override
         public InputStream createStream() {
@@ -42,11 +44,17 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
      *
      * @param bodySupplier the supplier that provides a new InputStream each time it is called
      */
-    record Streaming(BodySupplier bodySupplier) implements RequestBody {
+    record Streaming(String contentType, BodySupplier bodySupplier) implements RequestBody {
 
         @Override
-        public InputStream createStream() throws IOException {
-            return bodySupplier.getInputStream();
+        public InputStream createStream() {
+            try {
+                return bodySupplier.getInputStream();
+            } catch (IOException e) {
+                // Wrap the IOException in a UncheckedIOException to avoid changing the method signature.
+                // This is a common pattern when dealing with functional interfaces that don't allow checked exceptions.
+                throw new UncheckedIOException(e);
+            }
         }
     }
 
@@ -56,23 +64,24 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
     }
 
     static RequestBody ofEmpty() {
-        return new Bytes(new byte[0]);
+        // Empty request body is represented as a byte array with zero length. No content type is specified for empty bodies, but it can be set if needed.
+        return new Bytes(null, new byte[0]);
     }
 
-    static RequestBody ofBytes(byte[] data) {
-        return new Bytes(data);
+    static RequestBody ofBytes(String contentType, byte[] data) {
+        return new Bytes(contentType, data);
     }
 
-    static RequestBody ofStreaming(BodySupplier bodySupplier) {
-        return new Streaming(bodySupplier);
+    static RequestBody ofStreaming(String contentType, BodySupplier bodySupplier) {
+        return new Streaming(contentType, bodySupplier);
     }
 
-    static RequestBody ofString(String data) {
-        return new Bytes(data.getBytes(StandardCharsets.UTF_8));
+    static RequestBody ofString(String contentType, String data) {
+        return new Bytes(contentType, data.getBytes(StandardCharsets.UTF_8));
     }
 
-    static RequestBody ofString(String data, Charset charset) {
-        return new Bytes(data.getBytes(charset));
+    static RequestBody ofString(String contentType, String data, Charset charset) {
+        return new Bytes(contentType, data.getBytes(charset));
     }
 
 }
