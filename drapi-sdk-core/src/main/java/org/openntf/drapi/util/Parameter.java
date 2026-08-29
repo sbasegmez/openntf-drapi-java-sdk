@@ -8,8 +8,4 @@ package org.openntf.drapi.util;
  */
 public record Parameter(String key, String value) {
 
-    static Parameter of(String key, String value) {
-        return new Parameter(key, value);
-    }
-
 }

@@ -5,21 +5,31 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collection;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 
 class TypeUtilsTest {
 
     @Test
-    void isEmpty() {
+    @DisplayName("Test isEmpty and isNotEmpty methods")
+    void isEmptyTests() {
         assertTrue(TypeUtils.isEmpty(""));
-        assertTrue(TypeUtils.isEmpty((Object) null));
         assertFalse(TypeUtils.isEmpty(" "));
         assertFalse(TypeUtils.isEmpty("a"));
+
+        assertTrue(TypeUtils.isEmpty((Object) null));
+
+        // Collections
+        assertTrue(TypeUtils.isEmpty(List.of()));
+        assertFalse(TypeUtils.isEmpty(List.of("a")));
     }
 
     @Test
-    void isBlank() {
+    @DisplayName("Test isBlank method")
+    void isBlankTests() {
         assertTrue(TypeUtils.isBlank(""));
         assertTrue(TypeUtils.isBlank(null));
         assertTrue(TypeUtils.isBlank(" "));
@@ -27,6 +37,7 @@ class TypeUtilsTest {
     }
 
     @Test
+    @DisplayName("Test isNumeric method")
     void isNumeric() {
         assertTrue(TypeUtils.isNumeric("123"));
         assertTrue(TypeUtils.isNumeric(" 123"));

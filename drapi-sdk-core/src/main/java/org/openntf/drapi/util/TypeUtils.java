@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 public class TypeUtils {
 
     private TypeUtils() {
-        throw new IllegalStateException("Utility class");
     }
 
     /**
@@ -27,7 +26,8 @@ public class TypeUtils {
 
     /**
      * Check if a string is not null and not empty.
-      * @param value the string to check
+     *
+     * @param value the string to check
      * @return true if the string is not null and not empty
      */
     public static boolean isNotEmpty(String value) {
@@ -106,7 +106,7 @@ public class TypeUtils {
     /**
      * Require that a string is not null and not empty.
      *
-     * @param value the string to check
+     * @param value   the string to check
      * @param message the exception message to use if the check fails
      * @return the string if it is not null and not empty
      * @throws IllegalArgumentException if the string is null or empty
@@ -121,7 +121,7 @@ public class TypeUtils {
     /**
      * Require that a string is not null and not blank.
      *
-     * @param value the string to check
+     * @param value   the string to check
      * @param message the exception message to use if the check fails
      * @return the string if it is not null and not blank
      * @throws IllegalArgumentException if the string is null or blank
@@ -147,7 +147,7 @@ public class TypeUtils {
      * Check if a string is equal to any of the provided strings.
      *
      * @param strToFind the string to find
-     * @param strArgs the strings to check against
+     * @param strArgs   the strings to check against
      * @return true if the string is equal to any of the provided strings
      */
     public static boolean equalsOneOf(String strToFind, String... strArgs) {
@@ -191,9 +191,9 @@ public class TypeUtils {
     /**
      * Return the default value if the provided value is empty.
      *
-     * @param value the value to check
+     * @param value        the value to check
      * @param defaultValue the default value to return if the value is empty
-     * @param <T> the type of the value
+     * @param <T>          the type of the value
      * @return the value if it is not empty, otherwise the default value
      */
     public static <T> T defaultIfEmpty(T value, T defaultValue) {
@@ -203,9 +203,9 @@ public class TypeUtils {
     /**
      * Return the default value from the supplier if the provided value is empty.
      *
-     * @param value the value to check
+     * @param value                the value to check
      * @param defaultValueSupplier the supplier of the default value to return if the value is empty
-     * @param <T> the type of the value
+     * @param <T>                  the type of the value
      * @return the value if it is not empty, otherwise the default value from the supplier
      */
     public static <T> T defaultIfEmpty(T value, Supplier<T> defaultValueSupplier) {
@@ -213,8 +213,8 @@ public class TypeUtils {
     }
 
     /**
-     * Returns an optional containing the first non-empty string from the provided values. If all values are empty,
-     * the optional will be empty.
+     * Returns an optional containing the first non-empty string from the provided values. If all values are empty, the optional will be
+     * empty.
      *
      * @param values the strings to check
      * @return an optional containing the first non-empty string, or an empty optional if all are empty
@@ -232,7 +232,7 @@ public class TypeUtils {
     /**
      * Return the default value if the provided value is blank.
      *
-     * @param value the value to check
+     * @param value        the value to check
      * @param defaultValue the default value to return if the value is blank
      * @return the value if it is not blank, otherwise the default value
      */
@@ -243,7 +243,7 @@ public class TypeUtils {
     /**
      * Return the default value from the supplier if the provided value is blank.
      *
-     * @param value the value to check
+     * @param value                the value to check
      * @param defaultValueSupplier the supplier of the default value to return if the value is blank
      * @return the value if it is not blank, otherwise the default value from the supplier
      */
@@ -252,39 +252,22 @@ public class TypeUtils {
     }
 
     /**
-     * Null-safe toString(). This also makes sure object arrays are correctly converted to a string.
-     *
-     * @param obj object to convert
-     * @return string representation of the object using toString() or null if the object is null
-     */
-    public static String toString(Object obj) {
-        if (obj == null) {
-            return null;
-        }
-
-        if (obj instanceof Object[]) {
-            return Arrays.toString((Object[]) obj);
-        }
-
-        return obj.toString();
-    }
-
-    /**
      * Check if a string starts with a given prefix, ignoring case.
-     * @param key the string to check.
+     *
+     * @param key    the string to check.
      * @param prefix the prefix to check for.
      * @return true if the string starts with the prefix, ignoring case; false otherwise
      */
     public static boolean startsWithIgnoreCase(String key, String prefix) {
-        if(null == key) {
+        if (null == key) {
             return null == prefix;
         }
 
-        if(key.isEmpty()) {
+        if (key.isEmpty()) {
             return prefix.isEmpty();
         }
 
-        if(prefix == null) {
+        if (prefix == null) {
             return false;
         }
 
