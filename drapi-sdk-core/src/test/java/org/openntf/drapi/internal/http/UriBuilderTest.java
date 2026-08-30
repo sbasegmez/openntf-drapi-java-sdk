@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 class UriBuilderTest {
 
-
     /**
      * Convenience methods to build a URI
      */

@@ -3,37 +3,32 @@ package org.openntf.drapi.internal.http;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import org.openntf.drapi.util.Parameter;
 import org.openntf.drapi.util.TypeUtils;
 
 public class UriBuilder {
 
-    private final StringBuilder stringBuilder;
+    private final String baseUrl;
+    private final ApiPath apiPath;
     private final StringBuilder queryString;
 
-    private UriBuilder(String baseUrl) {
-        this.stringBuilder = new StringBuilder(validate(baseUrl));
+    private UriBuilder(String baseUrl, String startPath) {
+        this.baseUrl = validate(baseUrl);
+        this.apiPath = ApiPath.of(startPath);
         this.queryString = new StringBuilder();
     }
 
     public static UriBuilder startWith(URI base) {
-        return new UriBuilder(base.toString());
+        return new UriBuilder(base.toString(), null);
     }
 
-    public static UriBuilder startWith(String base) {
-        return new UriBuilder(base);
+    public static UriBuilder startWith(String baseUrl) {
+        return new UriBuilder(baseUrl, null);
     }
 
     public UriBuilder appendPath(String path) {
-        if(TypeUtils.isNotBlank(path)) {
-            Arrays.stream(path.split("/")).forEach(segment -> {
-                if (TypeUtils.isNotBlank(segment)) {
-                    this.stringBuilder.append("/").append(normalizeAndEncodePath(segment));
-                }
-            });
-        }
+        this.apiPath.append(path);
         return this;
     }
 
@@ -58,7 +53,7 @@ public class UriBuilder {
     }
 
     public URI build() {
-        return URI.create(this.stringBuilder.toString() + (queryString.isEmpty() ? "" : "?" + queryString.toString()));
+        return URI.create(this.baseUrl + this.apiPath.toString() + (queryString.isEmpty() ? "" : "?" + queryString));
     }
 
     private static String validate(String baseUrl) {
@@ -106,16 +101,7 @@ public class UriBuilder {
         return url;
     }
 
-    private static String normalizeAndEncodePath(String path) {
-        String trimmed = path.trim();
-
-        int start = trimmed.startsWith("/") ? 1 : 0;
-        int end = trimmed.endsWith("/") ? trimmed.length() - 1 : trimmed.length();
-
-        return urlEncode(trimmed.substring(start, end).trim());
-    }
-
-    private static String urlEncode(String value) {
+    static String urlEncode(String value) {
         // We'll go with form-encoding for now, since DRAPI doesn't seem to have much use of this.
         // Most importantly, this will encode spaces as '+' instead of '%20'. It should be fine for DRAPI.
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
