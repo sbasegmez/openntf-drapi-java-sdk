@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openntf.drapi.http.RequestBody.Bytes;
+import org.openntf.drapi.internal.http.ApiPath;
 
 class DrapiRequestTest {
 
@@ -107,7 +108,8 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Building a request with null method or path should throw an exception")
     void testBuildingRequestNullInputs() {
-        assertThrows(NullPointerException.class, () -> DrapiRequest.create(HttpMethod.GET, null));
+        assertThrows(NullPointerException.class, () -> DrapiRequest.create(HttpMethod.GET, (String) null));
+        assertThrows(NullPointerException.class, () -> DrapiRequest.create(HttpMethod.GET, (ApiPath) null));
         assertThrows(NullPointerException.class, () -> DrapiRequest.create(null, "/test"));
     }
 
@@ -136,5 +138,23 @@ class DrapiRequestTest {
         assertTrue(request.headers().get("Accept").contains("application/xml"), "'Accept' header should contain 'application/xml'");
     }
 
-}
+    @Test
+    @DisplayName("Test paths working with string or ApiPath")
+    void testPathsWithStringOrApiPath() {
+        assertEquals("/test", DrapiRequest.get("/test").path(), "Path should match the string input");
+        assertEquals("/test", DrapiRequest.get(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
 
+        assertEquals("/test", DrapiRequest.patch("/test").path(), "Path should match the string input");
+        assertEquals("/test", DrapiRequest.patch(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
+
+        assertEquals("/test", DrapiRequest.post("/test").path(), "Path should match the string input");
+        assertEquals("/test", DrapiRequest.post(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
+
+        assertEquals("/test", DrapiRequest.put("/test").path(), "Path should match the string input");
+        assertEquals("/test", DrapiRequest.put(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
+
+        assertEquals("/test", DrapiRequest.delete("/test").path(), "Path should match the string input");
+        assertEquals("/test", DrapiRequest.delete(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
+    }
+
+}

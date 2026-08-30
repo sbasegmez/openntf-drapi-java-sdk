@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import org.openntf.drapi.internal.http.ApiPath;
 import org.openntf.drapi.util.Parameter;
 
 public final class DrapiRequest {
@@ -38,24 +39,48 @@ public final class DrapiRequest {
         return new DrapiRequest(method, path);
     }
 
+    public static DrapiRequest create(HttpMethod method, ApiPath apiPath) {
+        return new DrapiRequest(method, apiPath.toString());
+    }
+
     public static DrapiRequest get(String path) {
         return new DrapiRequest(HttpMethod.GET, path);
+    }
+
+    public static DrapiRequest get(ApiPath apiPath) {
+        return new DrapiRequest(HttpMethod.GET, apiPath.toString());
     }
 
     public static DrapiRequest patch(String path) {
         return new DrapiRequest(HttpMethod.PATCH, path);
     }
 
+    public static DrapiRequest patch(ApiPath apiPath) {
+        return new DrapiRequest(HttpMethod.PATCH, apiPath.toString());
+    }
+
     public static DrapiRequest post(String path) {
         return new DrapiRequest(HttpMethod.POST, path);
+    }
+
+    public static DrapiRequest post(ApiPath apiPath) {
+        return new DrapiRequest(HttpMethod.POST, apiPath.toString());
     }
 
     public static DrapiRequest put(String path) {
         return new DrapiRequest(HttpMethod.PUT, path);
     }
 
+    public static DrapiRequest put(ApiPath apiPath) {
+        return new DrapiRequest(HttpMethod.PUT, apiPath.toString());
+    }
+
     public static DrapiRequest delete(String path) {
         return new DrapiRequest(HttpMethod.DELETE, path);
+    }
+
+    public static DrapiRequest delete(ApiPath apiPath) {
+        return new DrapiRequest(HttpMethod.DELETE, apiPath.toString());
     }
 
     public RequestBody body() {
