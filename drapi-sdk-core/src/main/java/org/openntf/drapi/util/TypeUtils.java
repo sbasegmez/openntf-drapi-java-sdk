@@ -78,7 +78,7 @@ public class TypeUtils {
     }
 
     /**
-     * Check if an object is null or empty. Supports String and Collection types.
+     * Check if an object is null or empty. Supports String, Collection, and Object[] types.
      *
      * @param obj the object to check
      * @return true if the object is null or empty
@@ -88,6 +88,8 @@ public class TypeUtils {
             return isEmpty(str);
         } else if (obj instanceof Collection<?> col) {
             return isEmpty(col);
+        } else if (obj instanceof Object[] array) {
+            return array.length == 0;
         } else {
             return obj == null;
         }

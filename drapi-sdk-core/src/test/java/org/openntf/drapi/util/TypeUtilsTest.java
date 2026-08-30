@@ -25,6 +25,10 @@ class TypeUtilsTest {
         // Collections
         assertTrue(TypeUtils.isEmpty(List.of()));
         assertFalse(TypeUtils.isEmpty(List.of("a")));
+
+        // Arrays
+        assertTrue(TypeUtils.isEmpty(new String[]{}));
+        assertFalse(TypeUtils.isEmpty(new String[]{"a"}));
     }
 
     @Test

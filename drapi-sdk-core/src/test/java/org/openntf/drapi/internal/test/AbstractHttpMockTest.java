@@ -63,7 +63,7 @@ public class AbstractHttpMockTest {
     }
 
     protected DrapiConfig config() {
-        if(config == null) {
+        if (config == null) {
             throw new IllegalStateException("Config has not been built yet. Call buildConfig() before using config().");
         }
         return config;
@@ -95,9 +95,16 @@ public class AbstractHttpMockTest {
     }
 
     protected DrapiConfig buildConfig(Consumer<DrapiConfigBuilder> configCustomizer) {
+        return buildConfig(configCustomizer, true);
+    }
+
+    protected DrapiConfig buildConfig(Consumer<DrapiConfigBuilder> configCustomizer, boolean addTokenMethod) {
         var builder = DrapiConfig.builder()
-                                 .baseUrl(URI.create("http://127.0.0.1:" + server.getAddress().getPort()).toString())
-                                 .token("dummy-token");
+                                 .baseUrl(URI.create("http://127.0.0.1:" + server.getAddress().getPort()).toString());
+
+        if (addTokenMethod) {
+            builder.token("dummy-token");
+        }
 
         if (configCustomizer != null) {
             configCustomizer.accept(builder);
