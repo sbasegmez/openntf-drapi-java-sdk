@@ -140,7 +140,7 @@ public class AbstractHttpMockTest {
     }
 
     protected void respondWith(Consumer<HttpExchange> customHandler) {
-        server.createContext("/", exchange -> {
+        server.createContext(pathToListen(), exchange -> {
             mirrorRequest.set(createMirrorRequest(exchange));
             requestCount.incrementAndGet();
 
@@ -150,6 +150,10 @@ public class AbstractHttpMockTest {
 
             exchange.close();
         });
+    }
+
+    protected String pathToListen() {
+        return "/";
     }
 
     protected static int findUnusedPort() {
