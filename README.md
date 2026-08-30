@@ -33,6 +33,7 @@ DrapiDocument contact = client.scope("demo")
 ## Documentation
 
 - [Configuration](docs/configuration.md)
+- [Development](docs/development.md)
 
 
 ## JSON Serialization
