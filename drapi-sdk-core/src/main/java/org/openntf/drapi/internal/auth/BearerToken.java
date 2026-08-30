@@ -7,8 +7,9 @@ import org.openntf.drapi.util.TypeUtils;
 
 /**
  * A bearer token together with what the SDK knows about its claims.
- * @param bearer
- * @param claims
+ *
+ * @param bearer the bearer token string
+ * @param claims the claims associated with the token
  */
 public record BearerToken(String bearer, Map<String, Object> claims) {
 
@@ -34,6 +35,10 @@ public record BearerToken(String bearer, Map<String, Object> claims) {
      * <p>
      * For expiry, we'll use the "exp" claim if present. RFC 7519 defines "exp" as optional. So, absent other rules, a token without
      * "exp" has no JWT-defined expiration time and could remain acceptable indefinitely.
+     * <p>
+     * Keep in mind, though, that this "exp" rule is only valid for JWTs. Other token types may have different rules, and the server may
+     * have its own rules that are not reflected in the token. So isExpired() is a best-effort check, not a guarantee that the token is
+     * still valid.
      *
      * @param skew how far ahead of the real expiry to renew, covering clock drift and the request's own flight time
      * @return whether the token needs replacing
