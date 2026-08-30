@@ -1,7 +1,7 @@
 package org.openntf.drapi.internal.auth;
 
+import java.util.Map;
 import org.openntf.drapi.DrapiConfig;
-import org.openntf.drapi.exception.AuthenticationException;
 
 public final class TokenAuthenticationProvider extends AuthenticationProviderBase {
 
@@ -12,13 +12,14 @@ public final class TokenAuthenticationProvider extends AuthenticationProviderBas
     /**
      * Acquires a token for the given context.
      *
-     * @param context the client's base URL, HTTP client and codec
+     * @param toolkit the toolkit providing access to the context and configuration
      * @return the token, never {@code null}
-     * @throws AuthenticationException if a token could not be obtained
+     * @throws org.openntf.drapi.exception.AuthenticationException if a token could not be obtained
      */
     @Override
-    public BearerToken acquireToken(Object context) {
-        return null;
+    public BearerToken acquireToken(AuthenticationToolkit toolkit) {
+        // Token authentication provider simply returns the token from the config, as it is assumed to be a fixed, externally-obtained token.
+        return new BearerToken(config.token(), Map.of());
     }
 
     /**
@@ -31,6 +32,7 @@ public final class TokenAuthenticationProvider extends AuthenticationProviderBas
      */
     @Override
     public boolean supportsRefresh() {
+        // Token authentication provider does not support refresh, as it is assumed to be a fixed, externally-obtained token.
         return false;
     }
 

@@ -7,17 +7,18 @@ public final class OAuthAuthenticationProvider extends AuthenticationProviderBas
 
     public OAuthAuthenticationProvider(DrapiConfig config) {
         super(config);
+        throw new UnsupportedOperationException("OAuth authentication is not yet implemented.");
     }
 
     /**
      * Acquires a token for the given context.
      *
-     * @param context the client's base URL, HTTP client and codec
+     * @param toolkit the toolkit providing context for token acquisition
      * @return the token, never {@code null}
      * @throws AuthenticationException if a token could not be obtained
      */
     @Override
-    public BearerToken acquireToken(Object context) {
+    public BearerToken acquireToken(AuthenticationToolkit toolkit) {
         return null;
     }
 
