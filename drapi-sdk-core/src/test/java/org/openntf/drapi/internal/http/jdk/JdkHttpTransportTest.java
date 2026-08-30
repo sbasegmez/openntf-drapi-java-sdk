@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.openntf.drapi.internal.http.HttpHeaderNames.USER_AGENT;
+import static org.openntf.drapi.internal.http.HttpHeaderConstants.USER_AGENT;
 
 import java.net.URI;
 import java.util.List;
