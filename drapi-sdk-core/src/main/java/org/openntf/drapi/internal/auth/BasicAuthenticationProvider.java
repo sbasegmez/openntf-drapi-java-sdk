@@ -10,6 +10,7 @@ import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.RequestBody;
 import org.openntf.drapi.internal.http.ApiPath;
+import org.openntf.drapi.json.JsonBinding;
 
 public final class BasicAuthenticationProvider extends AuthenticationProviderBase {
 
@@ -22,12 +23,12 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
     @Override
     public CompletableFuture<BearerToken> acquireToken(AuthenticationToolkit toolkit) {
         DrapiRequest request = DrapiRequest.post(AUTH_PATH)
-                                           .body(RequestBody.ofString(APPLICATION_JSON, jsonBodyForBasicAuth(toolkit)));
+                                           .body(RequestBody.ofString(APPLICATION_JSON, jsonBodyForBasicAuth()));
 
         return toolkit.httpTransport().submitAsync(request)
                       .thenCompose(response -> {
                           if (response.isSuccess()) {
-                              return CompletableFuture.completedFuture(parseBearerTokenFromResponse(toolkit, response));
+                              return CompletableFuture.completedFuture(parseBearerTokenFromResponse(response));
                           } else if (response.isAuthenticationFailure()) {
                                 // TODO Handle authentication failure more gracefully, possibly by throwing a custom exception
                                 return CompletableFuture.failedFuture(new AuthenticationException(
@@ -40,8 +41,8 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
                       });
     }
 
-    private BearerToken parseBearerTokenFromResponse(AuthenticationToolkit toolkit, DrapiResponse response) {
-        var authResponse = toolkit.jsonBinding().fromJson(response.bodyAsString(), AuthResponse.class);
+    private BearerToken parseBearerTokenFromResponse(DrapiResponse response) {
+        var authResponse = JsonBinding.get().fromJson(response.bodyAsString(), AuthResponse.class);
 
         if(authResponse == null || authResponse.bearer() == null) {
             // TODO Handle error response more gracefully, possibly by throwing a custom exception
@@ -52,8 +53,8 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
     }
 
     // Construct the JSON body for basic authentication
-    private String jsonBodyForBasicAuth(AuthenticationToolkit toolkit) {
-        return toolkit.jsonBinding().toJson(new AuthRequest(config().username(), config().password()));
+    private String jsonBodyForBasicAuth() {
+        return JsonBinding.get().toJson(new AuthRequest(config().username(), config().password()));
     }
 
     @Override

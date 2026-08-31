@@ -2,7 +2,6 @@ package org.openntf.drapi.internal.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,15 +11,13 @@ import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.internal.auth.AuthenticationProvider;
 import org.openntf.drapi.internal.auth.AuthenticationToolkit;
 import org.openntf.drapi.internal.test.AbstractHttpMockTest;
-import org.openntf.drapi.json.JsonBinding;
 
 class AuthenticatingHttpTransportTest extends AbstractHttpMockTest {
 
     protected HttpTransport createTransport(DrapiConfig config) {
-        JsonBinding jsonBinding = mock(JsonBinding.class);
         HttpTransport bareTransport = HttpTransport.defaultTransport(config, null);
 
-        AuthenticationToolkit toolkit = new AuthenticationToolkit(bareTransport, jsonBinding);
+        AuthenticationToolkit toolkit = new AuthenticationToolkit(bareTransport);
         AuthenticationProvider authProvider = AuthenticationProvider.create(config);
 
         return new AuthenticatingHttpTransport(toolkit, authProvider);

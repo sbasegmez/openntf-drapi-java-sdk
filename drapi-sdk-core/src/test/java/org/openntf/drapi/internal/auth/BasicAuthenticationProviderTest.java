@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,12 +25,23 @@ import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.internal.DrapiConfigBuilder;
 import org.openntf.drapi.internal.test.AbstractHttpMockTest;
 import org.openntf.drapi.json.JsonBinding;
+import org.openntf.drapi.json.JsonBindingTestSupport;
 
 @ExtendWith(MockitoExtension.class)
 class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
 
     @Mock
     JsonBinding jsonBinding;
+
+    @BeforeEach
+    public void setUp() {
+        JsonBindingTestSupport.set(jsonBinding);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        JsonBindingTestSupport.reset();
+    }
 
     @Override
     protected String pathToListen() {
@@ -48,7 +61,7 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
 
     protected AuthenticationToolkit toolkit(DrapiConfig config) {
         HttpTransport bareTransport = HttpTransport.defaultTransport(config, null);
-        return new AuthenticationToolkit(bareTransport, jsonBinding);
+        return new AuthenticationToolkit(bareTransport);
     }
 
     protected BasicAuthenticationProvider provider(DrapiConfig config) {

@@ -21,7 +21,7 @@ class JakartaJsonBindingTest extends AbstractJsonBindingTest {
     @DisplayName("Test that the JakartaJsonBinding is detected as the default JSON binding")
     void testJsonBindingIsDetected() {
         // Ensure that the JakartaJsonBinding is detected as the default JSON binding
-        JsonBinding binding = JsonBinding.create();
+        JsonBinding binding = JsonBinding.get();
 
         assertNotNull(binding, "Default JSON binding should not be null");
         assertSame(JakartaJsonBinding.class, binding.getClass(), "Default JSON binding should be JakartaJsonBinding");

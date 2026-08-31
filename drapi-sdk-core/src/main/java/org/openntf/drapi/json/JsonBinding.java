@@ -25,11 +25,6 @@ public interface JsonBinding {
 
     void toJson(Object objectValue, OutputStream outputStream);
 
-    static JsonBinding create() {
-        return ServiceRegistry.findService(JsonBindingProvider.class)
-                              .create();
-    }
-
     default Map<String, Object> fromJson(String jsonString) {
         return fromJson(
             new ByteArrayInputStream(jsonString.getBytes(StandardCharsets.UTF_8))
@@ -48,4 +43,43 @@ public interface JsonBinding {
         toJson(objectValue, outputStream);
         return outputStream.toString(StandardCharsets.UTF_8);
     }
+
+    static JsonBinding get() {
+        return JsonBindingHolder.getInstance();
+    }
+
+    final class JsonBindingHolder {
+        // Lazy-loaded singleton instance of JsonBinding
+        private static volatile JsonBinding defaultInstance;
+
+        // This can be overridden by a test
+        private static volatile JsonBinding overriddenInstance;
+
+        static JsonBinding getInstance() {
+            if (overriddenInstance != null) {
+                return overriddenInstance;
+            }
+            if (defaultInstance == null) {
+                synchronized (JsonBindingHolder.class) {
+                    if (defaultInstance == null) {
+                        defaultInstance = ServiceRegistry.findService(JsonBindingProvider.class).create();
+                    }
+                }
+            }
+            return defaultInstance;
+        }
+
+        // package-private method to allow tests to override the JsonBinding instance
+        static void override(JsonBinding jsonBinding) {
+            overriddenInstance = jsonBinding;
+        }
+
+        // package-private method to reset the overridden instance, allowing tests to clean up after themselves
+        static void reset() {
+            overriddenInstance = null;
+        }
+
+        private JsonBindingHolder() {}
+    }
+
 }

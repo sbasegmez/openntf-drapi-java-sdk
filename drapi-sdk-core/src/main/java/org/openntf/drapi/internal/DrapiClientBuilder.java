@@ -5,26 +5,19 @@ import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiContext;
-import org.openntf.drapi.internal.auth.AuthenticationProvider;
 import org.openntf.drapi.http.HttpTransport;
-import org.openntf.drapi.json.JsonBinding;
+import org.openntf.drapi.internal.auth.AuthenticationProvider;
 
 public class DrapiClientBuilder {
     final DrapiConfig config;
 
     // Temporary fields to hold the provided components before building the DrapiContext
-    private JsonBinding jsonBinding;
     private HttpTransport httpTransport;
     private Executor httpExecutor;
     private AuthenticationProvider authenticationProvider;
 
     public DrapiClientBuilder(DrapiConfig config) {
         this.config = Objects.requireNonNull(config, "Config must not be null");
-    }
-
-    public DrapiClientBuilder jsonBinding(JsonBinding jsonBinding) {
-        this.jsonBinding = jsonBinding;
-        return this;
     }
 
     public DrapiClientBuilder httpTransport(HttpTransport httpTransport) {
@@ -39,11 +32,6 @@ public class DrapiClientBuilder {
 
     public DrapiClient build() {
 
-        if (jsonBinding == null) {
-            // Fallback to default JSON binding if not provided
-            jsonBinding = JsonBinding.create();
-        }
-
         if (httpTransport == null) {
             // Fallback to default HTTP transport if not provided
             // If HttpExecutor is not provided, it will be handled inside the relevant constructor
@@ -55,7 +43,7 @@ public class DrapiClientBuilder {
             authenticationProvider = AuthenticationProvider.create(config);
         }
 
-        DrapiContext context = new DrapiContextImpl(config, jsonBinding, httpTransport, authenticationProvider);
+        DrapiContext context = new DrapiContextImpl(config, httpTransport, authenticationProvider);
         return new DrapiClientImpl(config, context);
     }
 
