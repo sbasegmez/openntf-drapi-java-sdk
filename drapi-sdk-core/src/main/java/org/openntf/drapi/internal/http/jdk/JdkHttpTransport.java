@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.exception.HttpTransportException;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.HttpTransportBase;
@@ -54,9 +55,7 @@ public class JdkHttpTransport extends HttpTransportBase {
             return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofInputStream())
                              .thenApply(this::toDrapiResponse)
                              .exceptionally(ex -> {
-                                 // TODO Handle these exceptions in a way that makes sense for your application.
-                                 // For example, you might want to log the error or wrap it in a custom exception.
-                                 throw new RuntimeException("Request failed", ex);
+                                 throw new HttpTransportException("Connection failed", ex);
                              });
 
         } catch (Exception e) {

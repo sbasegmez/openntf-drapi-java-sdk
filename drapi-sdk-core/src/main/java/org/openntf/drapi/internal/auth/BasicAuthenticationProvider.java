@@ -6,13 +6,17 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.exception.AuthenticationException;
+import org.openntf.drapi.exception.DrapiException;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.RequestBody;
 import org.openntf.drapi.internal.http.ApiPath;
+import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.json.JsonBinding;
 
 public final class BasicAuthenticationProvider extends AuthenticationProviderBase {
+
+    private static final Log LOG = Log.getLogger(BasicAuthenticationProvider.class);
 
     private static final ApiPath AUTH_PATH = ApiPath.root("/auth");
 
@@ -22,39 +26,41 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
 
     @Override
     public CompletableFuture<BearerToken> acquireToken(AuthenticationToolkit toolkit) {
-        DrapiRequest request = DrapiRequest.post(AUTH_PATH)
-                                           .body(RequestBody.ofString(APPLICATION_JSON, jsonBodyForBasicAuth()));
+        DrapiRequest authRequest = createAuthRequest();
 
-        return toolkit.httpTransport().submitAsync(request)
-                      .thenCompose(response -> {
-                          if (response.isSuccess()) {
-                              return CompletableFuture.completedFuture(parseBearerTokenFromResponse(response));
-                          } else if (response.isAuthenticationFailure()) {
-                                // TODO Handle authentication failure more gracefully, possibly by throwing a custom exception
-                                return CompletableFuture.failedFuture(new AuthenticationException(
-                                    "Authentication failed: " + response.statusCode()));
+        return toolkit.httpTransport()
+                      .submitAsync(authRequest)
+                      .thenCompose(authResponse -> {
+                          if (authResponse.isSuccess()) {
+                              return CompletableFuture.completedFuture(parseBearerTokenFromResponse(authRequest, authResponse));
+                          } else if (authResponse.isAuthenticationFailure()) {
+                              var exception = new AuthenticationException("Authentication failed", authRequest, authResponse);
+
+                              LOG.debug("Authentication failed for user: " + config().username(), exception);
+                              return CompletableFuture.failedFuture(exception);
                           } else {
-                              // TODO Handle unexpected response more gracefully, possibly by throwing a custom exception
-                              return CompletableFuture.failedFuture(new RuntimeException(
-                                  "Unexpected response: " + response.statusCode()));
+                              var exception = new DrapiException("Unexpected response from authentication", authRequest, authResponse);
+
+                              LOG.debug("Unexpected response from authentication for user: " + config().username(), exception);
+                              return CompletableFuture.failedFuture(exception);
                           }
                       });
     }
 
-    private BearerToken parseBearerTokenFromResponse(DrapiResponse response) {
+    private DrapiRequest createAuthRequest() {
+        AuthRequest authRequest = new AuthRequest(config().username(), config().password());
+        return DrapiRequest.post(AUTH_PATH)
+                           .body(RequestBody.ofString(APPLICATION_JSON, JsonBinding.get().toJson(authRequest)));
+    }
+
+    private BearerToken parseBearerTokenFromResponse(DrapiRequest request, DrapiResponse response) {
         var authResponse = JsonBinding.get().fromJson(response.bodyAsString(), AuthResponse.class);
 
-        if(authResponse == null || authResponse.bearer() == null) {
-            // TODO Handle error response more gracefully, possibly by throwing a custom exception
-            throw new RuntimeException("Invalid authentication response: " + response.bodyAsString());
+        if (authResponse == null || authResponse.bearer() == null) {
+            throw new DrapiException("Invalid authentication response", request, response);
         }
 
         return new BearerToken(authResponse.bearer(), authResponse.claims());
-    }
-
-    // Construct the JSON body for basic authentication
-    private String jsonBodyForBasicAuth() {
-        return JsonBinding.get().toJson(new AuthRequest(config().username(), config().password()));
     }
 
     @Override
@@ -63,9 +69,11 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
     }
 
     record AuthRequest(String username, String password) {
+
     }
 
     record AuthResponse(String bearer, Map<String, Object> claims, int leeway, int expSeconds, String issueDate) {
+
     }
 
 }

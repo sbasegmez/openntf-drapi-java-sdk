@@ -101,7 +101,7 @@ public class UriBuilder {
         return url;
     }
 
-    static String urlEncode(String value) {
+    public static String urlEncode(String value) {
         // We'll go with form-encoding for now, since DRAPI doesn't seem to have much use of this.
         // Most importantly, this will encode spaces as '+' instead of '%20'. It should be fine for DRAPI.
         return URLEncoder.encode(value, StandardCharsets.UTF_8);

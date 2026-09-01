@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.exception.HttpTransportException;
 import org.openntf.drapi.internal.http.jdk.JdkHttpTransportProvider;
 import org.openntf.drapi.util.ServiceRegistry;
 
@@ -20,7 +21,7 @@ public interface HttpTransport {
 
     /**
      * Submits a DrapiRequest synchronously. This method internally calls submitAsync and waits for the result. If an exception occurs
-     * during the submission, it wraps the cause in a RuntimeException and throws it.
+     * during the submission, it wraps the cause in a HttpTransportException and throws it.
      *
      * @param request the DrapiRequest to submit
      * @return the DrapiResponse
@@ -29,11 +30,8 @@ public interface HttpTransport {
         try {
             return submitAsync(request).join();
         } catch (CompletionException e) {
-            Throwable cause = e.getCause();
-
-            // TODO : Handle specific exceptions like IOException, InterruptedException, etc., if needed.
-
-            throw new RuntimeException("Failed to submit request", cause);
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            throw new HttpTransportException("Failed to submit request", cause);
         }
     }
 

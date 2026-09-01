@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.util.TypeUtils;
 
 /**
@@ -18,6 +19,8 @@ import org.openntf.drapi.util.TypeUtils;
  */
 public final class DrapiResponse implements AutoCloseable {
 
+    private static final Log LOG = Log.getLogger(DrapiResponse.class);
+
     // The HTTP status code of the response, e.g., 200 for OK, 404 for Not Found, etc.
     private final int statusCode;
 
@@ -26,6 +29,9 @@ public final class DrapiResponse implements AutoCloseable {
 
     // The body of the response is represented as an InputStream to allow for streaming large responses without loading them entirely into memory.
     private final InputStream bodyStream;
+
+    // Cache for the body as a string to avoid multiple reads errors
+    private String bodyStringCache = null;
 
     public DrapiResponse(int statusCode, Map<String, List<String>> givenHeaders, InputStream bodyStream) {
         this.statusCode = statusCode;
@@ -67,7 +73,10 @@ public final class DrapiResponse implements AutoCloseable {
     }
 
     public String bodyAsString() {
-        return new String(bodyAsBytes(), StandardCharsets.UTF_8);
+        if (bodyStringCache == null) {
+            bodyStringCache = new String(bodyAsBytes(), StandardCharsets.UTF_8);
+        }
+        return bodyStringCache;
     }
 
     public boolean containsHeader(String headerName) {
@@ -99,8 +108,8 @@ public final class DrapiResponse implements AutoCloseable {
             try {
                 bodyStream.close();
             } catch (IOException e) {
-                // TODO : Consider logging this exception instead of throwing it
-                throw new UncheckedIOException(e);
+                // Log and swallow the exception to avoid throwing during close, which can be problematic in try-with-resources blocks.
+                LOG.warn("Failed to close response body stream", e);
             }
         }
     }

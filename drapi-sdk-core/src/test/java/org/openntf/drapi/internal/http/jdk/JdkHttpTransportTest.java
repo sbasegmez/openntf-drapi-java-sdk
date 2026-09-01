@@ -3,6 +3,7 @@ package org.openntf.drapi.internal.http.jdk;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openntf.drapi.internal.http.HttpHeaderConstants.USER_AGENT;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.exception.HttpTransportException;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.HttpMethod;
 import org.openntf.drapi.http.HttpTransport;
@@ -79,15 +81,12 @@ class JdkHttpTransportTest extends AbstractHttpMockTest {
         });
         respondWith(200, "Successful Response"); // This response will never be reached due to the unused port
 
-        try (var response = createTransport(config).submit(DrapiRequest.get("/test"))) {
-            throw new AssertionError("Expected an exception due to unresponsive server, but got a response: " + response.statusCode());
-        } catch (RuntimeException e) {
-            // We expect a RuntimeException due to the unresponsive server. The exact exception type may vary based on the underlying HTTP client implementation.
-            assertInstanceOf(RuntimeException.class, e,
-                             "Expected a RuntimeException due to unresponsive server, but got: " + e.getCause());
-
-            // TODO Revisit this after we have a more robust exception handling mechanism in place. For now, we just check that an exception was thrown.
-        }
+        assertThrows(HttpTransportException.class, () -> {
+            try (var response = createTransport(config).submit(DrapiRequest.get("/test"))) {
+                // This line should not be reached due to the unresponsive server
+                response.bodyAsString();
+            }
+        }, "Expected a HttpTransportException due to unresponsive server, but no exception was thrown.");
     }
 
 }
