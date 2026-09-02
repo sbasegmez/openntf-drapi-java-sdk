@@ -59,7 +59,7 @@
                 <executions>
                     <execution>
                         <id>check-license</id>
-                        <phase>prepare-package</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>

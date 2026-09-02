@@ -16,6 +16,10 @@
     <name>OpenNTF Java SDK for HCL Domino REST API :: Samples</name>
     <description>Sample Projects for Domino REST API Java SDK</description>
 
+    <modules>
+        <module>drapi-sdk-samples-standalone</module>
+    </modules>
+
     <properties>
     </properties>
 
