@@ -1,6 +1,5 @@
 package org.openntf.drapi.internal.auth;
 
-import java.util.concurrent.CompletableFuture;
 import org.openntf.drapi.DrapiConfig;
 
 public sealed interface AuthenticationProvider permits AuthenticationProviderBase {
@@ -8,14 +7,14 @@ public sealed interface AuthenticationProvider permits AuthenticationProviderBas
     /**
      * Acquires a token for the given context. The implementation should not cache the token; the SDK will handle caching/refreshing.
      * <p>
-     * This method is asynchronous and returns a CompletableFuture that will complete with the acquired BearerToken or an exception if
-     * the acquisition fails.
+     * This method is synchronous and returns the acquired BearerToken or throws an exception if the acquisition fails. We may consider
+     * making this method asynchronous in the future, but for now, it is synchronous to simplify the implementation and usage.
      *
      * @param toolkit the toolkit providing context for token acquisition
      * @return a CompletableFuture that will complete with the acquired BearerToken, never {@code null}
      * @throws org.openntf.drapi.exception.AuthenticationException if a token could not be obtained
      */
-    CompletableFuture<BearerToken> acquireToken(AuthenticationToolkit toolkit);
+    BearerToken acquireToken(AuthenticationToolkit toolkit);
 
     /**
      * Reports whether asking again after a 401 is worthwhile.

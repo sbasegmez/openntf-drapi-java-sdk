@@ -3,7 +3,6 @@ package org.openntf.drapi.internal.auth;
 import static org.openntf.drapi.internal.http.HttpHeaderConstants.APPLICATION_JSON;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.exception.AuthenticationException;
 import org.openntf.drapi.exception.DrapiException;
@@ -25,26 +24,30 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
     }
 
     @Override
-    public CompletableFuture<BearerToken> acquireToken(AuthenticationToolkit toolkit) {
-        DrapiRequest authRequest = createAuthRequest();
+    public BearerToken acquireToken(AuthenticationToolkit toolkit) {
+        DrapiRequest request = createAuthRequest();
 
-        return toolkit.httpTransport()
-                      .submitAsync(authRequest)
-                      .thenCompose(authResponse -> {
-                          if (authResponse.isSuccess()) {
-                              return CompletableFuture.completedFuture(parseBearerTokenFromResponse(authRequest, authResponse));
-                          } else if (authResponse.isAuthenticationFailure()) {
-                              var exception = new AuthenticationException("Authentication failed", authRequest, authResponse);
+        // Currently, the authentication process is synchronous. In the future, we may consider making this asynchronous to improve performance and scalability.
+        DrapiResponse response = toolkit.httpTransport()
+                                        .submit(request);
 
-                              LOG.debug("Authentication failed for user: " + config().username(), exception);
-                              return CompletableFuture.failedFuture(exception);
-                          } else {
-                              var exception = new DrapiException("Unexpected response from authentication", authRequest, authResponse);
+        return processTokenResponse(request, response);
+    }
 
-                              LOG.debug("Unexpected response from authentication for user: " + config().username(), exception);
-                              return CompletableFuture.failedFuture(exception);
-                          }
-                      });
+    private BearerToken processTokenResponse(DrapiRequest request, DrapiResponse response) {
+
+        // If successful, parse the bearer token from the response and return it
+        if (response.isSuccess()) {
+            return parseBearerTokenFromResponse(request, response);
+        }
+
+        if (response.isAuthenticationFailure()) {
+            LOG.debug("Authentication failed for user {}", config().username());
+            throw new AuthenticationException("Authentication failed", request, response);
+        }
+
+        LOG.debug("Unexpected response from authentication for user {}", config().username());
+        throw new DrapiException("Unexpected response from authentication", request, response);
     }
 
     private DrapiRequest createAuthRequest() {

@@ -1,6 +1,5 @@
 package org.openntf.drapi.internal.auth;
 
-import java.util.concurrent.CompletableFuture;
 import org.openntf.drapi.DrapiConfig;
 
 public final class OAuthAuthenticationProvider extends AuthenticationProviderBase {
@@ -11,7 +10,7 @@ public final class OAuthAuthenticationProvider extends AuthenticationProviderBas
     }
 
     @Override
-    public CompletableFuture<BearerToken> acquireToken(AuthenticationToolkit toolkit) {
+    public BearerToken acquireToken(AuthenticationToolkit toolkit) {
         return null;
     }
 

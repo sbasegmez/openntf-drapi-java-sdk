@@ -9,14 +9,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
-import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openntf.drapi.DrapiConfig;
@@ -26,7 +24,6 @@ import org.openntf.drapi.exception.ErrorMessage;
 import org.openntf.drapi.exception.JsonBindingException;
 import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.internal.DrapiConfigBuilder;
-import org.openntf.drapi.internal.auth.BasicAuthenticationProvider.AuthResponse;
 import org.openntf.drapi.internal.test.AbstractHttpMockTest;
 import org.openntf.drapi.json.JsonBinding;
 import org.openntf.drapi.json.JsonBindingTestSupport;
@@ -85,10 +82,8 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.fromJson(anyString(), eq(BasicAuthenticationProvider.AuthResponse.class)))
             .thenReturn(new BasicAuthenticationProvider.AuthResponse("mocked-token", Map.of("exp", 123456789), 0, 3600, null));
 
-
         // Let's get the token and assert that it matches the mocked response
-        BearerToken token = provider(config).acquireToken(toolkit(config))
-                                            .join();
+        BearerToken token = provider(config).acquireToken(toolkit(config));
 
         verify(jsonBinding).toJson(new BasicAuthenticationProvider.AuthRequest("some-user", "some-password"));
         assertEquals("/api/v1/auth", mirrorRequest.get().path(), "The request path should match the expected auth path");
@@ -109,10 +104,7 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.fromJson(anyString(), eq(BasicAuthenticationProvider.AuthResponse.class)))
             .thenReturn(new BasicAuthenticationProvider.AuthResponse(null, null, 0, 0, null));
 
-        CompletionException exception = assertThrowsExactly(CompletionException.class, () -> provider(config).acquireToken(toolkit(config)).join());
-        assertEquals(DrapiException.class, exception.getCause().getClass(), "The cause of the exception should be an RuntimeException");
-
-        DrapiException drapiException = (DrapiException) exception.getCause();
+        DrapiException drapiException = assertThrowsExactly(DrapiException.class, () -> provider(config).acquireToken(toolkit(config)));
         assertEquals("Invalid authentication response", drapiException.getMessage(), "The exception message should indicate an invalid authentication response");
     }
 
@@ -129,8 +121,8 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.fromJson(anyString(), eq(BasicAuthenticationProvider.AuthResponse.class)))
             .thenThrow(new JsonBindingException(("Invalid JSON")));
 
-        CompletionException exception = assertThrowsExactly(CompletionException.class, () -> provider(config).acquireToken(toolkit(config)).join());
-        assertEquals(JsonBindingException.class, exception.getCause().getClass(), "The cause of the exception should be a JsonBindingException");
+        assertThrowsExactly(JsonBindingException.class, () -> provider(config).acquireToken(toolkit(config)),
+                            "A JsonBindingException should be thrown when the JSON response is invalid");
     }
 
     @Test
@@ -147,8 +139,8 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.fromJson(anyString(), eq(ErrorMessage.class)))
             .thenThrow(new JsonBindingException(("Invalid Json")));
 
-        CompletionException exception = assertThrowsExactly(CompletionException.class, () -> provider(config).acquireToken(toolkit(config)).join());
-        assertEquals(DrapiException.class, exception.getCause().getClass(), "The cause of the exception should be a DrapiException");
+        assertThrowsExactly(DrapiException.class, () -> provider(config).acquireToken(toolkit(config)),
+                            "A DrapiException should be thrown when the server returns an invalid HTML response");
     }
 
     @Test
@@ -165,8 +157,8 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.fromJson(anyString(), eq(ErrorMessage.class)))
             .thenThrow(new JsonBindingException(("Invalid Json")));
 
-        CompletionException exception = assertThrowsExactly(CompletionException.class, () -> provider(config).acquireToken(toolkit(config)).join());
-        assertEquals(AuthenticationException.class, exception.getCause().getClass(), "The cause of the exception should be a AuthenticationException");
+        assertThrowsExactly(AuthenticationException.class, () -> provider(config).acquireToken(toolkit(config)),
+                            "An AuthenticationException should be thrown when the server returns an invalid HTML response");
     }
 
     @Test
@@ -181,12 +173,11 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.fromJson(anyString(), eq(ErrorMessage.class)))
             .thenReturn(new ErrorMessage(401, "Invalid credentials or account locked", null, 900));
 
-        CompletionException exception = assertThrowsExactly(CompletionException.class, () -> provider(config).acquireToken(toolkit(config)).join());
-        assertEquals(AuthenticationException.class, exception.getCause().getClass(), "The cause of the exception should be an AuthenticationException");
+        var exception = assertThrowsExactly(AuthenticationException.class, () -> provider(config).acquireToken(toolkit(config)),
+                            "An AuthenticationException should be thrown when the server returns a 401 response with invalid credentials");
 
-        AuthenticationException authException = (AuthenticationException) exception.getCause();
-        assertEquals("Authentication failed [Invalid credentials or account locked]", authException.getMessage(), "The exception message should indicate authentication failure");
-        assertEquals(401, authException.getStatusCode(), "The response status code should be 401 for authentication failure");
+        assertEquals("Authentication failed [Invalid credentials or account locked]", exception.getMessage(), "The exception message should indicate authentication failure");
+        assertEquals(401, exception.getStatusCode(), "The response status code should be 401 for authentication failure");
     }
 
 }
