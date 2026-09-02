@@ -11,7 +11,6 @@
     </parent>
 
     <artifactId>drapi-sdk-test</artifactId>
-    <packaging>pom</packaging>
 
     <name>OpenNTF Java SDK for HCL Domino REST API :: Testing</name>
     <description>Integration Test Project for Domino REST API Java SDK</description>
@@ -19,8 +18,41 @@
     <properties>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.openntf.drapi</groupId>
+            <artifactId>drapi-sdk-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.openntf.drapi</groupId>
+            <artifactId>drapi-sdk-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <environmentVariables>
+                        <!-- Test environment variables for Integration Tests -->
+                        <DRAPI_BASEURL>http://localhost:8089</DRAPI_BASEURL>
+                        <DRAPI_TOKEN>some-token-value</DRAPI_TOKEN>
+                    </environmentVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
