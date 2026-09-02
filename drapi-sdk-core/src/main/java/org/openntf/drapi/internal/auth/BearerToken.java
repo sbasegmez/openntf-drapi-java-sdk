@@ -13,6 +13,8 @@ import org.openntf.drapi.util.TypeUtils;
  */
 public record BearerToken(String bearer, Map<String, Object> claims) {
 
+    private static final int DEFAULT_EXPIRY_SKEW = 30; // seconds
+
     public BearerToken {
         TypeUtils.requireNonEmpty(bearer, "bearer must not be null or empty");
         claims = claims == null ? Map.of() : Map.copyOf(claims);
@@ -27,7 +29,7 @@ public record BearerToken(String bearer, Map<String, Object> claims) {
      * @return whether the token needs replacing
      */
     public boolean isExpired() {
-        return isExpired(0);
+        return isExpired(DEFAULT_EXPIRY_SKEW);
     }
 
     /**
