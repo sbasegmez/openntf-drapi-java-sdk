@@ -1,5 +1,6 @@
 package org.openntf.drapi.internal.test;
 
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class AbstractHttpMockTest {
     protected HttpServer server;
     protected ExecutorService serverPool;
     private DrapiConfig config;
+    private HttpContext currentContext;
 
     // AtomicReference to hold the mirrored request for assertions in tests
     protected final AtomicReference<DrapiRequest> mirrorRequest = new AtomicReference<>();
@@ -69,31 +71,6 @@ public class AbstractHttpMockTest {
         return config;
     }
 
-    protected DrapiRequest createMirrorRequest(HttpExchange exchange) throws IOException {
-        var request = DrapiRequest.create(HttpMethod.of(exchange.getRequestMethod()), exchange.getRequestURI().getPath())
-                                  .headers(exchange.getRequestHeaders())
-                                  .body(RequestBody.ofBytes(exchange.getRequestHeaders().getFirst("Content-Type"),
-                                                            exchange.getRequestBody().readAllBytes()));
-
-        parseQueryParams(request, exchange.getRequestURI());
-
-        return request;
-    }
-
-    // Untested testing function...
-    protected void parseQueryParams(DrapiRequest request, URI uri) {
-        String query = uri.getRawQuery();
-        if (query != null && !query.isEmpty()) {
-            Arrays.stream(query.split("&"))
-                  .map(pair -> pair.split("=", 2))
-                  .forEach(keyValue -> {
-                      String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
-                      String value = keyValue.length > 1 ? URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8) : "";
-                      request.queryParam(key, value);
-                  });
-        }
-    }
-
     protected DrapiConfig buildConfig(Consumer<DrapiConfigBuilder> configCustomizer) {
         return buildConfig(configCustomizer, true);
     }
@@ -115,7 +92,7 @@ public class AbstractHttpMockTest {
     }
 
     // This method is a placeholder to set the next response for the mirror server.
-    // Should be called once per test to set the expected response for the next request.
+    // Can be called multiple times per test to set the expected response for the next request.
     protected void respondWith(int statusCode, String body) {
         respondWith(statusCode, body, null);
     }
@@ -123,7 +100,7 @@ public class AbstractHttpMockTest {
     protected void respondWith(int statusCode, String body, Map<String, List<String>> headers) {
         respondWith(httpExchange -> {
             try {
-                mirrorRequest.set(createMirrorRequest(httpExchange));
+                mirrorRequest.set(TestUtils.createMirrorRequest(httpExchange));
 
                 if (headers != null) {
                     httpExchange.getResponseHeaders().putAll(headers);
@@ -140,8 +117,14 @@ public class AbstractHttpMockTest {
     }
 
     protected void respondWith(Consumer<HttpExchange> customHandler) {
-        server.createContext(pathToListen(), exchange -> {
-            mirrorRequest.set(createMirrorRequest(exchange));
+        // Remove any existing context to avoid conflicts
+        if (currentContext != null) {
+            server.removeContext(currentContext);
+        }
+
+        // Add a new context with the custom handler
+        currentContext = server.createContext(pathToListen(), exchange -> {
+            mirrorRequest.set(TestUtils.createMirrorRequest(exchange));
             requestCount.incrementAndGet();
 
             if (customHandler != null) {
