@@ -17,7 +17,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.openntf.drapi.internal.test.ConcurrentUtils;
+import org.openntf.drapi.internal.test.TestUtils;
 
 class TokenCacheTest {
 
@@ -183,7 +183,7 @@ class TokenCacheTest {
             acquiredTokens.add(token);
         };
 
-        ConcurrentUtils.runMultipleThreadsAtTheSameTime(10, task);
+        TestUtils.runMultipleThreadsAtTheSameTime(10, task);
 
         assertEquals(1, acquiredTokens.size(), "All threads should have received the same token instance.");
         assertEquals(1, tokenCounter.get(), "The token supplier should have been called only once in concurrent access.");

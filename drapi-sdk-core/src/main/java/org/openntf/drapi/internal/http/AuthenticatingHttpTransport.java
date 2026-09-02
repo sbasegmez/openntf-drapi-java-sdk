@@ -2,13 +2,14 @@ package org.openntf.drapi.internal.http;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.internal.auth.AuthenticationProvider;
 import org.openntf.drapi.internal.auth.AuthenticationToolkit;
 import org.openntf.drapi.internal.auth.BearerToken;
+import org.openntf.drapi.internal.auth.TokenCache;
+import org.openntf.drapi.internal.log.Log;
 
 /**
  * A wrapper around an HttpTransport that adds authentication capabilities. This class is intended to be used internally by the SDK to
@@ -29,19 +30,28 @@ import org.openntf.drapi.internal.auth.BearerToken;
  */
 public class AuthenticatingHttpTransport implements HttpTransport {
 
+    private static final Log LOG = Log.getLogger(AuthenticatingHttpTransport.class);
+
+    private final TokenCache tokenCache;
+
     private final AuthenticationToolkit authenticationToolkit;
-    private final HttpTransport delegate;
     private final AuthenticationProvider authenticationProvider;
 
-    // We keep track of the current token acquisition process using an AtomicReference to a CompletableFuture.
-    // This allows us to handle concurrent requests that may require a token refresh without blocking the main thread.
-    // JS developers in the room will smile at this...
-    private final AtomicReference<CompletableFuture<BearerToken>> atomicTokenPromise = new AtomicReference<>();
-
     public AuthenticatingHttpTransport(AuthenticationToolkit authenticationToolkit, AuthenticationProvider authenticationProvider) {
+        this.tokenCache = new TokenCache(this::acquireToken);
         this.authenticationToolkit = Objects.requireNonNull(authenticationToolkit);
-        this.delegate = authenticationToolkit.httpTransport();
         this.authenticationProvider = Objects.requireNonNull(authenticationProvider);
+    }
+
+    /**
+     * This is the functional reference to the TokenCache's token acquisition method. It will be called by the TokenCache when it needs
+     * to acquire a new token.
+     *
+     * @return a new BearerToken
+     */
+    private BearerToken acquireToken() {
+        LOG.trace("Acquiring new token using {}", authenticationProvider.getClass().getSimpleName());
+        return authenticationProvider.acquireToken(authenticationToolkit);
     }
 
 
@@ -59,57 +69,43 @@ public class AuthenticatingHttpTransport implements HttpTransport {
 
     // We need this method with retryIfNeeded parameter to avoid infinite loops in case of repeated authentication failures.
     private CompletableFuture<DrapiResponse> submitRequestWithToken(DrapiRequest request, boolean retryIfNeeded) {
-        // Get the current token promise. If there is no valid token, this will trigger a token acquisition process.
-        var currentPromise = getTokenPromise();
+        LOG.trace("Submitting {} request to {} with retryIfNeeded={}", request.httpMethod(), request.path(), retryIfNeeded);
 
-        return currentPromise.thenCompose(token -> injectToken(request, token))
-                             .thenCompose(response -> peekResponse(request, response, retryIfNeeded, currentPromise));
+        // Get the current token promise. If there is no valid token, this will trigger a token acquisition process.
+        BearerToken token = tokenCache.get();
+
+        return injectTokenAndSend(request, token)
+            .thenCompose(response -> peekResponse(request, response, retryIfNeeded, token));
+    }
+
+    // Inject Token into the request and send it using the delegate HttpTransport.
+    private CompletableFuture<DrapiResponse> injectTokenAndSend(DrapiRequest request, BearerToken token) {
+        // We have a valid token, so we can proceed with the request
+        request.header(HttpHeaderConstants.AUTHORIZATION, "Bearer " + token.bearer());
+
+        return authenticationToolkit.httpTransport()
+                                    .submitAsync(request);
     }
 
     // This method checks the response for authentication failures. If the response indicates an authentication failure,
     // and we are allowed to retry, it will attempt to refresh the token and retry the request.
-    private CompletableFuture<DrapiResponse> injectToken(DrapiRequest request, BearerToken token) {
-        // We have a valid token, so we can proceed with the request
-        request.header(HttpHeaderConstants.AUTHORIZATION, "Bearer " + token.bearer());
-        return delegate.submitAsync(request);
-    }
-
-    private CompletableFuture<DrapiResponse> peekResponse(DrapiRequest request, DrapiResponse response, boolean retryIfNeeded, CompletableFuture<BearerToken> currentPromise) {
+    private CompletableFuture<DrapiResponse> peekResponse(DrapiRequest request, DrapiResponse response, boolean retryIfNeeded, BearerToken currentToken) {
         if (response.isAuthenticationFailure() && retryIfNeeded && authenticationProvider.supportsRefresh()) {
-            // The response indicates an authentication failure, and we are allowed to retry.
-            // We will attempt to refresh the token and retry the request.
-            // But we need to invalidate current token promise first, so that the next call to
-            // getTokenPromise() will trigger a new token acquisition process.
-            // Meanwhile, some other thread may have already started a token refresh process.
-            atomicTokenPromise.compareAndSet(currentPromise, null);
+
+            LOG.trace("We will retry {} request for {}", request.httpMethod(), request.path());
+
+            // If the tokenCache still has the same token, we can invalidate it to force a refresh.
+            // If another thread has already refreshed the token, we will not invalidate it.
+            tokenCache.invalidate(currentToken);
 
             // Now we can attempt to submit again. But this time if it fails, we will not retry again to avoid infinite loops.
             return submitRequestWithToken(request, false);
         }
 
-        // The response is valid, so we can return it
+        LOG.trace("No retry needed for {} request to {}", request.httpMethod(), request.path());
+
+        // The response is acceptable, so we can return it
         return CompletableFuture.completedFuture(response);
-    }
-
-    private CompletableFuture<BearerToken> getTokenPromise() {
-        CompletableFuture<BearerToken> currentPromise = atomicTokenPromise.get();
-
-        if (currentPromise == null || currentPromise.isCompletedExceptionally()) {
-            // Nobody tried to acquire a token yet, or the previous attempt failed, so we create a new promise and try to set it atomically
-            CompletableFuture<BearerToken> newPromise = authenticationProvider.acquireToken(authenticationToolkit);
-
-            if (atomicTokenPromise.compareAndSet(currentPromise, newPromise)) {
-                // We successfully set the new promise, so we return it
-                return newPromise;
-            } else {
-                // The atomic reference was updated by another thread before we could set our new promise.
-                // So we discard our new promise and return the other thread's promise instead
-                return atomicTokenPromise.get();
-            }
-        }
-
-        // If we reach here, it means that there is already a promise and it's not completed exceptionally.
-        return currentPromise;
     }
 
 }
