@@ -7,17 +7,17 @@
         <groupId>org.openntf.drapi</groupId>
         <artifactId>drapi-sdk-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
+        <relativePath>../../drapi-sdk-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>drapi-sdk-core</artifactId>
-    <name>OpenNTF Java SDK for HCL Domino REST API :: Core</name>
+    <name>OpenNTF Java SDK for HCL Domino REST API :: SDK Core</name>
     <description>Core features and dependencies for Domino REST API Java SDK</description>
 
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -43,6 +43,17 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
