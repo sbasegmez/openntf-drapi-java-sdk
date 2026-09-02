@@ -16,54 +16,9 @@
     <name>OpenNTF Java SDK for HCL Domino REST API :: Aggregator</name>
     <description>Maven aggregator for Domino REST API Java SDK</description>
 
-    <properties>
-        <!-- General -->
-        <license-developers>Serdar Basegmez</license-developers>
-        <license-year>2026</license-year>
-
-        <license-maven-plugin.version>5.1.1</license-maven-plugin.version>
-    </properties>
-
     <modules>
         <module>drapi-sdk</module>
+        <module>drapi-sdk-release</module>
     </modules>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${license-maven-plugin.version}</version>
-                    <configuration>
-                        <aggregate>true</aggregate>
-                        <properties>
-                            <owner>${license-developers}</owner>
-                            <copyrightYear>${license-year}</copyrightYear>
-                        </properties>
-                        <licenseSets>
-                            <licenseSet>
-                                <header>LicenseTemplate.txt</header>
-                                <excludes>
-                                    <exclude>**/pom.xml</exclude>
-                                    <exclude>**/README.*</exclude>
-                                    <exclude>src/test/resources/**</exclude>
-                                    <exclude>src/main/resources/**</exclude>
-                                    <exclude>**/build.properties</exclude>
-                                    <exclude>**/LICENSE.*</exclude>
-                                    <exclude>**/NOTICE.*</exclude>
-
-                                    <exclude>docs/**</exclude>
-                                </excludes>
-                            </licenseSet>
-                        </licenseSets>
-
-                        <mapping>
-                            <xsp-config>XML_STYLE</xsp-config>
-                        </mapping>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>
