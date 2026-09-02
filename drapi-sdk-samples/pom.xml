@@ -7,19 +7,20 @@
         <groupId>org.openntf.drapi</groupId>
         <artifactId>drapi-sdk-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
-        <relativePath>drapi-sdk-parent/pom.xml</relativePath>
+        <relativePath>../drapi-sdk-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>drapi-sdk-aggregator</artifactId>
+    <artifactId>drapi-sdk-samples</artifactId>
     <packaging>pom</packaging>
 
-    <name>OpenNTF Java SDK for HCL Domino REST API :: Aggregator</name>
-    <description>Maven aggregator for Domino REST API Java SDK</description>
+    <name>OpenNTF Java SDK for HCL Domino REST API :: Samples</name>
+    <description>Sample Projects for Domino REST API Java SDK</description>
 
-    <modules>
-        <module>drapi-sdk</module>
-        <module>drapi-sdk-release</module>
-        <module>drapi-sdk-samples</module>
-    </modules>
+    <properties>
+    </properties>
 
+    <build>
+        <plugins>
+        </plugins>
+    </build>
 </project>
