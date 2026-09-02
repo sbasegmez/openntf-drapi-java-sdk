@@ -1,0 +1,41 @@
+/*
+ * Copyright (c) 2026 Serdar Basegmez
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.openntf.drapi.http;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Executor;
+import org.openntf.drapi.DrapiConfig;
+
+public abstract class HttpTransportBase implements HttpTransport {
+
+    private final DrapiConfig config;
+    private final Executor executor;
+
+    protected HttpTransportBase(DrapiConfig config, Executor executor) {
+        this.config = Objects.requireNonNull(config, "config must not be null");
+        this.executor = executor;
+    }
+
+    protected DrapiConfig config() {
+        return config;
+    }
+
+    protected Optional<Executor> executor() {
+        return Optional.ofNullable(executor);
+    }
+
+}
