@@ -24,6 +24,10 @@ import java.util.Optional;
 
 public class DataTypeUtils {
 
+    private DataTypeUtils() {
+        // Private constructor to prevent instantiation
+    }
+
     public static <T> Optional<T> typedScalar(Object value, Class<T> type) {
         Objects.requireNonNull(type, "Type must not be null");
 
@@ -173,7 +177,7 @@ public class DataTypeUtils {
         }
 
         // We don't expect BigDecimal or BigInteger here, but if you want to handle them, you can add checks for those types as well.
-        // Also we don't want to mutate data types, so we won't convert from String to Integer here.
+        // Also we don't want to mutate data types, so we won't convert from String to Double here.
 
         return Optional.empty();
     }

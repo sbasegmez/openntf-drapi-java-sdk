@@ -24,6 +24,10 @@ import org.openntf.drapi.meta.DocumentMeta;
 
 public class ResponseParser {
 
+    private ResponseParser() {
+        // Private constructor to prevent instantiation
+    }
+
     public static Document toDocument(DrapiResponse response) {
         Objects.requireNonNull(response, "Response cannot be null");
 
