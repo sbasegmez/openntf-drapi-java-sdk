@@ -21,9 +21,7 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -35,8 +33,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.http.DrapiRequest;
-import org.openntf.drapi.http.HttpMethod;
-import org.openntf.drapi.http.RequestBody;
 import org.openntf.drapi.internal.DrapiConfigBuilder;
 
 public class AbstractHttpMockTest {
@@ -115,8 +111,6 @@ public class AbstractHttpMockTest {
     protected void respondWith(int statusCode, String body, Map<String, List<String>> headers) {
         respondWith(httpExchange -> {
             try {
-                mirrorRequest.set(TestUtils.createMirrorRequest(httpExchange));
-
                 if (headers != null) {
                     httpExchange.getResponseHeaders().putAll(headers);
                 }

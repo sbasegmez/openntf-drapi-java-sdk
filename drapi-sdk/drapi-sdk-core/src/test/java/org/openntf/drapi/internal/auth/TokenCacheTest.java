@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,10 +51,6 @@ class TokenCacheTest {
             currentToken.set(token);
             return token;
         });
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 
     @Test
