@@ -21,7 +21,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import org.openntf.drapi.internal.http.ApiPath;
+import org.openntf.drapi.internal.http.HttpHeaderConstants;
 import org.openntf.drapi.util.Parameter;
+import org.openntf.drapi.util.TypeUtils;
 
 public final class DrapiRequest {
 
@@ -177,6 +179,9 @@ public final class DrapiRequest {
 
     public DrapiRequest body(RequestBody body) {
         this.body = Objects.requireNonNull(body, "Request body cannot be null");
+        if(TypeUtils.isNotEmpty(body.contentType())) {
+            this.header(HttpHeaderConstants.CONTENT_TYPE, body.contentType());
+        }
         return this;
     }
 

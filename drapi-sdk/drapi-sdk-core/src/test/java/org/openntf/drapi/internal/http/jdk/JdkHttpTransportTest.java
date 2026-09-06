@@ -17,12 +17,12 @@ package org.openntf.drapi.internal.http.jdk;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openntf.drapi.internal.http.HttpHeaderConstants.USER_AGENT;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +32,8 @@ import org.openntf.drapi.exception.HttpTransportException;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.HttpMethod;
 import org.openntf.drapi.http.HttpTransport;
+import org.openntf.drapi.http.RequestBody;
+import org.openntf.drapi.http.RequestBody.Bytes;
 import org.openntf.drapi.internal.test.AbstractHttpMockTest;
 
 class JdkHttpTransportTest extends AbstractHttpMockTest {
@@ -61,6 +63,31 @@ class JdkHttpTransportTest extends AbstractHttpMockTest {
             assertTrue(response.containsHeader("X-Test-Header", "another-value"), "The mirrored request should have the correct X-Test-Header header");
         }
     }
+
+    @Test
+    @DisplayName("Test POST request with body and headers, ensuring the request is mirrored correctly and response is as expected")
+    void postRequestWithBodyAndHeaders() {
+        DrapiConfig config = buildConfig(null);
+        respondWith(201, "Created");
+
+        DrapiRequest request = DrapiRequest.post("/create")
+                .body(RequestBody.ofString("application/json", "{\"name\":\"test\"}"));
+
+        try (var response = createTransport(config).submit(request)) {
+            DrapiRequest mirroredRequest = mirrorRequest.get();
+
+            assertEquals("/create", mirroredRequest.path(), "The mirrored request path should match the original request path");
+            assertEquals(HttpMethod.POST, mirroredRequest.httpMethod(), "The mirrored request HTTP method should match the original request HTTP method");
+            assertTrue(mirroredRequest.containsHeader("Content-Type", "application/json"), "The mirrored request should have the correct Content-Type header");
+
+            String body = new String(((Bytes) mirroredRequest.body()).data(), StandardCharsets.UTF_8);
+            assertEquals("{\"name\":\"test\"}", body, "The mirrored request body should match the original request body");
+
+            assertEquals(201, response.statusCode(), "The response status code should match the expected status code");
+            assertEquals("Created", response.bodyAsString(), "The response body should match the expected body");
+        }
+    }
+
 
     @Test
     @DisplayName("Test that server returns 404 and we can detect that normally")
