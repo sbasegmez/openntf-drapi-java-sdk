@@ -4,7 +4,7 @@ import java.util.List;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
-import org.openntf.drapi.internal.api.DocumentsApiImpl.GetOptions;
+import org.openntf.drapi.api.DocumentsApi.GetOptions;
 import org.openntf.drapi.meta.Document;
 import org.openntf.drapi.util.TypeUtils;
 
