@@ -34,6 +34,7 @@ DrapiDocument contact = client.scope("demo")
 
 - [Configuration](docs/configuration.md)
 - [Development](docs/development.md)
+- [Api Semantics](docs/api-semantics.md)
 
 
 ## JSON Serialization
