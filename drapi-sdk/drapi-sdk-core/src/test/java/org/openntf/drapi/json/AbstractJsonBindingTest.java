@@ -17,10 +17,12 @@ package org.openntf.drapi.json;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -73,16 +75,27 @@ public abstract class AbstractJsonBindingTest {
 
             assertTrue(result.containsKey("key"), "Result should contain the key 'key'");
             assertEquals("value", result.get("key"), "The value for 'key' should be 'value'");
+            assertInstanceOf(String.class, result.get("key"), "The value for 'key' should be of type String");
+
             assertTrue(result.containsKey("integer"), "Result should contain the key 'integer'");
             assertEquals(42L, result.get("integer"), "The value for 'integer' should be 42 (Long)");
+            assertInstanceOf(Long.class, result.get("integer"), "The value for 'integer' should be of type Long");
+
             assertTrue(result.containsKey("double"), "Result should contain the key 'double'");
             assertEquals(3.14, result.get("double"), "The value for 'double' should be 3.14");
+            assertInstanceOf(Double.class, result.get("double"), "The value for 'double' should be of type Double");
+
             assertTrue(result.containsKey("boolean"), "Result should contain the key 'boolean'");
             assertEquals(true, result.get("boolean"), "The value for 'boolean' should be true");
+            assertInstanceOf(Boolean.class, result.get("boolean"), "The value for 'boolean' should be of type Boolean");
+
             assertTrue(result.containsKey("nullValue"), "Result should contain the key 'nullValue'");
             assertNull(result.get("nullValue"), "The value for 'nullValue' should be null");
+
             assertTrue(result.containsKey("array"), "Result should contain the key 'array'");
             assertEquals(java.util.List.of(1L, 2L, 3L), result.get("array"), "The value for 'array' should be [1, 2, 3] (Long)");
+            assertInstanceOf(List.class, result.get("array"), "The value for 'array' should be of type List");
+
             assertTrue(result.containsKey("object"), "Result should contain the key 'object'");
             assertEquals(java.util.Map.of("nestedKey", "nestedValue"), result.get("object"), "The value for 'object' should be {nestedKey=nestedValue}");
         }
