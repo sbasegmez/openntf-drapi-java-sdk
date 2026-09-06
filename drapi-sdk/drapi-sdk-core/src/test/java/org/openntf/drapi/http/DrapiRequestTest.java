@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openntf.drapi.http.RequestBody.Bytes;
-import org.openntf.drapi.internal.http.ApiPath;
 
 class DrapiRequestTest {
 

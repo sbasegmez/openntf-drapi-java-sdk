@@ -13,42 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi;
+module org.openntf.json.jakarta {
 
-import java.net.URI;
+    requires org.openntf.drapi;
+    requires jakarta.json;
+    requires jakarta.json.bind;
 
-public interface DrapiConfig {
-
-    URI baseUrl();
-    String authScope();
-    AuthType authType();
-
-    // For BASIC auth
-    String username();
-    String password();
-
-    // For TOKEN auth
-    String token();
-
-    // For OAUTH auth
-    String appId();
-
-    String appSecret();
-
-    String userAgent();
-
-    int connectTimeoutSecs();
-
-    int requestTimeoutSecs();
-
-    enum AuthType {
-        BASIC,
-        TOKEN,
-        OAUTH
-    }
-
-    static DrapiConfigBuilder builder() {
-        return new DrapiConfigBuilder();
-    }
+    // No exports: this module is consumed only through the JsonBindingProvider service, never by direct type reference.
+    provides org.openntf.drapi.json.JsonBindingProvider with org.openntf.json.jakarta.JakartaJsonBindingProvider;
 
 }

@@ -18,22 +18,21 @@ package org.openntf.drapi.internal;
 import java.util.Objects;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
-import org.openntf.drapi.DrapiContext;
 import org.openntf.drapi.DrapiDataSource;
 
 public class DrapiClientImpl implements DrapiClient {
 
     private final DrapiContext context;
 
-    DrapiClientImpl(DrapiContext context) {
+    public DrapiClientImpl(DrapiContext context) {
         this.context = Objects.requireNonNull(context, "Context must not be null");
     }
 
-    DrapiContext context() {
+    public DrapiContext context() {
         return context;
     }
 
-    DrapiConfig config() {
+    public DrapiConfig config() {
         return context.config();
     }
 

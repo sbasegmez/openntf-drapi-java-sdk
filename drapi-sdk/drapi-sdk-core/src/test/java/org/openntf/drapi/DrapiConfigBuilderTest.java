@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal;
+package org.openntf.drapi;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,11 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiConfig.AuthType;
+import org.openntf.drapi.internal.DrapiConfigImpl;
 
 class DrapiConfigBuilderTest {
 
@@ -58,7 +59,7 @@ class DrapiConfigBuilderTest {
         assertEquals("your_password", config.password(), "Password should match the properties file");
         assertTrue(config.userAgent().startsWith("your_user_agent"), "User agent should match the properties file");
         assertEquals(13, config.connectTimeoutSecs(), "Connect timeout should match the properties file");
-        assertEquals(DrapiConfigImpl.DEFAULT_REQUEST_TIMEOUT_SECS, config.requestTimeoutSecs(), "Request timeout should be ignored from invalid property");
+        Assertions.assertEquals(DrapiConfigImpl.DEFAULT_REQUEST_TIMEOUT_SECS, config.requestTimeoutSecs(), "Request timeout should be ignored from invalid property");
     }
 
     @Test

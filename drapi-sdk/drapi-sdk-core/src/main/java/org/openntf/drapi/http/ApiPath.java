@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal.http;
+package org.openntf.drapi.http;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.openntf.drapi.internal.http.UriBuilder;
 import org.openntf.drapi.util.TypeUtils;
 
 public class ApiPath {

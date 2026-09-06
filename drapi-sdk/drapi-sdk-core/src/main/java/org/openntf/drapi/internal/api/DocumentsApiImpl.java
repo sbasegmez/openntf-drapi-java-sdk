@@ -16,10 +16,10 @@
 package org.openntf.drapi.internal.api;
 
 import java.util.concurrent.CompletableFuture;
-import org.openntf.drapi.DrapiContext;
 import org.openntf.drapi.api.DocumentsApi;
 import org.openntf.drapi.http.DrapiRequest;
-import org.openntf.drapi.internal.http.ApiPath;
+import org.openntf.drapi.http.ApiPath;
+import org.openntf.drapi.internal.DrapiContext;
 import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.internal.meta.ResponseParser;
 import org.openntf.drapi.meta.Document;

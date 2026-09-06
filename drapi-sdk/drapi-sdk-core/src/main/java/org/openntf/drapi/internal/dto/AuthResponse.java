@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal;
+package org.openntf.drapi.internal.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Map;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.openntf.drapi.DrapiClient;
-
-class DrapiClientBuilderTest {
-
-    @Test
-    @DisplayName("Test DrapiClientBuilder with null config")
-    void testNullConfig() {
-        assertThrows(NullPointerException.class, () -> DrapiClient.builder(null), "Expected NullPointerException for null config");
-    }
+public record AuthResponse(String bearer, Map<String, Object> claims, int leeway, int expSeconds, String issueDate) {
 
 }

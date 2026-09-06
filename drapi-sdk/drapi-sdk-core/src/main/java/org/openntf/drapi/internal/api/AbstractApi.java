@@ -17,11 +17,11 @@ package org.openntf.drapi.internal.api;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import org.openntf.drapi.DrapiContext;
 import org.openntf.drapi.exception.AuthenticationException;
 import org.openntf.drapi.exception.DrapiException;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
+import org.openntf.drapi.internal.DrapiContext;
 import org.openntf.drapi.internal.log.Log;
 
 public abstract class AbstractApi {

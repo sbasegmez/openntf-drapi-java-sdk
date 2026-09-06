@@ -13,17 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi;
+package org.openntf.drapi.internal.dto;
 
-import org.openntf.drapi.http.HttpTransport;
-import org.openntf.drapi.internal.auth.AuthenticationProvider;
-
-public interface DrapiContext {
-
-    DrapiConfig config();
-
-    HttpTransport httpTransport();
-
-    AuthenticationProvider authenticationProvider();
+public record AuthRequest(String username, String password) {
 
 }

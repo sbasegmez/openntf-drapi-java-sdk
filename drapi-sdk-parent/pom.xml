@@ -79,6 +79,16 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- Keep test compilation on the classpath even when main sources declare a module-info.java, so test-only
+                             JDK modules (e.g. jdk.httpserver, java.logging) don't have to be added to the module's requires. -->
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <useModulePath>false</useModulePath>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -117,6 +127,10 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire.version}</version>
                     <configuration>
+
+                        <!-- Run tests on the classpath rather than the module path, matching the testCompile override above - keeps
+                             test-only JDK modules (e.g. jdk.httpserver, java.logging) out of the module's requires. -->
+                        <useModulePath>false</useModulePath>
 
                         <!-- The recommended way to add the Mockito Java agent is to use the maven-dependency-plugin to determine exactly where the jar is located in the local repository. -->
                         <!-- Until simpler approach here works, we will use the ${settings.localRepository} variable to locate the mockito-core jar in the local Maven repository. -->

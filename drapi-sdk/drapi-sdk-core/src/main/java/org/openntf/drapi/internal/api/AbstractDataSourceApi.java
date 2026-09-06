@@ -15,7 +15,7 @@
  */
 package org.openntf.drapi.internal.api;
 
-import org.openntf.drapi.DrapiContext;
+import org.openntf.drapi.internal.DrapiContext;
 
 public abstract class AbstractDataSourceApi extends AbstractApi {
 

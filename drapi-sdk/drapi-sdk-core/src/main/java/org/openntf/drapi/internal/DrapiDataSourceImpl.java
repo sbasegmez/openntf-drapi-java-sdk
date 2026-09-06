@@ -15,7 +15,6 @@
  */
 package org.openntf.drapi.internal;
 
-import org.openntf.drapi.DrapiContext;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.DocumentsApi;
 import org.openntf.drapi.internal.api.DocumentsApiImpl;

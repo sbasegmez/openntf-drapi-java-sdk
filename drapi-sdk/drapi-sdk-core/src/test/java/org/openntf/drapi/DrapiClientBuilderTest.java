@@ -15,40 +15,17 @@
  */
 package org.openntf.drapi;
 
-import java.net.URI;
+import static org.junit.jupiter.api.Assertions.*;
 
-public interface DrapiConfig {
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-    URI baseUrl();
-    String authScope();
-    AuthType authType();
+class DrapiClientBuilderTest {
 
-    // For BASIC auth
-    String username();
-    String password();
-
-    // For TOKEN auth
-    String token();
-
-    // For OAUTH auth
-    String appId();
-
-    String appSecret();
-
-    String userAgent();
-
-    int connectTimeoutSecs();
-
-    int requestTimeoutSecs();
-
-    enum AuthType {
-        BASIC,
-        TOKEN,
-        OAUTH
-    }
-
-    static DrapiConfigBuilder builder() {
-        return new DrapiConfigBuilder();
+    @Test
+    @DisplayName("Test DrapiClientBuilder with null config")
+    void testNullConfig() {
+        assertThrows(NullPointerException.class, () -> DrapiClient.builder(null), "Expected NullPointerException for null config");
     }
 
 }
