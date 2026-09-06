@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import org.openntf.drapi.internal.http.ApiPath;
 import org.openntf.drapi.internal.http.HttpHeaderConstants;
 import org.openntf.drapi.util.Parameter;
 import org.openntf.drapi.util.TypeUtils;

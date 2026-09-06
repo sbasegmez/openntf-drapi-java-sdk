@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal;
+package org.openntf.drapi;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.internal.DrapiConfigImpl;
 import org.openntf.drapi.util.TypeUtils;
 
 public class DrapiConfigBuilder {
@@ -205,5 +205,44 @@ public class DrapiConfigBuilder {
         return this;
     }
 
+    public URI baseUrl() {
+        return baseUrl;
+    }
+
+    public String authScope() {
+        return authScope;
+    }
+
+    public String username() {
+        return username;
+    }
+
+    public String password() {
+        return password;
+    }
+
+    public String token() {
+        return token;
+    }
+
+    public String appId() {
+        return appId;
+    }
+
+    public String appSecret() {
+        return appSecret;
+    }
+
+    public String userAgent() {
+        return userAgent;
+    }
+
+    public int connectTimeoutSecs() {
+        return connectTimeoutSecs;
+    }
+
+    public int requestTimeoutSecs() {
+        return requestTimeoutSecs;
+    }
 }
 

@@ -16,7 +16,6 @@
 package org.openntf.drapi;
 
 import java.net.URI;
-import org.openntf.drapi.internal.DrapiConfigBuilder;
 
 public interface DrapiConfig {
 

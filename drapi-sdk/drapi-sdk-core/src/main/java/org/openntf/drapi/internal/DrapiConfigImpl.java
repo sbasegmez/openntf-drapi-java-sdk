@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.DrapiConfigBuilder;
 import org.openntf.drapi.util.TypeUtils;
 
 public class DrapiConfigImpl implements DrapiConfig {
@@ -50,33 +51,33 @@ public class DrapiConfigImpl implements DrapiConfig {
     private final int connectTimeoutSecs;
     private final int requestTimeoutSecs;
 
-    DrapiConfigImpl(DrapiConfigBuilder builder) {
-        this.baseUrl = builder.baseUrl;
-        this.authScope = builder.authScope;
+    public DrapiConfigImpl(DrapiConfigBuilder builder) {
+        this.baseUrl = builder.baseUrl();
+        this.authScope = builder.authScope();
         this.authType = resolveAndValidateAuthType(builder);
-        this.username = builder.username;
-        this.password = builder.password;
-        this.token = builder.token;
-        this.appId = builder.appId;
-        this.appSecret = builder.appSecret;
+        this.username = builder.username();
+        this.password = builder.password();
+        this.token = builder.token();
+        this.appId = builder.appId();
+        this.appSecret = builder.appSecret();
 
-        this.userAgent = TypeUtils.defaultIfBlank(builder.userAgent, DEFAULT_USER_AGENT + "/" + Version.get());
-        this.connectTimeoutSecs = builder.connectTimeoutSecs == 0 ? DEFAULT_CONNECT_TIMEOUT_SECS : builder.connectTimeoutSecs;
-        this.requestTimeoutSecs = builder.requestTimeoutSecs == 0 ? DEFAULT_REQUEST_TIMEOUT_SECS : builder.requestTimeoutSecs;
+        this.userAgent = TypeUtils.defaultIfBlank(builder.userAgent(), DEFAULT_USER_AGENT + "/" + Version.get());
+        this.connectTimeoutSecs = builder.connectTimeoutSecs() == 0 ? DEFAULT_CONNECT_TIMEOUT_SECS : builder.connectTimeoutSecs();
+        this.requestTimeoutSecs = builder.requestTimeoutSecs() == 0 ? DEFAULT_REQUEST_TIMEOUT_SECS : builder.requestTimeoutSecs();
     }
 
     private static AuthType resolveAndValidateAuthType(DrapiConfigBuilder builder) {
         List<AuthType> detectedTypes = new ArrayList<>();
 
-        if (TypeUtils.isAllNonEmpty(builder.username, builder.password)) {
+        if (TypeUtils.isAllNonEmpty(builder.username(), builder.password())) {
             detectedTypes.add(AuthType.BASIC);
         }
 
-        if (TypeUtils.isNotEmpty(builder.token)) {
+        if (TypeUtils.isNotEmpty(builder.token())) {
             detectedTypes.add(AuthType.TOKEN);
         }
 
-        if (TypeUtils.isAllNonEmpty(builder.appId, builder.appSecret)) {
+        if (TypeUtils.isAllNonEmpty(builder.appId(), builder.appSecret())) {
             detectedTypes.add(AuthType.OAUTH);
         }
 

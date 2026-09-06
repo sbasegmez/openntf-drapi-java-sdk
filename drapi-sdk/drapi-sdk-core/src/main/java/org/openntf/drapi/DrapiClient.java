@@ -15,8 +15,6 @@
  */
 package org.openntf.drapi;
 
-import org.openntf.drapi.internal.DrapiClientBuilder;
-
 /**
  * The DrapiClient interface provides the gateway to access and interact with the DRAPI (Domino REST Api) system.
  */

@@ -33,7 +33,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.http.DrapiRequest;
-import org.openntf.drapi.internal.DrapiConfigBuilder;
+import org.openntf.drapi.DrapiConfigBuilder;
 
 public class AbstractHttpMockTest {
 

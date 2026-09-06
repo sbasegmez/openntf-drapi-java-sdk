@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal;
+package org.openntf.drapi;
 
 import java.util.Objects;
 import java.util.concurrent.Executor;
-import org.openntf.drapi.DrapiClient;
-import org.openntf.drapi.DrapiConfig;
-import org.openntf.drapi.DrapiContext;
 import org.openntf.drapi.http.HttpTransport;
+import org.openntf.drapi.internal.DrapiClientImpl;
+import org.openntf.drapi.internal.DrapiContext;
 import org.openntf.drapi.internal.auth.AuthenticationProvider;
 import org.openntf.drapi.internal.auth.AuthenticationToolkit;
 import org.openntf.drapi.internal.http.AuthenticatingHttpTransport;
@@ -63,7 +62,7 @@ public class DrapiClientBuilder {
         // authTransport is a wrapper around the provided HttpTransport that adds authentication capabilities
         AuthenticatingHttpTransport authTransport = new AuthenticatingHttpTransport(new AuthenticationToolkit(httpTransport), authenticationProvider);
 
-        DrapiContext context = new DrapiContextImpl(config, authTransport, authenticationProvider);
+        DrapiContext context = new DrapiContext(config, authTransport, authenticationProvider);
         return new DrapiClientImpl(context);
     }
 

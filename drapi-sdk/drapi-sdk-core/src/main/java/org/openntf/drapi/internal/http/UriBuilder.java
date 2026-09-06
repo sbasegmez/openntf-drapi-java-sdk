@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.openntf.drapi.http.ApiPath;
 import org.openntf.drapi.util.Parameter;
 import org.openntf.drapi.util.TypeUtils;
 
