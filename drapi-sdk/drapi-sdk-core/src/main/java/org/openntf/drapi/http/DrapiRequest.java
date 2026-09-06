@@ -179,7 +179,7 @@ public final class DrapiRequest {
 
     public DrapiRequest body(RequestBody body) {
         this.body = Objects.requireNonNull(body, "Request body cannot be null");
-        if(TypeUtils.isNotEmpty(body.contentType())) {
+        if(TypeUtils.isNotEmpty(body.contentType()) && !this.containsHeader(HttpHeaderConstants.CONTENT_TYPE)) {
             this.header(HttpHeaderConstants.CONTENT_TYPE, body.contentType());
         }
         return this;

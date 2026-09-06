@@ -18,20 +18,32 @@ public class ResponseParser {
         var bodyTree = jsonBinding.fromJson(response.bodyAsString());
 
         DocumentMeta meta = null;
-        List<String> warnings = null;
+        List<String> warnings = List.of();
+        String form = null;
 
-        if(bodyTree.containsKey("@meta")) {
+        if (bodyTree.containsKey("@meta")) {
             meta = toDocumentMeta(bodyTree.get("@meta"));
             bodyTree.remove("@meta");
         }
 
-        if(bodyTree.get("@warnings") instanceof List<?> list) {
+        if (bodyTree.get("@warnings") instanceof List<?> list) {
             warnings = list.stream().map(Object::toString).toList();
             bodyTree.remove("@warnings");
         }
 
+        // TODO Investigate in what cases @form is present and in what cases Form is present.
+        // For now, we will check for @form first, and if it's not present, we will check for Form.
+        // We expect that the "Form" field is always present in the bodyTree, but if it's not, we default to an empty string.
+        // We don't remove the "Form" field from the bodyTree, as it is part of the document's data.
+        if (bodyTree.containsKey("@form")) {
+            form = bodyTree.get("@form").toString();
+            bodyTree.remove("@form");
+        } else {
+            form = bodyTree.getOrDefault("Form", "").toString();
+        }
+
         return new DocumentImpl(
-            bodyTree.getOrDefault("Form", "").toString(),
+            form,
             meta,
             warnings,
             bodyTree

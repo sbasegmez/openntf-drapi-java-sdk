@@ -9,8 +9,8 @@ public interface Document {
 
     /**
      * Returns the form name, read from the {@code Form} item, or from {@code @form} when the server sent it there. While Domino doesn't
-     * required a "form" value, it is marked as required in the OpenAPI specs. So implementation should always return a non-empty
-     * value.
+     * require a "form" value, OpenAPI mandates a "form" field. Documents without a form field are only shown within lists. So the
+     * Document implementation should always return a non-empty value.
      *
      * @return the form name
      */
@@ -40,6 +40,7 @@ public interface Document {
 
     /**
      * Returns the field with the given name. The name lookup is case-insensitive.
+     *
      * @param name the name of the field
      * @return the field with the given name
      */

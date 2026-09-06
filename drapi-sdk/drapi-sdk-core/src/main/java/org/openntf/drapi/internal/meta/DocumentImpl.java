@@ -1,5 +1,6 @@
 package org.openntf.drapi.internal.meta;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,7 +58,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public Set<String> fieldNames() {
-        return valueMap.keySet();
+        return Collections.unmodifiableSet(valueMap.keySet());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.openntf.drapi.meta;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -35,7 +36,7 @@ public final class RichTextAs {
     }
 
     public static Collection<RichTextAs> known() {
-        return KNOWN.values();
+        return Collections.unmodifiableCollection(KNOWN.values());
     }
 
 }
