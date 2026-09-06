@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.json.jakarta;
+package org.openntf.drapi.json.jakarta;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openntf.drapi.json.AbstractJsonBindingTest;
 import org.openntf.drapi.json.JsonBinding;
+import org.openntf.drapi.json.jakarta.JakartaJsonBinding;
 
 class JakartaJsonBindingTest extends AbstractJsonBindingTest {
 
