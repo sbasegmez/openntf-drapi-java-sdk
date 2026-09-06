@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) 2026 Serdar Basegmez
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.openntf.drapi.internal.meta;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Stream;
+import org.openntf.drapi.meta.Document;
+import org.openntf.drapi.meta.DocumentMeta;
+import org.openntf.drapi.meta.Field;
+import org.openntf.drapi.util.TypeUtils;
+
+public class DocumentImpl implements Document {
+
+    private final String form;
+    private final DocumentMeta meta;
+    private final List<String> warnings;
+
+    // Implementation mandates using a TreeMap with case-insensitive ordering for field names. This ensures that field access is case-insensitive.
+    private final TreeMap<String, Object> valueMap;
+
+    /**
+     * Constructs a DocumentImpl instance.
+     * <p>
+     * We only do shallow-copy for the valueMap, so the caller should not modify it after passing it to this constructor. Warnings will
+     * not be copied. In theory, the caller should not modify it after passing it to this constructor. The meta object is immutable, so
+     * no need to copy it.
+     *
+     * @param form     the form name of the document
+     * @param meta     the metadata associated with the document, can be null
+     * @param warnings a list of warnings related to the document, can be null
+     * @param valueMap a map containing field names and their corresponding values
+     */
+    public DocumentImpl(String form, DocumentMeta meta, List<String> warnings, Map<String, Object> valueMap) {
+        this.form = TypeUtils.requireNonEmpty(form, "Form name cannot be null or empty");
+        this.meta = meta;
+        this.warnings = warnings == null ? List.of() : warnings;
+
+        this.valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        this.valueMap.putAll(Objects.requireNonNull(valueMap, "Value map cannot be null"));
+    }
+
+    @Override
+    public String form() {
+        return form;
+    }
+
+    @Override
+    public Optional<DocumentMeta> meta() {
+        return Optional.ofNullable(meta);
+    }
+
+    @Override
+    public List<String> warnings() {
+        return warnings;
+    }
+
+    @Override
+    public Set<String> fieldNames() {
+        return Collections.unmodifiableSet(valueMap.keySet());
+    }
+
+    @Override
+    public Stream<Field> fields() {
+        return valueMap.entrySet()
+                       .stream()
+                       .map(entry -> new FieldImpl(entry.getKey(), entry.getValue(), true));
+    }
+
+    @Override
+    public Field field(String name) {
+        Object value = valueMap.get(name);
+        boolean isPresent = valueMap.containsKey(name);
+
+        // If the field is present, we return the original case of the field name as stored in the valueMap. If not present, we return the requested name.
+        String actualName = valueMap.containsKey(name) ? valueMap.ceilingKey(name) : name;
+
+        // value being null does not mean the field is absent, it could be present with a null value. So we check if the key exists in the map.
+        return new FieldImpl(actualName, value, isPresent);
+    }
+}

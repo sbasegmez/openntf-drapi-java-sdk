@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal.http;
+package org.openntf.drapi.internal.api;
 
-public class HttpHeaderConstants {
+class DocumentsApiImplTest {
 
-    private HttpHeaderConstants() {
-        // Utility class, prevent instantiation
-    }
-
-    // Common HTTP headers
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String CONTENT_LENGTH = "Content-Length";
-    public static final String AUTHORIZATION = "Authorization";
-    public static final String USER_AGENT = "User-Agent";
-
-    // Content types
-    public static final String APPLICATION_JSON = "application/json";
+    // Test
+    // - Test form cannot be empty
+    // - Case insensitive field access
+    // - Support for field-group representations
 
 }

@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal.http;
+package org.openntf.drapi.exception;
 
-public class HttpHeaderConstants {
+public class InvalidValueException extends RuntimeException {
 
-    private HttpHeaderConstants() {
-        // Utility class, prevent instantiation
+    public InvalidValueException(String message) {
+        super(message);
     }
-
-    // Common HTTP headers
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String CONTENT_LENGTH = "Content-Length";
-    public static final String AUTHORIZATION = "Authorization";
-    public static final String USER_AGENT = "User-Agent";
-
-    // Content types
-    public static final String APPLICATION_JSON = "application/json";
 
 }

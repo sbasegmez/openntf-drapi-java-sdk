@@ -78,6 +78,8 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
             throw new DrapiException("Invalid authentication response", request, response);
         }
 
+        LOG.trace("Successfully authenticated user {}. Token expires in {} seconds.", config().username(), authResponse.expSeconds());
+
         return new BearerToken(authResponse.bearer(), authResponse.claims());
     }
 
@@ -86,11 +88,11 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
         return true;
     }
 
-    record AuthRequest(String username, String password) {
+    public record AuthRequest(String username, String password) {
 
     }
 
-    record AuthResponse(String bearer, Map<String, Object> claims, int leeway, int expSeconds, String issueDate) {
+    public record AuthResponse(String bearer, Map<String, Object> claims, int leeway, int expSeconds, String issueDate) {
 
     }
 

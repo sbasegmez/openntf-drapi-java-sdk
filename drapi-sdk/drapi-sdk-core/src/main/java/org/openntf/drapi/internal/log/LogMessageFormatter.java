@@ -90,7 +90,7 @@ public class LogMessageFormatter {
 
         // Final step: Convert the StringBuilder to a String and
         // replace any escaped placeholders (i.e., "\{}") with "{}"
-        String formattedMessageFinal = formattedMessage.toString().replaceAll("\\\\\\{}", "\\{}");
+        String formattedMessageFinal = formattedMessage.toString().replaceAll("\\\\\\{}", "{}");
 
         return new FormattedMessage(formattedMessageFinal, throwable);
 

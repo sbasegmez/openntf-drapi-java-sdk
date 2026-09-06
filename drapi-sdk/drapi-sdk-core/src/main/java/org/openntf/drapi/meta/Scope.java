@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal.http;
+package org.openntf.drapi.meta;
 
-public class HttpHeaderConstants {
-
-    private HttpHeaderConstants() {
-        // Utility class, prevent instantiation
-    }
-
-    // Common HTTP headers
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String CONTENT_LENGTH = "Content-Length";
-    public static final String AUTHORIZATION = "Authorization";
-    public static final String USER_AGENT = "User-Agent";
-
-    // Content types
-    public static final String APPLICATION_JSON = "application/json";
+/**
+ * This record is a Scope data schema. Don't confuse it with the DrapiDataSource interface, which is a representation of an API context
+ * on DRAPI and incidentally referred to as Scope in the DRAPI interface. This record is used to define the structure of a scope,
+ * including its name, NSF path, schema name, icon name, icon, description, and active status.
+ */
+public record Scope(String apiName, String nsfPath, String schemaName, String iconName, String icon, String description,
+                    boolean isActive) {
 
 }

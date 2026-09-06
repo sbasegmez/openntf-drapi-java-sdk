@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal.http;
+package org.openntf.drapi.internal.api;
 
-public class HttpHeaderConstants {
+import org.openntf.drapi.DrapiContext;
 
-    private HttpHeaderConstants() {
-        // Utility class, prevent instantiation
+public abstract class AbstractDataSourceApi extends AbstractApi {
+
+    protected static final String QS_DATASOURCE = "dataSource";
+
+    private final String dataSource;
+
+    protected AbstractDataSourceApi(DrapiContext context, String dataSource) {
+        super(context);
+        this.dataSource = dataSource;
     }
 
-    // Common HTTP headers
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String CONTENT_LENGTH = "Content-Length";
-    public static final String AUTHORIZATION = "Authorization";
-    public static final String USER_AGENT = "User-Agent";
-
-    // Content types
-    public static final String APPLICATION_JSON = "application/json";
+    protected String dataSource() {
+        return dataSource;
+    }
 
 }

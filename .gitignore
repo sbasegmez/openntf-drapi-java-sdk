@@ -4,6 +4,10 @@ target/
 !**/src/test/**/target/
 .env
 
+### AI Settings are removed for various reasons, please add your own settings if you need them ###
+.claude/
+.github/
+
 ### Setting file for Example Projets ###
 drapi-sdk-sample.properties
 

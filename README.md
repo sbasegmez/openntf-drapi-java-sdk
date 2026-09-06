@@ -10,30 +10,13 @@ This SDK targets Java developers building applications that need to interact wit
 
 This SDK targets Java 17 and above, and is designed to be modular and extensible. The core implementation targets minimal/no dependencies, but additional modules may be provided to support specific frameworks or libraries. The SDK is designed to be easy to use and understand, with clear documentation and examples provided.
 
-_(Class names and SDK structure are not final...)_
-
-```java
-// Build a DrapiConfig first
-DrapiConfig config = DrapiConfig.builder()
-        .baseUrl("https://demo.example.com:8880")
-        .basicAuth("Doctor notes", password)
-        .build();
-
-// Build once and share: the client caches the bearer tokes, and refresh as needed.
-DrapiClient client = DrapiClient.builder(config)
-                                .build();
-
-DrapiDocument contact = client.scope("demo")
-                              .documents()
-                              .get("0123456789ABCDEF0123456789ABCDEF")
-                              .orElseThrow();
-
-```
+Planned SDK surface is documented in the [API Semantics](docs/api-semantics.md) document. You might check [drapi-sdk-samples](drapi-sdk-samples/README.md) for usage examples.
 
 ## Documentation
 
 - [Configuration](docs/configuration.md)
 - [Development](docs/development.md)
+- [Api Semantics](docs/api-semantics.md)
 
 
 ## JSON Serialization

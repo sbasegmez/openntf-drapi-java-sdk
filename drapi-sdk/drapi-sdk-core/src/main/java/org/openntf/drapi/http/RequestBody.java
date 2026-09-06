@@ -24,7 +24,20 @@ import java.nio.charset.StandardCharsets;
 
 public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Streaming {
 
+    /**
+     * Returns the content type of the request body.
+     *
+     * @return the content type as a String
+     */
     String contentType();
+
+    /**
+     * Creates an InputStream for the request body.
+     * <p>
+     * Streaming variant will use a provided a lazy BodySupplier to get a new InputStream each time it is called.
+     *
+     * @return an InputStream representing the request body
+     */
     InputStream createStream();
 
     /**
@@ -75,6 +88,7 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
 
     @FunctionalInterface
     interface BodySupplier {
+
         InputStream getInputStream() throws IOException;
     }
 

@@ -17,8 +17,19 @@ package org.openntf.drapi;
 
 import org.openntf.drapi.internal.DrapiClientBuilder;
 
+/**
+ * The DrapiClient interface provides the gateway to access and interact with the DRAPI (Domino REST Api) system.
+ */
 public interface DrapiClient {
 
+    /**
+     * Retrieves a DrapiDataSource instance for the specified data source name. This provides gateway to all resources accessed by a
+     * "dataSource" (apiName/scope) parameter within the DRAPI system and allows for further interactions with that data source.
+     *
+     * @param name the name of the data source
+     * @return a DrapiDataSource instance representing the specified data source
+     */
+    DrapiDataSource dataSource(String name);
 
     static DrapiClientBuilder builder(DrapiConfig config) {
         return new DrapiClientBuilder(config);

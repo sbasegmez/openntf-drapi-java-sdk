@@ -15,31 +15,30 @@
  */
 package org.openntf.drapi.internal;
 
-import java.util.Objects;
-import org.openntf.drapi.DrapiClient;
-import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiContext;
 import org.openntf.drapi.DrapiDataSource;
+import org.openntf.drapi.api.DocumentsApi;
+import org.openntf.drapi.internal.api.DocumentsApiImpl;
 
-public class DrapiClientImpl implements DrapiClient {
+public class DrapiDataSourceImpl implements DrapiDataSource {
 
+    private final String dataSource;
     private final DrapiContext context;
 
-    DrapiClientImpl(DrapiContext context) {
-        this.context = Objects.requireNonNull(context, "Context must not be null");
-    }
-
-    DrapiContext context() {
-        return context;
-    }
-
-    DrapiConfig config() {
-        return context.config();
+    DrapiDataSourceImpl(String dataSource, DrapiContext context) {
+        this.dataSource = dataSource;
+        this.context = context;
     }
 
     @Override
-    public DrapiDataSource dataSource(String name) {
-        return new DrapiDataSourceImpl(name, context);
+    public String dataSource() {
+        return dataSource;
     }
+
+    @Override
+    public DocumentsApi documents() {
+        return new DocumentsApiImpl(context, dataSource);
+    }
+
 
 }

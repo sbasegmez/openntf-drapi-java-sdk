@@ -38,7 +38,7 @@ public class MockableHttpTest {
     protected DrapiConfig config;
 
     // AtomicInteger to keep track of the number of requests received by the mirror server
-    protected AtomicInteger requestCount = new AtomicInteger(0);
+    protected final AtomicInteger requestCount = new AtomicInteger(0);
 
     // AtomicReference to hold the mirrored request for assertions in tests
     protected final AtomicReference<DrapiRequest> mirrorRequest = new AtomicReference<>();

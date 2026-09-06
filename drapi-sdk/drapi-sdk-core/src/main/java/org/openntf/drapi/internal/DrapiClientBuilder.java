@@ -22,6 +22,8 @@ import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiContext;
 import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.internal.auth.AuthenticationProvider;
+import org.openntf.drapi.internal.auth.AuthenticationToolkit;
+import org.openntf.drapi.internal.http.AuthenticatingHttpTransport;
 
 public class DrapiClientBuilder {
     final DrapiConfig config;
@@ -58,8 +60,11 @@ public class DrapiClientBuilder {
             authenticationProvider = AuthenticationProvider.create(config);
         }
 
-        DrapiContext context = new DrapiContextImpl(config, httpTransport, authenticationProvider);
-        return new DrapiClientImpl(config, context);
+        // authTransport is a wrapper around the provided HttpTransport that adds authentication capabilities
+        AuthenticatingHttpTransport authTransport = new AuthenticatingHttpTransport(new AuthenticationToolkit(httpTransport), authenticationProvider);
+
+        DrapiContext context = new DrapiContextImpl(config, authTransport, authenticationProvider);
+        return new DrapiClientImpl(context);
     }
 
 }
