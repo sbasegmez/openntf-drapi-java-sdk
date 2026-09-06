@@ -79,4 +79,13 @@ class DocumentImplTest {
         assertEquals(123, doc.field("Field2").asInt().orElse(0), "Field2 value should match");
     }
 
+    @Test
+    @DisplayName("Document.field() should lookup field names in a case-insensitive manner but return the original case of the field name")
+    void testFieldOriginalCase() {
+        var doc = new DocumentImpl("TestForm", null, null, Map.of("Field1", "Value1", "FIELD2", 123));
+
+        assertEquals("Field1", doc.field("field1").name(), "Field1 should return the original case of the field name");
+        assertEquals("FIELD2", doc.field("field2").name(), "FIELD2 should return the original case of the field name");
+    }
+
 }

@@ -33,7 +33,9 @@ public class DocumentImpl implements Document {
     private final String form;
     private final DocumentMeta meta;
     private final List<String> warnings;
-    private final Map<String, Object> valueMap;
+
+    // Implementation mandates using a TreeMap with case-insensitive ordering for field names. This ensures that field access is case-insensitive.
+    private final TreeMap<String, Object> valueMap;
 
     /**
      * Constructs a DocumentImpl instance.
@@ -86,8 +88,12 @@ public class DocumentImpl implements Document {
     @Override
     public Field field(String name) {
         Object value = valueMap.get(name);
+        boolean isPresent = valueMap.containsKey(name);
+
+        // If the field is present, we return the original case of the field name as stored in the valueMap. If not present, we return the requested name.
+        String actualName = valueMap.containsKey(name) ? valueMap.ceilingKey(name) : name;
 
         // value being null does not mean the field is absent, it could be present with a null value. So we check if the key exists in the map.
-        return new FieldImpl(name, value, valueMap.containsKey(name));
+        return new FieldImpl(actualName, value, isPresent);
     }
 }
