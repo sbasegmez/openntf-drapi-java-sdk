@@ -37,8 +37,10 @@ import org.openntf.drapi.exception.AuthenticationException;
 import org.openntf.drapi.exception.DrapiException;
 import org.openntf.drapi.exception.ErrorMessage;
 import org.openntf.drapi.exception.JsonBindingException;
+import org.openntf.drapi.DrapiConfigBuilder;
 import org.openntf.drapi.http.HttpTransport;
-import org.openntf.drapi.internal.DrapiConfigBuilder;
+import org.openntf.drapi.internal.dto.AuthRequest;
+import org.openntf.drapi.internal.dto.AuthResponse;
 import org.openntf.drapi.internal.test.AbstractHttpMockTest;
 import org.openntf.drapi.json.JsonBinding;
 import org.openntf.drapi.json.JsonBindingTestSupport;
@@ -94,13 +96,13 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.toJson(any())).thenReturn("{\"username\":\"some-user\",\"password\":\"some-password\"}");
 
         // Mock the JSON binding to return a specific AuthResponse object if anyone asks for an AuthResponse from a JSON string
-        when(jsonBinding.fromJson(anyString(), eq(BasicAuthenticationProvider.AuthResponse.class)))
-            .thenReturn(new BasicAuthenticationProvider.AuthResponse("mocked-token", Map.of("exp", 123456789), 0, 3600, null));
+        when(jsonBinding.fromJson(anyString(), eq(AuthResponse.class)))
+            .thenReturn(new AuthResponse("mocked-token", Map.of("exp", 123456789), 0, 3600, null));
 
         // Let's get the token and assert that it matches the mocked response
         BearerToken token = provider(config).acquireToken(toolkit(config));
 
-        verify(jsonBinding).toJson(new BasicAuthenticationProvider.AuthRequest("some-user", "some-password"));
+        verify(jsonBinding).toJson(new AuthRequest("some-user", "some-password"));
         assertEquals("/api/v1/auth", mirrorRequest.get().path(), "The request path should match the expected auth path");
         assertEquals("mocked-token", token.bearer(), "The acquired token should match the mocked token");
         assertEquals(123456789, token.claims().get("exp"), "The token expiration should match the mocked value");
@@ -116,8 +118,8 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.toJson(any())).thenReturn("{\"username\":\"some-user\",\"password\":\"some-password\"}");
 
         // Mock the JSON binding to return a specific AuthResponse object if anyone asks for an AuthResponse from a JSON string
-        when(jsonBinding.fromJson(anyString(), eq(BasicAuthenticationProvider.AuthResponse.class)))
-            .thenReturn(new BasicAuthenticationProvider.AuthResponse(null, null, 0, 0, null));
+        when(jsonBinding.fromJson(anyString(), eq(AuthResponse.class)))
+            .thenReturn(new AuthResponse(null, null, 0, 0, null));
 
         DrapiException drapiException = assertThrowsExactly(DrapiException.class, () -> provider(config).acquireToken(toolkit(config)));
         assertEquals("Invalid authentication response", drapiException.getMessage(), "The exception message should indicate an invalid authentication response");
@@ -133,7 +135,7 @@ class BasicAuthenticationProviderTest extends AbstractHttpMockTest {
         when(jsonBinding.toJson(any())).thenReturn("{\"username\":\"some-user\",\"password\":\"some-password\"}");
 
         // Mock the JSON binding to return a specific AuthResponse object if anyone asks for an AuthResponse from a JSON string
-        when(jsonBinding.fromJson(anyString(), eq(BasicAuthenticationProvider.AuthResponse.class)))
+        when(jsonBinding.fromJson(anyString(), eq(AuthResponse.class)))
             .thenThrow(new JsonBindingException(("Invalid JSON")));
 
         assertThrowsExactly(JsonBindingException.class, () -> provider(config).acquireToken(toolkit(config)),

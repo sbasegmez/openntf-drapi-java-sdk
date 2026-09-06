@@ -17,14 +17,15 @@ package org.openntf.drapi.internal.auth;
 
 import static org.openntf.drapi.internal.http.HttpHeaderConstants.APPLICATION_JSON;
 
-import java.util.Map;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.exception.AuthenticationException;
 import org.openntf.drapi.exception.DrapiException;
+import org.openntf.drapi.http.ApiPath;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.RequestBody;
-import org.openntf.drapi.internal.http.ApiPath;
+import org.openntf.drapi.internal.dto.AuthRequest;
+import org.openntf.drapi.internal.dto.AuthResponse;
 import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.json.JsonBinding;
 
@@ -86,14 +87,6 @@ public final class BasicAuthenticationProvider extends AuthenticationProviderBas
     @Override
     public boolean supportsRefresh() {
         return true;
-    }
-
-    public record AuthRequest(String username, String password) {
-
-    }
-
-    public record AuthResponse(String bearer, Map<String, Object> claims, int leeway, int expSeconds, String issueDate) {
-
     }
 
 }
