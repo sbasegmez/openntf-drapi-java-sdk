@@ -35,11 +35,11 @@ public interface Field {
     String name();
 
     /**
-     * Checks whether the field is present in the document, regardless of its value.
+     * Checks whether the field exists in the document, regardless of its value.
      *
      * @return true if the field is present, false otherwise
      */
-    boolean isPresent();
+    boolean exists();
 
     /**
      * Checks whether the field value is null.

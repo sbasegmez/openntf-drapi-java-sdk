@@ -26,12 +26,12 @@ public class FieldImpl implements Field {
 
     private final String name;
     private final Object rawValue;
-    private final boolean present;
+    private final boolean exists;
 
-    public FieldImpl(String name, Object rawValue, boolean present) {
+    public FieldImpl(String name, Object rawValue, boolean exists) {
         this.name = name;
         this.rawValue = rawValue;
-        this.present = present;
+        this.exists = exists;
     }
 
     @Override
@@ -40,8 +40,8 @@ public class FieldImpl implements Field {
     }
 
     @Override
-    public boolean isPresent() {
-        return this.present;
+    public boolean exists() {
+        return this.exists;
     }
 
     @Override
