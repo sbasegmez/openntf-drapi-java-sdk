@@ -1,0 +1,54 @@
+{
+  "category": "",
+  "fieldGroupTest": {
+    "0": {
+      "firstName": "Jesse",
+      "lastName": "Gallagher"
+    },
+    "1": {
+      "firstName": "Nathan T",
+      "lastName": "Freeman"
+    },
+    "2": {
+      "firstName": "Paul S",
+      "lastName": "Withers"
+    }
+  },
+  "chefs": [
+    "Jesse Gallagher",
+    "Nathan T Freeman",
+    "Paul S Withers"
+  ],
+  "cooks": [
+    "Jesse Gallagher",
+    "Tim Tripcony",
+    "Paul Withers",
+    "Declan Lynch",
+    "Rene Winklemeyer"
+  ],
+  "markdownBody": {
+    "type": "text/markdown",
+    "encoding": "PLAIN",
+    "content": "```\n2026-09-04T07:47:59.28Z\n```\n\n"
+  },
+  "htmlBody": {
+    "type": "text/html",
+    "encoding": "PLAIN",
+    "content": "<pre>2026-09-04T07:47:59.28Z</pre>"
+  },
+  "mimeBody": {
+    "type": "multipart/form-data",
+    "topLevelType": "text/plain",
+    "encoding": "BASE64",
+    "content": "WC1NSU1FVHJhY2s6IEl0ZW1pemUgYnkgcmVzdGFwaSBvbiBtYWdnaWUvZGV2ZWxvcGkoUmVsZWFzZSAxNC41LjFGUDF8SnVuZSAyNiwgMjAyNikgYXQNCiAwNC8wOS8yMDI2IDEyOjE4OjE5LA0KCUl0ZW1pemUgYnkgcmVzdGFwaSBvbiBtYWdnaWUvZGV2ZWxvcGkoUmVsZWFzZSAxNC41LjFGUDF8SnVuZSAyNiwgMjAyNikgYXQNCiAwNC8wOS8yMDI2IDEyOjE4OjQ0LA0KCUl0ZW1pemUgYnkgcmVzdGFwaSBvbiBtYWdnaWUvZGV2ZWxvcGkoUmVsZWFzZSAxNC41LjFGUDF8SnVuZSAyNiwgMjAyNikgYXQNCiAwNC8wOS8yMDI2IDEyOjE5OjIyLA0KCVNlcmlhbGl6ZSBieSByZXN0YXBpIG9uIG1hZ2dpZS9kZXZlbG9waShSZWxlYXNlIDE0LjUuMUZQMXxKdW5lIDI2LCAyMDI2KSBhdA0KIDA2LzA5LzIwMjYgMjE6MTg6NTksDQoJU2VyaWFsaXplIGNvbXBsZXRlIGF0IDA2LzA5LzIwMjYgMjE6MTg6NTkNCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD1VVEYtOA0KDQoyMDI2LTA5LTA0VDA3OjQ3OjU5LjI4Wg=="
+  },
+  "emptyList": [],
+  "details": "",
+  "downloads": 16061.0,
+  "id": "834D5167536C762386257B41000FFBD8",
+  "name": "OpenNTF Domino API",
+  "overview": "Wrapper API for lotus.domino API",
+  "sourceControlUrl": "org.openntf.domino",
+  "sourceUrl": "https://www.openntf.org/main.nsf/project.xsp?r=project/OpenNTF+Domino+API",
+  "Form": "project"
+}
