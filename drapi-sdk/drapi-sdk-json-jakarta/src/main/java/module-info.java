@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module org.openntf.json.jakarta {
+module org.openntf.drapi.json.jakarta {
 
     requires org.openntf.drapi;
     requires jakarta.json;
     requires jakarta.json.bind;
 
     // No exports: this module is consumed only through the JsonBindingProvider service, never by direct type reference.
-    provides org.openntf.drapi.json.JsonBindingProvider with org.openntf.json.jakarta.JakartaJsonBindingProvider;
+    provides org.openntf.drapi.json.JsonBindingProvider with org.openntf.drapi.json.jakarta.JakartaJsonBindingProvider;
 
 }

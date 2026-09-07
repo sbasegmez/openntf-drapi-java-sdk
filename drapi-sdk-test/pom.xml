@@ -23,9 +23,17 @@
             <groupId>org.openntf.drapi</groupId>
             <artifactId>drapi-sdk-core</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- Test dependencies -->
+        <!-- Integration Test uses Jakarta Json APIs -->
+        <dependency>
+            <groupId>org.openntf.drapi</groupId>
+            <artifactId>drapi-sdk-json-jakarta</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.openntf.drapi</groupId>
             <artifactId>drapi-sdk-core</artifactId>
@@ -33,6 +41,21 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
+        <!-- Json Processing API and Implementations for Integration Tests -->
+        <dependency>
+            <groupId>org.eclipse.parsson</groupId>
+            <artifactId>parsson</artifactId>
+            <version>${parsson.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <version>${yasson.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

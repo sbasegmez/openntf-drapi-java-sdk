@@ -61,10 +61,10 @@ class DocumentImplTest {
         assertEquals("Value1", doc.field("Field1").asString().orElse(""), "Field1 value should match");
         assertEquals(123, doc.field("Field2").asInt().orElse(0), "Field2 value should match");
 
-        assertTrue(doc.field("Field3").isPresent(), "Field3 should be present");
+        assertTrue(doc.field("Field3").exists(), "Field3 should be present");
         assertTrue(doc.field("Field3").isNull(), "Field3 should be null");
 
-        assertFalse(doc.field("NonExistentField").isPresent(), "Non-existent field should not be present");
+        assertFalse(doc.field("NonExistentField").exists(), "Non-existent field should not be present");
         assertFalse(doc.field("NonExistentField").raw().isPresent(), "Non-existent field should not have a value");
     }
 
@@ -73,9 +73,9 @@ class DocumentImplTest {
     void testCaseInsensitiveFieldAccess() {
         var doc = new DocumentImpl("TestForm", null, null, Map.of("Field1", "Value1", "FIELD2", 123));
 
-        assertTrue(doc.field("field1").isPresent(), "Field1 should be accessible case-insensitively");
+        assertTrue(doc.field("field1").exists(), "Field1 should be accessible case-insensitively");
         assertEquals("Value1", doc.field("field1").asString().orElse(""), "Field1 value should match");
-        assertTrue(doc.field("Field2").isPresent(), "FIELD2 should be accessible case-insensitively");
+        assertTrue(doc.field("Field2").exists(), "FIELD2 should be accessible case-insensitively");
         assertEquals(123, doc.field("Field2").asInt().orElse(0), "Field2 value should match");
     }
 

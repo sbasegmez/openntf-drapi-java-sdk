@@ -1,0 +1,86 @@
+{
+  "@meta": {
+    "noteid": 46366,
+    "lastaccessed": "2024-11-17T19:19:22.8Z",
+    "lastmodifiedinfile": "2024-11-17T19:21:24.81Z",
+    "addedtofile": "2024-11-17T19:19:36.8Z",
+    "noteclass": [
+      "DATA",
+      "DOCUMENT"
+    ],
+    "unread": false,
+    "editable": true,
+    "unid": "0C19F98DC58BCB1900258BD8006A25AF",
+    "created": "2024-11-17T15:01:36.63Z",
+    "lastmodified": "2024-11-17T19:21:24.81Z",
+    "revision": "00000001006A25C000258BD8",
+    "etag": "W/\" 673a41bc\"",
+    "toplevelchildunids": [],
+    "size": 1137
+  },
+  "category": "",
+  "fieldGroupTest": {
+    "0": {
+      "firstName": "Jesse",
+      "lastName": "Gallagher"
+    },
+    "1": {
+      "firstName": "Nathan T",
+      "lastName": "Freeman"
+    },
+    "2": {
+      "firstName": "Paul S",
+      "lastName": "Withers"
+    }
+  },
+  "chefs": [
+    "Jesse Gallagher",
+    "Nathan T Freeman",
+    "Paul S Withers"
+  ],
+  "cooks": [
+    "Jesse Gallagher",
+    "Tim Tripcony",
+    "Paul Withers",
+    "Declan Lynch",
+    "Rene Winklemeyer"
+  ],
+  "markdownBody": {
+    "type": "text/markdown",
+    "encoding": "PLAIN",
+    "content": "```\n2026-09-04T07:47:59.28Z\n```\n\n"
+  },
+  "htmlBody": {
+    "type": "text/html",
+    "encoding": "PLAIN",
+    "content": "<pre>2026-09-04T07:47:59.28Z</pre>"
+  },
+  "mimeBody": {
+    "type": "multipart/form-data",
+    "topLevelType": "text/plain",
+    "encoding": "BASE64",
+    "content": "WC1NSU1FVHJhY2s6IEl0ZW1pemUgYnkgcmVzdGFwaSBvbiBtYWdnaWUvZGV2ZWxvcGkoUmVsZWFzZSAxNC41LjFGUDF8SnVuZSAyNiwgMjAyNikgYXQNCiAwNC8wOS8yMDI2IDEyOjE4OjE5LA0KCUl0ZW1pemUgYnkgcmVzdGFwaSBvbiBtYWdnaWUvZGV2ZWxvcGkoUmVsZWFzZSAxNC41LjFGUDF8SnVuZSAyNiwgMjAyNikgYXQNCiAwNC8wOS8yMDI2IDEyOjE4OjQ0LA0KCUl0ZW1pemUgYnkgcmVzdGFwaSBvbiBtYWdnaWUvZGV2ZWxvcGkoUmVsZWFzZSAxNC41LjFGUDF8SnVuZSAyNiwgMjAyNikgYXQNCiAwNC8wOS8yMDI2IDEyOjE5OjIyLA0KCVNlcmlhbGl6ZSBieSByZXN0YXBpIG9uIG1hZ2dpZS9kZXZlbG9waShSZWxlYXNlIDE0LjUuMUZQMXxKdW5lIDI2LCAyMDI2KSBhdA0KIDA2LzA5LzIwMjYgMjE6MTg6NTksDQoJU2VyaWFsaXplIGNvbXBsZXRlIGF0IDA2LzA5LzIwMjYgMjE6MTg6NTkNCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD1VVEYtOA0KDQoyMDI2LTA5LTA0VDA3OjQ3OjU5LjI4Wg=="
+  },
+  "dateField": "2026-09-04",
+  "invalidDateField": "2026-02-29",
+  "dateTimeField": "2026-09-04T07:47:59.28Z",
+  "invalidDateTimeField": "2026-02-29T07:47:59.28Z",
+  "emptyList": [],
+  "details": "",
+  "nullField": null,
+  "downloadsDouble": 16061.0,
+  "downloadsInt": 16061,
+  "largeNumber": 2147483651,
+  "reallyDouble": 3.1415926,
+  "numberAsString": "123",
+  "id": "834D5167536C762386257B41000FFBD8",
+  "name": "OpenNTF Domino API",
+  "overview": "Wrapper API for lotus.domino API",
+  "sourceControlUrl": "org.openntf.domino",
+  "sourceUrl": "https://www.openntf.org/main.nsf/project.xsp?r=project/OpenNTF+Domino+API",
+  "Form": "project",
+  "@warnings": [
+    "No values found for item textField",
+    "No values found for item textList"
+  ]
+}

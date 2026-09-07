@@ -17,10 +17,12 @@ package org.openntf.drapi.internal.meta;
 
 import java.util.List;
 import java.util.Objects;
+import org.openntf.drapi.exception.DrapiException;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.json.JsonBinding;
 import org.openntf.drapi.meta.Document;
 import org.openntf.drapi.meta.DocumentMeta;
+import org.openntf.drapi.util.TypeUtils;
 
 public class ResponseParser {
 
@@ -52,13 +54,18 @@ public class ResponseParser {
 
         // TODO Investigate in what cases @form is present and in what cases Form is present.
         // For now, we will check for @form first, and if it's not present, we will check for Form.
-        // We expect that the "Form" field is always present in the bodyTree, but if it's not, we default to an empty string.
+        // We expect that the "Form" field is always present in the bodyTree, but if it's not, that's an invalid response.
         // We don't remove the "Form" field from the bodyTree, as it is part of the document's data.
         if (bodyTree.containsKey("@form")) {
             form = bodyTree.get("@form").toString();
             bodyTree.remove("@form");
-        } else {
-            form = bodyTree.getOrDefault("Form", "").toString();
+        } else if (bodyTree.containsKey("Form")) {
+            // "Form" field name will always be "Form", not "form" or "FORM", so we don't need to check for case-insensitive match.
+            form = bodyTree.get("Form").toString();
+        }
+
+        if(TypeUtils.isEmpty(form)) {
+            throw new DrapiException("Form field is missing in the response body. This is an invalid response.", null, response);
         }
 
         return new DocumentImpl(

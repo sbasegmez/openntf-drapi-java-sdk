@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.json.jakarta;
+package org.openntf.drapi.json.jakarta;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
