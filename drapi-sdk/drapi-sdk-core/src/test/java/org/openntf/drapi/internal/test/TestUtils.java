@@ -90,4 +90,15 @@ public class TestUtils {
         }
     }
 
+    public static String readTestResourceContent(String resourceName) {
+        try (var inputStream = TestUtils.class.getClassLoader().getResourceAsStream(resourceName)) {
+            if (inputStream == null) {
+                throw new IOException("Resource not found: " + resourceName);
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
