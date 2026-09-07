@@ -60,7 +60,7 @@ public class ResponseParser {
             form = bodyTree.get("@form").toString();
             bodyTree.remove("@form");
         } else if (bodyTree.containsKey("Form")) {
-            // "Form" field name is always be "Form", not "form" or "FORM", so we don't need to check for case-insensitive match.
+            // "Form" field name will always be "Form", not "form" or "FORM", so we don't need to check for case-insensitive match.
             form = bodyTree.get("Form").toString();
         }
 

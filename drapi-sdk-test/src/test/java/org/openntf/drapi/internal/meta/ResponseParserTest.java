@@ -23,9 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -86,7 +84,6 @@ class ResponseParserTest {
             Document doc = ResponseParser.toDocument(response);
 
             assertFalse(doc.warnings().isEmpty(), "Warnings should not be empty");
-            ;
             assertFalse(doc.fieldNames().contains("@warnings"), "@warnings should be removed from the field names");
         }
     }
@@ -221,7 +218,7 @@ class ResponseParserTest {
 
     @Test
     @DisplayName("Test Datetime access")
-    public void testDatetimeAccess() {
+    void testDatetimeAccess() {
         try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
             var doc = ResponseParser.toDocument(response);
 
@@ -235,7 +232,7 @@ class ResponseParserTest {
             assertTrue(dateTimeField.exists(), "Existing date-time field should be accessible and exists");
             assertFalse(dateTimeField.isMultiValue(), "Existing date-time field should not be recognized as multi-value");
             assertEquals("2026-09-04T07:47:59.28Z", dateTimeField.asString().orElse(""), "Existing date-time field should return the correct string value");
-            assertEquals(OffsetDateTime.of(2026, 9, 4, 7, 47, 59, 280_000_000, ZoneOffset.UTC), dateTimeField.asDateTime().orElse(null), "Existing date-time field should return the correct LocalDateTime value");
+            assertEquals(OffsetDateTime.of(2026, 9, 4, 7, 47, 59, 280_000_000, ZoneOffset.UTC), dateTimeField.asDateTime().orElse(null), "Existing date-time field should return the correct OffsetDateTime value");
 
             var invalidDateField = doc.field("invalidDateField");
             assertTrue(invalidDateField.exists(), "Invalid date field should be accessible and exists");
