@@ -106,6 +106,7 @@ public class JdkHttpTransport extends HttpTransportBase {
     }
 
     private DrapiResponse toDrapiResponse(HttpResponse<InputStream> httpResponse) {
+        // TODO : Import some of the request information into the DrapiResponse for troubleshooting purposes, such as the request path, method, and headers.
         return new DrapiResponse(httpResponse.statusCode(), httpResponse.headers().map(), httpResponse.body());
     }
 

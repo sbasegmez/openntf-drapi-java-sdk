@@ -28,20 +28,15 @@ import org.openntf.drapi.meta.Document;
 public class DocumentsApiImpl extends AbstractDataSourceApi implements DocumentsApi {
 
     private static final Log LOG = Log.getLogger(DocumentsApiImpl.class);
+    public static final ApiPath DOCUMENT_API_PATH = ApiPath.root("/document");
 
     public DocumentsApiImpl(DrapiContext context, String dataSource) {
         super(context, dataSource);
     }
 
     @Override
-    public CompletableFuture<Document> get(String documentId) {
-        return get(documentId, null);
-    }
-
-    @Override
     public CompletableFuture<Document> get(String documentId, DocumentsGetOptions options) {
-        DrapiRequest request = DrapiRequest.get(ApiPath.root("/document")
-                                                       .append(documentId))
+        DrapiRequest request = DrapiRequest.get(DOCUMENT_API_PATH.append(documentId))
                                            .queryParam(QS_DATASOURCE, dataSource());
 
         if (options != null) {
