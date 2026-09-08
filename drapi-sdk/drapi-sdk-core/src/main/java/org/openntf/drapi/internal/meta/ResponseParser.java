@@ -56,10 +56,10 @@ public class ResponseParser {
         // For now, we will check for @form first, and if it's not present, we will check for Form.
         // We expect that the "Form" field is always present in the bodyTree, but if it's not, that's an invalid response.
         // We don't remove the "Form" field from the bodyTree, as it is part of the document's data.
-        if (bodyTree.containsKey("@form")) {
+        if (TypeUtils.isNotEmpty(bodyTree.get("@form"))) {
             form = bodyTree.get("@form").toString();
             bodyTree.remove("@form");
-        } else if (bodyTree.containsKey("Form")) {
+        } else if (TypeUtils.isNotEmpty(bodyTree.get("Form"))) {
             // "Form" field name will always be "Form", not "form" or "FORM", so we don't need to check for case-insensitive match.
             form = bodyTree.get("Form").toString();
         }
@@ -80,7 +80,7 @@ public class ResponseParser {
         if(obj instanceof java.util.Map<?, ?> map) {
             return new DocumentMeta(
                 DataTypeUtils.toLong(map.get("noteid")).orElse(null),
-                DataTypeUtils.toString(map.get("unid")).orElse(null),
+                DataTypeUtils.toStringValue(map.get("unid")).orElse(null),
                 DataTypeUtils.toDateTime(map.get("created")).orElse(null),
                 DataTypeUtils.toDateTime(map.get("addedtofile")).orElse(null),
                 DataTypeUtils.toDateTime(map.get("lastmodified")).orElse(null),
@@ -89,11 +89,11 @@ public class ResponseParser {
                 DataTypeUtils.typedList(map.get("noteclass"), String.class).orElse(List.of()),
                 DataTypeUtils.toBoolean(map.get("unread")).orElse(null),
                 DataTypeUtils.toBoolean(map.get("editable")).orElse(null),
-                DataTypeUtils.toString(map.get("revision")).orElse(null),
-                DataTypeUtils.toString(map.get("etag")).orElse(null),
+                DataTypeUtils.toStringValue(map.get("revision")).orElse(null),
+                DataTypeUtils.toStringValue(map.get("etag")).orElse(null),
                 DataTypeUtils.typedList(map.get("toplevelchildunids"), String.class).orElse(List.of()),
                 DataTypeUtils.toLong(map.get("size")).orElse(null),
-                DataTypeUtils.toString(map.get("form")).orElse(null)
+                DataTypeUtils.toStringValue(map.get("form")).orElse(null)
             );
 
 
