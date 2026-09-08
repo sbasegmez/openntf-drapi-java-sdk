@@ -22,7 +22,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openntf.drapi.json.AbstractJsonBindingTest;
 import org.openntf.drapi.json.JsonBinding;
-import org.openntf.drapi.json.jakarta.JakartaJsonBinding;
 
 class JakartaJsonBindingTest extends AbstractJsonBindingTest {
 
