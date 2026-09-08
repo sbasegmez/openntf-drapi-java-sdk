@@ -18,8 +18,8 @@ package org.openntf.drapi.internal.api;
 import java.util.concurrent.CompletableFuture;
 import org.openntf.drapi.api.DocumentsApi;
 import org.openntf.drapi.api.options.DocumentsGetOptions;
-import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.ApiPath;
+import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.internal.DrapiContext;
 import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.internal.meta.ResponseParser;
@@ -45,7 +45,7 @@ public class DocumentsApiImpl extends AbstractDataSourceApi implements Documents
                                            .queryParam(QS_DATASOURCE, dataSource());
 
         if (options != null) {
-            options.applyToRequest(request);
+            options.toParameterList().forEach(request::queryParam);
         }
 
         LOG.trace("Submitting request for {}", request.path());
