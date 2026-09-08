@@ -15,14 +15,9 @@
  */
 package org.openntf.drapi.internal.meta;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import org.openntf.drapi.meta.Field;
 
-public class FieldImpl implements Field {
+public final class FieldImpl implements Field {
 
     private final String name;
     private final Object rawValue;
@@ -45,62 +40,8 @@ public class FieldImpl implements Field {
     }
 
     @Override
-    public boolean isNull() {
-        return rawValue == null;
+    public Object rawValue() {
+        return this.rawValue;
     }
 
-    @Override
-    public boolean isMultiValue() {
-        return rawValue instanceof Collection<?>;
-    }
-
-    @Override
-    public Optional<Object> raw() {
-        return Optional.ofNullable(rawValue);
-    }
-
-    @Override
-    public <T> Optional<T> as(Class<T> type) {
-        return DataTypeUtils.typedScalar(rawValue, type);
-    }
-
-    @Override
-    public <T> List<T> asList(Class<T> type) {
-        return DataTypeUtils.typedList(rawValue, type).orElse(List.of());
-    }
-
-    @Override
-    public Optional<String> asString() {
-        return as(String.class);
-    }
-
-    @Override
-    public Optional<Integer> asInt() {
-        return as(Integer.class);
-    }
-
-    @Override
-    public Optional<Long> asLong() {
-        return as(Long.class);
-    }
-
-    @Override
-    public Optional<Double> asDouble() {
-        return as(Double.class);
-    }
-
-    @Override
-    public Optional<Boolean> asBoolean() {
-        return as(Boolean.class);
-    }
-
-    @Override
-    public Optional<OffsetDateTime> asDateTime() {
-        return as(OffsetDateTime.class);
-    }
-
-    @Override
-    public Optional<LocalDate> asDate() {
-        return as(LocalDate.class);
-    }
 }
