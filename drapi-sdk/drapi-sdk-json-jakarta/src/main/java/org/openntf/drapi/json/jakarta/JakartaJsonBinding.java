@@ -26,6 +26,8 @@ import jakarta.json.JsonValue;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
+import jakarta.json.stream.JsonParser;
+import jakarta.json.stream.JsonParser.Event;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 import org.openntf.drapi.exception.JsonBindingException;
 import org.openntf.drapi.json.JsonBinding;
 
@@ -90,6 +93,66 @@ public class JakartaJsonBinding implements JsonBinding {
         }
     }
 
+    @Override
+    public Stream<Map<String, Object>> streamFromJsonArray(InputStream jsonStream) {
+        final JsonParser parser;
+
+        // Let's try to create the parser first, and if it fails, we can close the stream manually.
+        try {
+            parser = Json.createParser(Objects.requireNonNull(jsonStream, "jsonStream cannot be null"));
+        } catch (JsonException e) {
+            // We don't have a parser to close here, so we need to close stream manually.
+            try {
+                jsonStream.close();
+            } catch (Exception closeException) {
+                e.addSuppressed(closeException);
+            }
+            throw new JsonBindingException("Could not create JSON parser", e);
+        }
+
+        // Now we have a parser, we don't have to think about the stream anymore.
+        boolean parserNeedsClosing = true; // Flag to track if the parser needs to be closed
+
+        try {
+            if (!parser.hasNext()) {
+                throw new JsonBindingException("Empty JSON stream");
+            }
+
+            Event firstEvent = parser.next(); // Move to the first event
+
+            if (firstEvent == Event.START_ARRAY) {
+
+                parserNeedsClosing = false; // The parser will be closed by the stream's onClose handler
+
+                // TODO This code fails with a JsonException if the input stream ended prematurely. We can create our own stream
+                //  from a spliterator that reads elements one by one and handles premature end of stream gracefully.
+                //  Manual stream might also eliminate the need for the onClose handler.
+
+                return parser.getArrayStream()
+                             .map(JakartaJsonBinding::requireObject) // Ensure each element is a JsonObject
+                             .map(JakartaJsonBinding::toMap)
+                             .onClose(parser::close); // Ensure the parser is closed when the stream is closed
+
+            } else {
+                throw new JsonBindingException("Expected a JSON array but found " + firstEvent);
+            }
+
+        } catch (JsonException e) {
+            throw new JsonBindingException("Could not parse JSON array", e);
+        } finally {
+            if (parserNeedsClosing) {
+                parser.close(); // Close the parser if it wasn't handed over to the stream's onClose handler
+            }
+        }
+    }
+
+    private static JsonObject requireObject(JsonValue jsonValue) {
+        if (!(jsonValue instanceof JsonObject object)) {
+            throw new JsonBindingException("Expected a JSON object but found " + jsonValue.getValueType());
+        }
+        return object;
+    }
+
     private static Map<String, Object> toMap(JsonObject jsonObject) {
         // Use LinkedHashMap to preserve insertion order
         Map<String, Object> map = new LinkedHashMap<>();
@@ -127,7 +190,7 @@ public class JakartaJsonBinding implements JsonBinding {
      * @return a Long if the number is integral, otherwise a Double
      */
     private static Object toNumber(JsonNumber number) {
-        if(number.isIntegral()) {
+        if (number.isIntegral()) {
             return number.longValue();
         } else {
             return number.doubleValue();

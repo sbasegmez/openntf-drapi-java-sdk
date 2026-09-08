@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.stream.Stream;
+import org.openntf.drapi.exception.JsonBindingException;
 import org.openntf.drapi.util.ServiceRegistry;
 
 /**
@@ -74,6 +76,25 @@ public interface JsonBinding {
      * @param outputStream the OutputStream to write the JSON data to
      */
     void toJson(Object objectValue, OutputStream outputStream);
+
+    /**
+     * Deserializes JSON data from the provided InputStream into a Stream of Map<String, Object>. Each map represents a JSON object
+     * within the stream.
+     * <p>
+     * Throws a JsonBindingException if the JSON data is not in the expected format (e.g., not a JSON array).
+     * <p>
+     * The returned Stream should be closed after use to ensure that the underlying InputStream is also closed. Use try-with-resources
+     * or explicitly call close() on the Stream when done.
+     * <p>
+     * The implementation should handle all exceptions and translate them to JsonBindingException, providing meaningful error messages
+     * to help diagnose issues with the JSON data or the deserialization process. The consumer should expect an IO error during
+     * streaming as the connection can drop in mid-stream.
+     *
+     * @param jsonStream the InputStream containing the JSON data, will be closed when returning stream is closed
+     * @return a Stream of maps representing the deserialized JSON objects, should be closed after use
+     * @throws JsonBindingException if the JSON data is not in the expected format or if an error occurs during deserialization
+     */
+    Stream<Map<String, Object>> streamFromJsonArray(InputStream jsonStream);
 
     /**
      * Deserializes JSON data from the provided jsonString into a Map<String, Object>. The resulting map represents the JSON structure,
