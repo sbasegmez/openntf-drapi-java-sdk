@@ -148,6 +148,13 @@ public final class DrapiRequest {
         return this;
     }
 
+    public DrapiRequest queryParam(Parameter queryParam) {
+        if (queryParam != null && queryParam.value() != null) {
+            this.queryParams.add(queryParam);
+        }
+        return this;
+    }
+
     public DrapiRequest queryParams(Map<String, List<String>> queryParams) {
         queryParams.forEach((key, values) -> {
             for (String value : values) {

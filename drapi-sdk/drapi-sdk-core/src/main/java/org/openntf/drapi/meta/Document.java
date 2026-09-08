@@ -42,7 +42,8 @@ public interface Document {
     List<String> warnings();
 
     /**
-     * @return the data field names, in case-insensitive order and with the server's original casing, excluding metadata keys
+     * @return the data field names, in case-insensitive order and with the server's original casing, excluding documented metadata keys
+     * (e.g. "@meta", "@form", "@warnings")
      */
     Set<String> fieldNames();
 

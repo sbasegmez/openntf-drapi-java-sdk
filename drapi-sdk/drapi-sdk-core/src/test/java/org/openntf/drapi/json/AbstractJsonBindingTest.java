@@ -22,7 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,7 +45,9 @@ public abstract class AbstractJsonBindingTest {
     protected abstract JsonBinding jsonBinding();
 
     // Record for testing purposes
-    public record Person(String name, int age, String city) {}
+    public record Person(String name, int age, String city) {
+
+    }
 
 
     @Test
@@ -262,4 +269,103 @@ public abstract class AbstractJsonBindingTest {
         }
     }
 
+    @Nested
+    @DisplayName("Test JSON binding streamFromJsonArray method")
+    class StreamFromJsonArrayTests {
+
+        static class CloseTrackingInputStream extends FilterInputStream {
+
+            private boolean closed = false;
+
+            public CloseTrackingInputStream(String json) {
+                super(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+            }
+
+            public boolean isClosed() {
+                return closed;
+            }
+
+            @Override
+            public void close() throws IOException {
+                closed = true;
+                super.close();
+            }
+        }
+
+
+        @Test
+        @DisplayName("Test streamFromJsonArray with empty stream")
+        void testStreamFromJsonArrayWithEmptyStream() {
+            var emptyStream = new CloseTrackingInputStream("");
+
+            assertThrows(JsonBindingException.class, () -> jsonBinding().streamFromJsonArray(emptyStream), "Expected JsonBindingException for empty input stream");
+            assertTrue(emptyStream.isClosed(), "Input stream should be closed after exception");
+        }
+
+        @Test
+        @DisplayName("Test streamFromJsonArray with non-Json input")
+        void testStreamFromJsonArrayWithNonJsonInput() {
+            var nonJsonStream = new CloseTrackingInputStream("This is not JSON");
+
+            assertThrows(JsonBindingException.class, () -> jsonBinding().streamFromJsonArray(nonJsonStream), "Expected JsonBindingException for non-JSON input stream");
+            assertTrue(nonJsonStream.isClosed(), "Input stream should be closed after exception");
+        }
+
+        @Test
+        @DisplayName("Test streamFromJsonArray with empty array")
+        void testStreamFromJsonArrayWithEmptyArray() {
+            var is = new CloseTrackingInputStream("[]");
+
+            try(var resultStream = jsonBinding().streamFromJsonArray(is)){
+                assertTrue(resultStream.findAny().isEmpty(), "Result stream should be empty for empty JSON array");
+            }
+
+            assertTrue(is.isClosed(), "Input stream should be closed after processing the stream");
+        }
+
+        @Test
+        @DisplayName("Test streamFromJsonArray with non-array JSON")
+        void testStreamFromJsonArrayWithNonArrayJson() {
+            var is = new CloseTrackingInputStream("{\"key\": \"value\"}");
+            assertThrows(JsonBindingException.class, () -> jsonBinding().streamFromJsonArray(is), "Expected JsonBindingException for non-array JSON");
+            assertTrue(is.isClosed(), "Input stream should be closed after exception");
+        }
+
+        @Test
+        @DisplayName("Test streamFromJsonArray with array of non-object elements")
+        void testStreamFromJsonArrayWithArrayOfNonObjectElements() {
+            var is = new CloseTrackingInputStream("[1, 2, 3]");
+
+            try (var resultStream = jsonBinding().streamFromJsonArray(is)) {
+                assertThrows(JsonBindingException.class, resultStream::findFirst, "Expected JsonBindingException for array of non-object elements");
+            }
+
+            assertTrue(is.isClosed(), "Input stream should be closed after exception");
+        }
+
+        @Test
+        @DisplayName("Test streamFromJsonArray with a proper array of objects")
+        void testStreamFromJsonArrayWithProperArrayOfObjects() {
+            var is = new CloseTrackingInputStream("""
+                                                      [
+                                                        {"key1": "value1"},
+                                                        {"key2": "value2"},
+                                                        {"key3": "value3"}
+                                                       ]
+                                                      """);
+
+            try(var stream = jsonBinding().streamFromJsonArray(is)) {
+                var list = stream.toList(); // Collect the stream into a list for easier assertions
+                assertEquals(3, list.size(), "Result list should contain 3 elements for the given JSON array");
+
+                assertEquals(Map.of("key1", "value1"), list.get(0), "First element should match the first JSON object");
+                assertEquals(Map.of("key2", "value2"), list.get(1), "Second element should match the second JSON object");
+                assertEquals(Map.of("key3", "value3"), list.get(2), "Third element should match the third JSON object");
+            }
+
+            assertTrue(is.isClosed(), "Input stream should be closed after stream processing");
+        }
+
+
+    }
 }

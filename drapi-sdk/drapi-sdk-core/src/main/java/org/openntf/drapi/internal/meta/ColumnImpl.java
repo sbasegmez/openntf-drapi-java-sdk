@@ -15,15 +15,15 @@
  */
 package org.openntf.drapi.internal.meta;
 
-import org.openntf.drapi.meta.Field;
+import org.openntf.drapi.meta.Column;
 
-public final class FieldImpl implements Field {
+public final class ColumnImpl implements Column {
 
     private final String name;
     private final Object rawValue;
     private final boolean exists;
 
-    public FieldImpl(String name, Object rawValue, boolean exists) {
+    public ColumnImpl(String name, Object rawValue, boolean exists) {
         this.name = name;
         this.rawValue = rawValue;
         this.exists = exists;

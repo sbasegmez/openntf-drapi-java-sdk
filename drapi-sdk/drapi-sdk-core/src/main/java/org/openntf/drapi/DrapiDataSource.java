@@ -16,6 +16,7 @@
 package org.openntf.drapi;
 
 import org.openntf.drapi.api.DocumentsApi;
+import org.openntf.drapi.api.ListsApi;
 
 /**
  * This class represents an API context on DRAPI. It is the bridge between DrapiClient and the API functions.
@@ -37,5 +38,13 @@ public interface DrapiDataSource {
      * @return an instance of DocumentsApi for interacting with documents in this data source
      */
     DocumentsApi documents();
+
+    /**
+     * Provides access to the Lists API for this data source. This allows for operations related to lists within the specified
+     * data source.
+     *
+     * @return an instance of ListsApi for interacting with lists in this data source
+     */
+    ListsApi lists();
 
 }

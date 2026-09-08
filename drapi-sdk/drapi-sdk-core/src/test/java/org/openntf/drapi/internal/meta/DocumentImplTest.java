@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -86,6 +87,25 @@ class DocumentImplTest {
 
         assertEquals("Field1", doc.field("field1").name(), "Field1 should return the original case of the field name");
         assertEquals("FIELD2", doc.field("field2").name(), "FIELD2 should return the original case of the field name");
+    }
+
+    @Test
+    @DisplayName("Test list access for number values")
+    void testListAccessForNumberValues() {
+        var doc = new DocumentImpl("TestForm", null, null, Map.of("Field1", List.of(1, 2, 3), "Field2", List.of(4.5, 5.5)));
+
+        var field1 = doc.field("field1");
+
+        assertEquals(3, field1.asList(Integer.class).size(), "List of whole numbers should be accessible through Integer mapping");
+        assertEquals(3, field1.asList(Long.class).size(), "List of whole numbers should be accessible through Long mapping");
+        assertEquals(3, field1.asList(Double.class).size(), "List of whole numbers should be accessible through Double mapping");
+
+        var field2 = doc.field("field2");
+
+        assertEquals(2, field2.asList(Double.class).size(), "List of decimal numbers should be accessible through Double mapping");
+        assertTrue(field2.asList(Integer.class).isEmpty(), "List of decimal numbers should not be accessible through Integer mapping");
+        assertTrue(field2.asList(Long.class).isEmpty(), "List of decimal numbers should be accessible through Long mapping");
+
     }
 
 }

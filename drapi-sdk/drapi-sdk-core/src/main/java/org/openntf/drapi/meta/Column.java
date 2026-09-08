@@ -15,10 +15,11 @@
  */
 package org.openntf.drapi.meta;
 
-import org.openntf.drapi.internal.meta.FieldImpl;
+import org.openntf.drapi.internal.meta.ColumnImpl;
 
 /**
- * Represents a field in a document. Currently, it's pretty much a marker interface, but it will be extended in the future.
+ * Represents a column in a view. Currently, it's pretty much a marker interface.
  */
-public sealed interface Field extends ValueHolder permits FieldImpl {
+public sealed interface Column extends ValueHolder permits ColumnImpl {
+
 }

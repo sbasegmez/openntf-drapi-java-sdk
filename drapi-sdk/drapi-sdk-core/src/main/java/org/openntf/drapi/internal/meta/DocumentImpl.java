@@ -49,10 +49,10 @@ public class DocumentImpl implements Document {
      * @param warnings a list of warnings related to the document, can be null
      * @param valueMap a map containing field names and their corresponding values
      */
-    public DocumentImpl(String form, DocumentMeta meta, List<String> warnings, Map<String, Object> valueMap) {
+    DocumentImpl(String form, DocumentMeta meta, List<String> warnings, Map<String, Object> valueMap) {
         this.form = TypeUtils.requireNonEmpty(form, "Form name cannot be null or empty");
         this.meta = meta;
-        this.warnings = warnings == null ? List.of() : warnings;
+        this.warnings = warnings == null ? List.of() : List.copyOf(warnings);
 
         this.valueMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         this.valueMap.putAll(Objects.requireNonNull(valueMap, "Value map cannot be null"));
@@ -70,7 +70,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public List<String> warnings() {
-        return warnings;
+        return List.copyOf(warnings);
     }
 
     @Override
@@ -87,6 +87,8 @@ public class DocumentImpl implements Document {
 
     @Override
     public Field field(String name) {
+        Objects.requireNonNull(name, "Field name cannot be null");
+
         Object value = valueMap.get(name);
         boolean isPresent = valueMap.containsKey(name);
 

@@ -33,7 +33,7 @@ class DataTypeUtilsTest {
     @DisplayName("Test typedScalar")
     void testTypedScalar() {
         assertTrue(DataTypeUtils.typedScalar(null, String.class).isEmpty(), "Null value should return empty Optional");
-        assertTrue(DataTypeUtils.typedScalar("test", NonExistentType.class).isEmpty(), "Unsupported type should return empty Optional");
+        assertThrows(IllegalArgumentException.class, () -> DataTypeUtils.typedScalar("test", NonExistentType.class), "Unsupported type should throw IllegalArgumentException");
     }
 
     @Test
@@ -41,22 +41,28 @@ class DataTypeUtilsTest {
     void testTypedList() {
         assertTrue(DataTypeUtils.typedList(null, String.class).isEmpty(), "Null value should return empty Optional");
 
-        assertEquals(List.of("test"), DataTypeUtils.typedList("test", String.class).orElse(List.of()), "Non-list value should return a list with the single element");
         assertEquals(List.of("test1", "test2"), DataTypeUtils.typedList(List.of("test1", "test2"), String.class).orElse(List.of()), "List of strings should return the same list");
         assertEquals(List.of(123, 456), DataTypeUtils.typedList(List.of(123, 456), Integer.class).orElse(List.of()), "List of integers should return the same list");
 
-        assertTrue(DataTypeUtils.typedList(List.of("test1", "test2"), NonExistentType.class).isEmpty(), "Unsupported type should return empty Optional");
+        assertThrows(IllegalArgumentException.class, () -> DataTypeUtils.typedList(List.of("test1", "test2"), NonExistentType.class), "Unsupported type should throw IllegalArgumentException");
         assertTrue(DataTypeUtils.typedList(List.of("test1", 123), String.class).isEmpty(), "Mixed type list should return empty Optional");
         assertTrue(DataTypeUtils.typedList("test", Integer.class).isEmpty(), "Non-list value of unsupported type should return empty Optional");
+
+        assertEquals(2, DataTypeUtils.typedList(List.of(42L, 13L), Integer.class).orElse(List.of()).size(), "List of longs should return a list of the same size when converted to integers");
+
+        // Currently we have a strict schema compatibility check.
+        // assertEquals(List.of("test"), DataTypeUtils.typedList("test", String.class).orElse(List.of()), "Non-list value should return a list with the single element");
+        // assertEquals(List.of(42), DataTypeUtils.typedList(42, Integer.class).orElse(List.of()), "Non-list value of supported type should return a list with the single element when types match");
+        // assertEquals(List.of(42L), DataTypeUtils.typedList(42, Long.class).orElse(List.of()), "Non-list value of supported type should return a list with the single element when types are compatible (Integer to Long)");
     }
 
     @Test
     @DisplayName("Test String conversion")
     void testStringConversion() {
-        assertEquals("test", DataTypeUtils.toString("test").orElse("NO_VALUE"));
-        assertNotEquals("123", DataTypeUtils.toString(123).orElse("NO_VALUE"), "toString should not convert Integer to String");
-        assertNotEquals("true", DataTypeUtils.toString(true).orElse("NO_VALUE"), "toString should not convert Boolean to String");
-        assertNull(DataTypeUtils.toString(null).orElse(null));
+        assertEquals("test", DataTypeUtils.toStringValue("test").orElse("NO_VALUE"));
+        assertNotEquals("123", DataTypeUtils.toStringValue(123).orElse("NO_VALUE"), "toString should not convert Integer to String");
+        assertNotEquals("true", DataTypeUtils.toStringValue(true).orElse("NO_VALUE"), "toString should not convert Boolean to String");
+        assertNull(DataTypeUtils.toStringValue(null).orElse(null));
     }
 
     @Test

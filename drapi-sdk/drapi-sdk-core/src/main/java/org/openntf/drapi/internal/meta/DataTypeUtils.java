@@ -36,7 +36,7 @@ public class DataTypeUtils {
         }
 
         if (type == String.class) {
-            return toString(value).map(type::cast);
+            return toStringValue(value).map(type::cast);
         }
         if (type == Integer.class) {
             return toInteger(value).map(type::cast);
@@ -59,11 +59,16 @@ public class DataTypeUtils {
 
         // TODO Add Custom type conversion support
 
-        return Optional.empty(); // Add more type conversions as needed
+        throw new IllegalArgumentException("Unsupported type: " + type.getName());
     }
 
     public static <T> Optional<List<T>> typedList(Object value, Class<T> type) {
+        Objects.requireNonNull(type, "Type must not be null");
         List<T> resultList = new ArrayList<>();
+
+        if(value == null) {
+            return Optional.empty();
+        }
 
         if(value instanceof List<?> list) {
             for(Object item : list) {
@@ -76,17 +81,19 @@ public class DataTypeUtils {
             }
 
             return Optional.of(resultList);
-        } else if (type.isInstance(value)) {
-            // If the value is a single instance of the desired type, wrap it in a list
-            resultList.add(type.cast(value));
-            return Optional.of(resultList);
         }
 
-        return Optional.empty();
+        return Optional.empty(); // If the value is not a list, return empty for now.
+
+        // This is a design choice: If we go with strict schema-enforcement, we should return empty if the value is not a list.
+        // However, if we have a lenient mode and allow single values to be treated as lists, we could do the following:
+        // If the value is a single instance of the desired type (or a compatible one), wrap it in a list
+        // return typedScalar(value, type).map(List::of);
+
     }
 
 
-    public static Optional<String> toString(Object value) {
+    public static Optional<String> toStringValue(Object value) {
         if(value instanceof String strValue) {
             return Optional.of(strValue);
         }
@@ -204,7 +211,7 @@ public class DataTypeUtils {
      * @return an Optional containing the OffsetDateTime if conversion is successful, or empty if not
      */
     public static Optional<OffsetDateTime> toDateTime(Object value) {
-        Optional<String> stringValue = toString(value);
+        Optional<String> stringValue = toStringValue(value);
 
         if (stringValue.isPresent()) {
             try {
@@ -218,7 +225,7 @@ public class DataTypeUtils {
     }
 
     public static Optional<LocalDate> toDate(Object value) {
-        Optional<String> stringValue = toString(value);
+        Optional<String> stringValue = toStringValue(value);
 
         if (stringValue.isPresent()) {
             try {

@@ -13,12 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.meta;
+package org.openntf.drapi.api.options;
 
-import org.openntf.drapi.internal.meta.FieldImpl;
+import java.util.Locale;
 
-/**
- * Represents a field in a document. Currently, it's pretty much a marker interface, but it will be extended in the future.
- */
-public sealed interface Field extends ValueHolder permits FieldImpl {
+public enum KeyType {
+
+    NUMBER,
+    TEXT,
+    TIME;
+
+    public String value() {
+        return name().toLowerCase(Locale.ENGLISH);
+    }
+
+    public static KeyType fromString(String value) {
+        for (KeyType keyType : KeyType.values()) {
+            if (keyType.name().equalsIgnoreCase(value)) {
+                return keyType;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant for value: " + value);
+    }
+
 }
