@@ -17,7 +17,9 @@ package org.openntf.drapi.internal;
 
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.DocumentsApi;
+import org.openntf.drapi.api.ListsApi;
 import org.openntf.drapi.internal.api.DocumentsApiImpl;
+import org.openntf.drapi.internal.api.ListsApiImpl;
 
 public class DrapiDataSourceImpl implements DrapiDataSource {
 
@@ -39,5 +41,8 @@ public class DrapiDataSourceImpl implements DrapiDataSource {
         return new DocumentsApiImpl(context, dataSource);
     }
 
-
+    @Override
+    public ListsApi lists() {
+        return new ListsApiImpl(context, dataSource);
+    }
 }

@@ -26,6 +26,7 @@ import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.json.JsonBinding;
 import org.openntf.drapi.meta.Document;
 import org.openntf.drapi.meta.DocumentMeta;
+import org.openntf.drapi.meta.ListEntry;
 import org.openntf.drapi.util.TypeUtils;
 
 public class ResponseParser {
@@ -137,4 +138,66 @@ public class ResponseParser {
         return null;
     }
 
+    /**
+     * Converts a response body tree to a stream of ListEntry objects.
+     * <p>
+     * This method expects the JSON response body to contain an array of entries in a format that can be converted to ListEntry
+     * objects.
+     *
+     * @param response The DrapiResponse containing the JSON body to be converted.
+     * @return A Stream of ListEntry objects constructed from the response body.
+     */
+    public static Stream<ListEntry> toListEntryStream(DrapiResponse response) {
+        Objects.requireNonNull(response, "Response cannot be null");
+
+        JsonBinding jsonBinding = JsonBinding.get();
+
+        try (response) {
+            return jsonBinding.streamFromJsonArray(response.bodyStream())
+                              .map(ResponseParser::toListEntry)
+                              .onClose(response::close);  // Ensure the response is closed when the stream is closed
+        }
+    }
+
+    /**
+     * Converts a response body tree to a ListEntry object.
+     * <p>
+     * This method expects the simple map representation of a ListEntry.
+     *
+     * @param valueMap The map representation of the ListEntry.
+     * @return A ListEntry object constructed from the provided map.
+     */
+    public static ListEntry toListEntry(Map<String, Object> valueMap) {
+        Objects.requireNonNull(valueMap, "Value map cannot be null");
+
+        String unid = null;
+        Integer noteId = null;
+        String index = null;
+        Boolean unread = null;
+
+        // Create a copy to avoid modifying the original map
+        Map<String, Object> valueMapCopy = new TreeMap<>(valueMap);
+
+        if (valueMapCopy.containsKey(AT_UNID)) {
+            unid = DataTypeUtils.toStringValue(valueMapCopy.get(AT_UNID)).orElse(null);
+            valueMapCopy.remove(AT_UNID);
+        }
+
+        if (valueMapCopy.containsKey(AT_NOTEID)) {
+            noteId = DataTypeUtils.toInteger(valueMapCopy.get(AT_NOTEID)).orElse(null);
+            valueMapCopy.remove(AT_NOTEID);
+        }
+
+        if (valueMapCopy.containsKey(AT_INDEX)) {
+            index = DataTypeUtils.toStringValue(valueMapCopy.get(AT_INDEX)).orElse(null);
+            valueMapCopy.remove(AT_INDEX);
+        }
+
+        if (valueMapCopy.containsKey(AT_UNREAD)) {
+            unread = DataTypeUtils.toBoolean(valueMapCopy.get(AT_UNREAD)).orElse(null);
+            valueMapCopy.remove(AT_UNREAD);
+        }
+
+        return new ListEntryImpl(unid, noteId, index, unread, valueMapCopy);
+    }
 }
