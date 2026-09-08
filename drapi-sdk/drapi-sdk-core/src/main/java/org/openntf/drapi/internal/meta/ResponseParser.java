@@ -152,11 +152,9 @@ public class ResponseParser {
 
         JsonBinding jsonBinding = JsonBinding.get();
 
-        try (response) {
-            return jsonBinding.streamFromJsonArray(response.bodyStream())
-                              .map(ResponseParser::toListEntry)
-                              .onClose(response::close);  // Ensure the response is closed when the stream is closed
-        }
+        return jsonBinding.streamFromJsonArray(response.bodyStream())
+                          .map(ResponseParser::toListEntry)
+                          .onClose(response::close);  // Ensure the response is closed when the stream is closed
     }
 
     /**

@@ -15,6 +15,8 @@
  */
 package org.openntf.drapi.api.options;
 
+import java.util.Locale;
+
 public enum QueryScope {
 
     ALL,
@@ -22,7 +24,7 @@ public enum QueryScope {
     DOCUMENTS;
 
     public String value() {
-        return name().toLowerCase();
+        return name().toLowerCase(Locale.ENGLISH);
     }
 
     public static QueryScope of(String value) {
