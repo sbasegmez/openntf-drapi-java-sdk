@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public interface ListEntry {
 
     /**
-     * Returns the universal ID of the documents which is belong to the entry, if available.
+     * Returns the universal ID of the documents which belongs to the entry, if available.
      * <p>
      * Metadata keys may not be available when they are not requested in the request.
      *
@@ -32,7 +32,7 @@ public interface ListEntry {
     Optional<String> unid();
 
     /**
-     * Returns the note ID of the documents which is belong to the entry, if available.
+     * Returns the note ID of the documents which belongs to the entry, if available.
      * <p>
      * Metadata keys may not be available when they are not requested in the request.
      *
@@ -41,7 +41,7 @@ public interface ListEntry {
     OptionalInt noteId();
 
     /**
-     * Returns the index of the documents which is belong to the entry, if available. Index is the position of the entry in the view,
+     * Returns the index of the documents which belongs to the entry, if available. Index is the position of the entry in the view,
      * and it reflects the indentation level of the entry in the view hierarchy.
      * <p>
      * Metadata keys may not be available when they are not requested in the request.
@@ -51,7 +51,7 @@ public interface ListEntry {
     Optional<String> index();
 
     /**
-     * Returns whether the documents which is belong to the entry is unread, if available.
+     * Returns whether the documents which belongs to the entry is unread, if available.
      * <p>
      * Metadata keys may not be available when they are not requested in the request.
      *
