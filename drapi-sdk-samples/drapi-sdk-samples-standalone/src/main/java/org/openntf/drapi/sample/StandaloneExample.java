@@ -19,7 +19,7 @@ import java.util.List;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
-import org.openntf.drapi.api.DocumentsApi.GetOptions;
+import org.openntf.drapi.api.options.DocumentsGetOptions;
 import org.openntf.drapi.meta.Document;
 import org.openntf.drapi.util.TypeUtils;
 
@@ -38,7 +38,7 @@ public class StandaloneExample {
 
         // Do not forget to create a schema for your scope. You can also change the UNID below to a valid UNID of a document in your db.
         ds.documents()
-          .get("0C19F98DC58BCB1900258BD8006A25AF", new GetOptions().withMeta(true))
+          .get("0C19F98DC58BCB1900258BD8006A25AF", DocumentsGetOptions.create().meta(true))
           .thenAccept(StandaloneExample::processDocument)
           .exceptionally(StandaloneExample::handleError)
           .join();

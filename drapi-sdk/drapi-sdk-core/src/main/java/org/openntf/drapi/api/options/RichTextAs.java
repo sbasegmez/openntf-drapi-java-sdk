@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.meta;
+package org.openntf.drapi.api.options;
 
 import java.util.Collection;
 import java.util.Collections;

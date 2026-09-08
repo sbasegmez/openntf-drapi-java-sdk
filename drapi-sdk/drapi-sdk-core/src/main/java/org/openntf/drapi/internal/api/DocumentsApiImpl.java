@@ -17,6 +17,7 @@ package org.openntf.drapi.internal.api;
 
 import java.util.concurrent.CompletableFuture;
 import org.openntf.drapi.api.DocumentsApi;
+import org.openntf.drapi.api.options.DocumentsGetOptions;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.ApiPath;
 import org.openntf.drapi.internal.DrapiContext;
@@ -38,7 +39,7 @@ public class DocumentsApiImpl extends AbstractDataSourceApi implements Documents
     }
 
     @Override
-    public CompletableFuture<Document> get(String documentId, GetOptions options) {
+    public CompletableFuture<Document> get(String documentId, DocumentsGetOptions options) {
         DrapiRequest request = DrapiRequest.get(ApiPath.root("/document")
                                                        .append(documentId))
                                            .queryParam(QS_DATASOURCE, dataSource());
