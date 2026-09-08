@@ -15,15 +15,26 @@
  */
 package org.openntf.drapi.sample;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.DocumentsGetOptions;
+import org.openntf.drapi.api.options.ListsGetOptions;
+import org.openntf.drapi.meta.Column;
 import org.openntf.drapi.meta.Document;
+import org.openntf.drapi.meta.ListEntry;
 import org.openntf.drapi.util.TypeUtils;
 
 public class StandaloneExample {
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
     public static void main(String[] args) {
         DrapiConfig config = DrapiConfig.builder()
@@ -36,16 +47,54 @@ public class StandaloneExample {
         // Create a scope on your favourite DRAPI server and name it as "projects".
         DrapiDataSource ds = client.dataSource("projects");
 
+        String unid = ds.lists()
+                        .get("projects", ListsGetOptions.create().count(10).meta(true))
+                        .thenApply(StandaloneExample::consumeListStream)
+                        .join(); // Join the CompletableFuture to get the UNID
+
+        System.out.println("-------------------------------");
+        System.out.println("Fetching document with UNID: " + unid);
+        System.out.println("-------------------------------");
+
         // Do not forget to create a schema for your scope. You can also change the UNID below to a valid UNID of a document in your db.
         ds.documents()
-          .get("0C19F98DC58BCB1900258BD8006A25AF", DocumentsGetOptions.create().meta(true))
+          .get(unid, DocumentsGetOptions.create().meta(true))
           .thenAccept(StandaloneExample::processDocument)
           .exceptionally(StandaloneExample::handleError)
           .join();
+
+    }
+
+    private static String consumeListStream(Stream<ListEntry> listStream) {
+        List<String> unids = new ArrayList<>();
+
+        try (listStream) {
+            listStream.forEach(entry -> {
+                entry.unid().ifPresent(unids::add);
+
+                String name = entry.column("name")
+                                   .asString()
+                                   .orElse("--Unknown project--");
+
+                String created = entry.column("created")
+                                      .asDateTime()
+                                      .map(OffsetDateTime::toZonedDateTime)
+                                      .map(dt -> dt.format(FORMATTER))
+                                      .orElse("--Unknown date--");
+
+                Column col = entry.column("Chefscooks");
+
+                List<String> chefscooks = col.isMultiValue() ? col.asList(String.class) : List.of(col.asString()
+                                                                                                     .orElse("--No chefs--"));
+
+                System.out.printf("%1$-30s %2$-45s %3$s%n", name, created, String.join(", ", chefscooks));
+            });
+        }
+
+        return unids.get(0); // Return the first UNID for demonstration purposes
     }
 
     private static void processDocument(Document document) {
-
         // Do something with the document, e.g., print its fields
 
         String projectName = document.field("name").asString().orElse("--Unknown project--");
