@@ -15,23 +15,21 @@
  */
 package org.openntf.drapi.sample;
 
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
+import java.util.concurrent.CompletionException;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.DocumentsGetOptions;
 import org.openntf.drapi.api.options.ListsGetOptions;
-import org.openntf.drapi.meta.Column;
 import org.openntf.drapi.meta.Document;
 import org.openntf.drapi.meta.ListEntry;
 import org.openntf.drapi.util.TypeUtils;
 
-public class StandaloneExample {
+public class FetchSingleDocument {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
@@ -44,61 +42,58 @@ public class StandaloneExample {
                                         .build();
 
         // Create a scope on your favourite DRAPI server and name it as "projects".
-        DrapiDataSource ds = client.dataSource("projects");
+        DrapiDataSource ds = client.dataSource("projectdb");
 
-        String unid = ds.lists()
-                        .get("projects", ListsGetOptions.create().count(10).meta(true))
-                        .thenApply(StandaloneExample::consumeListStream)
-                        .join(); // Join the CompletableFuture to get the UNID
+        // Lookup unid of a document representing "XSnippets" project.
+        Optional<String> unid = findDocumentUnid(ds, "XSnippets");
 
-        System.out.println("-------------------------------");
-        System.out.println("Fetching document with UNID: " + unid);
-        System.out.println("-------------------------------");
+        if(unid.isEmpty()) {
+            System.out.println("No document found for project 'XSnippets'. Please ensure the project exists in the 'projects' view.");
+            return;
+        }
+
+        System.out.println("-----------------------------------------------------------------");
+        System.out.println("Fetching document with UNID: " + unid.get());
+        System.out.println("-----------------------------------------------------------------");
 
         // Do not forget to create a schema for your scope. You can also change the UNID below to a valid UNID of a document in your db.
         ds.documents()
-          .get(unid, DocumentsGetOptions.create().meta(true))
-          .thenAccept(StandaloneExample::processDocument)
-          .exceptionally(StandaloneExample::handleError)
+          .get(unid.get(), DocumentsGetOptions.create().meta(true))
+          .thenAccept(FetchSingleDocument::processDocument)
+          .exceptionally(FetchSingleDocument::handleError)
           .join();
 
     }
 
-    private static String consumeListStream(Stream<ListEntry> listStream) {
-        List<String> unids = new ArrayList<>();
+    private static Optional<String> findDocumentUnid(DrapiDataSource ds, String projectName) {
+        var options = ListsGetOptions.create()
+                                     .meta(true) // Include metadata in the response, so we can access the UNID of the document
+                                     .key(List.of(projectName)) // Filter by project name
+                                     .keyAllowPartial(false); // Ensure we only get exact matches for the project name
 
-        try (listStream) {
-            listStream.forEach(entry -> {
-                entry.unid().ifPresent(unids::add);
+        try {
 
-                String name = entry.column("name")
-                                   .asString()
-                                   .orElse("--Unknown project--");
+            // Fetch the list entries from the "projects" view and extract the UNID of the first matching entry
+            return ds.lists()
+                     .get("projects", options)
+                     .join() // Wait for the CompletableFuture to complete and get the Stream<ListEntry>
+                     .findFirst()
+                     .flatMap(ListEntry::unid);
 
-                String created = entry.column("created")
-                                      .asDateTime()
-                                      .map(OffsetDateTime::toZonedDateTime)
-                                      .map(dt -> dt.format(FORMATTER))
-                                      .orElse("--Unknown date--");
-
-                Column col = entry.column("Chefscooks");
-
-                List<String> chefscooks = col.isMultiValue() ? col.asList(String.class) : List.of(col.asString()
-                                                                                                     .orElse("--No chefs--"));
-
-                System.out.printf("%1$-30s %2$-45s %3$s%n", name, created, String.join(", ", chefscooks));
-            });
+        } catch (Exception ex) {
+            handleError(ex);
+            return Optional.empty();
         }
-
-        return unids.get(0); // Return the first UNID for demonstration purposes
     }
 
     private static void processDocument(Document document) {
         // Do something with the document, e.g., print its fields
 
+        // Extract the "name" and "overview" fields, defaulting to placeholders if not present
         String projectName = document.field("name").asString().orElse("--Unknown project--");
         String projectOverview = document.field("overview").asString().orElse("--No overview--");
 
+        // Extract the "chefs" field as a list of strings, defaulting to an empty list if not present
         List<String> projectChefs = document.field("chefs").asList(String.class);
 
         System.out.println("Project Name: " + projectName);
@@ -118,10 +113,16 @@ public class StandaloneExample {
     }
 
     private static Void handleError(Throwable ex) {
+        Throwable cause = ex;
+
+        if (ex instanceof CompletionException && ex.getCause() != null) {
+            cause = ex.getCause(); // Unwrap the CompletionException to get the actual cause
+        }
 
         // Do something with the exception, e.g., log it or print the stack trace
 
-        ex.printStackTrace();
+        System.out.println("An error occurred while fetching the document: " + cause.getMessage());
+        cause.printStackTrace();
 
         // Satisfy CompletableFuture<Void> return type by returning null
         return null;
