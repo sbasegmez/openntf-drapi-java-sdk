@@ -15,37 +15,12 @@
     <description>Standalone sample implementation for Domino REST API Java SDK</description>
 
     <dependencies>
+        <!-- Easy to use starter dependency for the Domino REST API Java SDK -->
+        <!-- This dependency will transitively include all required dependencies for the SDK -->
         <dependency>
             <groupId>org.openntf.drapi</groupId>
-            <artifactId>drapi-sdk-core</artifactId>
+            <artifactId>drapi-sdk-starter</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openntf.drapi</groupId>
-            <artifactId>drapi-sdk-json-jakarta</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-            <version>${jakarta.json.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.json.bind</groupId>
-            <artifactId>jakarta.json.bind-api</artifactId>
-            <version>${jakarta.jsonb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.parsson</groupId>
-            <artifactId>parsson</artifactId>
-            <version>${parsson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse</groupId>
-            <artifactId>yasson</artifactId>
-            <version>${yasson.version}</version>
         </dependency>
     </dependencies>
 </project>
