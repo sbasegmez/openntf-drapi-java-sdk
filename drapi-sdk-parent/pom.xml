@@ -22,9 +22,18 @@
     <developers>
         <developer>
             <name>Serdar Basegmez</name>
+            <organization>OpenNTF</organization>
+            <organizationUrl>https://openntf.org</organizationUrl>
             <url>https://lotusnotus.com</url>
         </developer>
     </developers>
+
+    <url>https://github.com/sbasegmez/openntf-drapi-java-sdk</url>
+    <scm>
+        <url>https://github.com/sbasegmez/openntf-drapi-java-sdk</url>
+        <connection>scm:git:https://github.com/sbasegmez/openntf-drapi-java-sdk.git</connection>
+        <developerConnection>scm:git:https://github.com/sbasegmez/openntf-drapi-java-sdk.git</developerConnection>
+    </scm>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
@@ -49,6 +58,9 @@
         <maven-surefire.version>3.5.6</maven-surefire.version>
         <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -149,4 +161,71 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <!-- Uncomment this when it's time to deploy -->
+            <!--<distributionManagement>-->
+            <!--    <repository>-->
+            <!--        <id>artifactory.openntf.org</id>-->
+            <!--        <name>artifactory.openntf.org</name>-->
+            <!--        <url>https://artifactory.openntf.org/openntf</url>-->
+            <!--    </repository>-->
+            <!--</distributionManagement>-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven-source-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -22,6 +22,9 @@
         <license-year>2026</license-year>
 
         <license-maven-plugin.version>5.1.1</license-maven-plugin.version>
+
+        <!-- Skip deploy for this module, as it is an aggregator -->
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <build>

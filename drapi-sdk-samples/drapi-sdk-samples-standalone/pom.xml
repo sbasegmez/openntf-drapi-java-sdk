@@ -14,6 +14,11 @@
     <name>OpenNTF Java SDK for HCL Domino REST API :: SDK Samples Standalone</name>
     <description>Standalone sample implementation for Domino REST API Java SDK</description>
 
+    <properties>
+        <!-- Skip deploy for this module, as it is samples only -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <!-- Easy to use starter dependency for the Domino REST API Java SDK -->
         <!-- This dependency will transitively include all required dependencies for the SDK -->

@@ -22,6 +22,11 @@
         <module>drapi-sdk-starter</module>
     </modules>
 
+    <properties>
+        <!-- Skip deploy for this module, as it is an aggregator -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

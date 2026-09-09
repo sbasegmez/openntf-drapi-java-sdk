@@ -16,12 +16,14 @@
     <name>OpenNTF Java SDK for HCL Domino REST API :: Samples</name>
     <description>Sample Projects for Domino REST API Java SDK</description>
 
+    <properties>
+        <!-- Skip deploy for this module, as it is samples only -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <modules>
         <module>drapi-sdk-samples-standalone</module>
     </modules>
-
-    <properties>
-    </properties>
 
     <build>
         <plugins>
