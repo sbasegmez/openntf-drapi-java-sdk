@@ -36,8 +36,7 @@ public interface DocumentsApi {
      * {@link org.openntf.drapi.DrapiDataSource}.
      *
      * @param documentId the universal id (UNID) of the document to retrieve
-     * @param options    the optional query parameters ({@code mode}, {@code meta}, {@code richTextAs}, {@code markRead} and
-     *                   {@code markUnread}), or {@code null} to use the server defaults
+     * @param options    the optional query parameters. {@link DocumentsGetOptions#create()} to use the server defaults
      * @return a future that completes with the requested {@link Document}, or completes exceptionally if the document cannot be
      *         retrieved, for example because it does not exist or access is denied
      */
@@ -54,7 +53,7 @@ public interface DocumentsApi {
      *         retrieved, for example because it does not exist or access is denied
      */
     default CompletableFuture<Document> get(String documentId) {
-        return get(documentId, null);
+        return get(documentId, DocumentsGetOptions.create());
     }
 
 }
