@@ -19,7 +19,7 @@
     <modules>
         <module>drapi-sdk-core</module>
         <module>drapi-sdk-json-jakarta</module>
-        <module>drapi-sdk-starter</module>
+        <module>drapi-sdk-starter-jakarta</module>
     </modules>
 
     <properties>

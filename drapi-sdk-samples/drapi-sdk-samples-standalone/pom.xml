@@ -24,7 +24,7 @@
         <!-- This dependency will transitively include all required dependencies for the SDK -->
         <dependency>
             <groupId>org.openntf.drapi</groupId>
-            <artifactId>drapi-sdk-starter</artifactId>
+            <artifactId>drapi-sdk-starter-jakarta</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

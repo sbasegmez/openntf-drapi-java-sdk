@@ -11,9 +11,9 @@
         <relativePath>../../drapi-sdk-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>drapi-sdk-starter</artifactId>
-    <name>OpenNTF Java SDK for HCL Domino REST API :: Starter</name>
-    <description>Starter boilerplate for Domino REST API Java SDK</description>
+    <artifactId>drapi-sdk-starter-jakarta</artifactId>
+    <name>OpenNTF Java SDK for HCL Domino REST API :: Starter - Jakarta</name>
+    <description>Starter boilerplate with Jakarta JSON for Domino REST API Java SDK</description>
     <packaging>jar</packaging>
 
     <dependencies>

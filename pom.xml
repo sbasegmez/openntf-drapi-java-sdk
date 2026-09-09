@@ -16,6 +16,11 @@
     <name>OpenNTF Java SDK for HCL Domino REST API :: Aggregator</name>
     <description>Maven aggregator for Domino REST API Java SDK</description>
 
+    <properties>
+        <!-- Skip deployment of aggregator -->
+        <deployment.skip>true</deployment.skip>
+    </properties>
+
     <modules>
         <module>drapi-sdk</module>
         <module>drapi-sdk-release</module>
