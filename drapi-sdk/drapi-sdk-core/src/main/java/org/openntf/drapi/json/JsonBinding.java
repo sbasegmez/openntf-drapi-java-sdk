@@ -44,7 +44,7 @@ public interface JsonBinding {
     String name();
 
     /**
-     * Deserializes JSON data from the provided InputStream into a Map<String, Object>. The resulting map represents the JSON structure,
+     * Deserializes JSON data from the provided InputStream into a {@code Map<String, Object>}. The resulting map represents the JSON structure,
      * where keys are JSON field names and values are the corresponding values.
      *
      * @param jsonStream the InputStream containing the JSON data
@@ -78,7 +78,7 @@ public interface JsonBinding {
     void toJson(Object objectValue, OutputStream outputStream);
 
     /**
-     * Deserializes JSON data from the provided InputStream into a Stream of Map<String, Object>. Each map represents a JSON object
+     * Deserializes JSON data from the provided InputStream into a {@code Stream<Map<String, Object>}}. Each map represents a JSON object
      * within the stream.
      * <p>
      * Throws a JsonBindingException if the JSON data is not in the expected format (e.g., not a JSON array).
@@ -97,7 +97,7 @@ public interface JsonBinding {
     Stream<Map<String, Object>> streamFromJsonArray(InputStream jsonStream);
 
     /**
-     * Deserializes JSON data from the provided jsonString into a Map<String, Object>. The resulting map represents the JSON structure,
+     * Deserializes JSON data from the provided jsonString into a {@code Map<String, Object>}. The resulting map represents the JSON structure,
      * where keys are JSON field names and values are the corresponding values.
      *
      * @param jsonString the JSON string to be deserialized

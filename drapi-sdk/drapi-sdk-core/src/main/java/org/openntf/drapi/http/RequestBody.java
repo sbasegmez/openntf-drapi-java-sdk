@@ -45,6 +45,7 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
      * <p>
      * For long requests, consider using the Streaming variant to avoid loading the entire request body into memory.
      *
+     * @param contentType the content type of the request body
      * @param data the byte array containing the request body data
      */
     record Bytes(String contentType, byte[] data) implements RequestBody {
@@ -70,6 +71,7 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
      * This is a good example of how to create a repeatable streaming request body. Every time the SDK needs to retry the request, it
      * will call the lambda and get a new fresh InputStream.
      *
+     * @param contentType the content type of the request body
      * @param bodySupplier the supplier that provides a new InputStream each time it is called
      */
     record Streaming(String contentType, BodySupplier bodySupplier) implements RequestBody {
@@ -88,7 +90,7 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
 
     @FunctionalInterface
     interface BodySupplier {
-
+        @SuppressWarnings("RedundantThrows")
         InputStream getInputStream() throws IOException;
     }
 

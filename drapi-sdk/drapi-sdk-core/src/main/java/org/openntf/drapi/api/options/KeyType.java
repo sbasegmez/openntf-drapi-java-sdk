@@ -17,16 +17,31 @@ package org.openntf.drapi.api.options;
 
 import java.util.Locale;
 
+/**
+ * Enum representing the type of key used in a list. Used by lists api.
+ */
 public enum KeyType {
 
     NUMBER,
     TEXT,
     TIME;
 
+    /**
+     * Returns the string representation of the key type.
+     *
+     * @return the string representation of the key type
+     */
     public String value() {
         return name().toLowerCase(Locale.ENGLISH);
     }
 
+    /**
+     * Returns the KeyType enum corresponding to the given string value.
+     *
+     * @param value the string representation of the key type
+     * @return the corresponding KeyType enum
+     * @throws IllegalArgumentException if the value does not match any KeyType
+     */
     public static KeyType fromString(String value) {
         for (KeyType keyType : KeyType.values()) {
             if (keyType.name().equalsIgnoreCase(value)) {

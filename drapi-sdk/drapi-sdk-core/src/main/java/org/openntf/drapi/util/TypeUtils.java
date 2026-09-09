@@ -30,7 +30,6 @@ public class TypeUtils {
      * Check if a string is null or empty.
      * <p>
      * null -> true "" -> true " " -> false
-     * <p>
      *
      * @param value the string to check
      * @return true if the string is null or blank
@@ -53,7 +52,6 @@ public class TypeUtils {
      * Check if a string is null or blank.
      * <p>
      * null -> true, "" -> true, " " -> true
-     * <p>
      *
      * @param value the string to check
      * @return true if the string is null or blank
