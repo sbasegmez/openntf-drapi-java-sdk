@@ -36,7 +36,7 @@ You can add the SDK to your project using Maven. You can include the following d
 
 This will include the core SDK and the Jakarta JSON implementation. As additional libraries are added, they will be provided as separate dependencies, allowing you to choose the ones that best fit your platform.
 
-Pre-release versions of the SDK are available in the [OpenNTF Maven Repository](https://artifactory.openntf.org/). You can add the repository to your `pom.xml` file as follows:
+Pre-release versions of the SDK are available in the [OpenNTF Maven Repository](https://artifactory.openntf.org/openntf). You can add the repository to your `pom.xml` file as follows:
 
 ```xml
  <repositories>

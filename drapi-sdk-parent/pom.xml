@@ -37,9 +37,6 @@
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -92,11 +89,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <release>${maven.compiler.release}</release>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
                 <executions>
                     <execution>
                         <!-- Keep test compilation on the classpath even when main sources declare a module-info.java, so test-only
@@ -164,14 +156,13 @@
     <profiles>
         <profile>
             <id>release</id>
-            <!-- Uncomment this when it's time to deploy -->
-            <!--<distributionManagement>-->
-            <!--    <repository>-->
-            <!--        <id>artifactory.openntf.org</id>-->
-            <!--        <name>artifactory.openntf.org</name>-->
-            <!--        <url>https://artifactory.openntf.org/openntf</url>-->
-            <!--    </repository>-->
-            <!--</distributionManagement>-->
+            <distributionManagement>
+                <repository>
+                    <id>artifactory.openntf.org</id>
+                    <name>artifactory.openntf.org</name>
+                    <url>https://artifactory.openntf.org/openntf</url>
+                </repository>
+            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
