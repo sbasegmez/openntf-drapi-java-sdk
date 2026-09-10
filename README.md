@@ -28,7 +28,7 @@ You can add the SDK to your project using Maven. You can include the following d
 
 ```xml
 <dependency>
-    <groupId>com.openntf.drapi</groupId>
+    <groupId>org.openntf.drapi</groupId>
     <artifactId>drapi-sdk-starter-jakarta</artifactId>
     <version>0.1.0</version>
 </dependency>

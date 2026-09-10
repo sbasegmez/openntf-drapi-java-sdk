@@ -92,7 +92,7 @@ public class FetchListEntries {
 
         // Do something with the exception, e.g., log it or print the stack trace
 
-        System.out.println("An error occurred while fetching the document: " + cause.getMessage());
+        System.out.println("An error occurred while fetching the list entries: " + cause.getMessage());
         cause.printStackTrace();
 
         // Satisfy CompletableFuture<Void> return type by returning null

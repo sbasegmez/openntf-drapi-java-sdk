@@ -41,7 +41,7 @@ public class FetchSingleDocument {
         DrapiClient client = DrapiClient.builder(config)
                                         .build();
 
-        // Create a scope on your favourite DRAPI server and name it as "projects".
+        // Create a scope on your favourite DRAPI server and name it as "projectdb".
         DrapiDataSource ds = client.dataSource("projectdb");
 
         // Lookup unid of a document representing "XSnippets" project.

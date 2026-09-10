@@ -198,7 +198,7 @@ Options objects:
 - `ListsGetOptions`: mode (string), scope (enum: all, categories, documents), start (integer), count (integer), key (list of strings), keyType (enum: text, number, time), keyAllowPartial (boolean), startKey (string), untilKey (string), startsWith (string), category (list of strings), column (string), direction (enum: asc, desc), documents (boolean), meta (boolean), metaAdditional (boolean), richTextAs (RichTextAs), distinctDocuments (boolean), includeEmptyRows (boolean), ftSearchQuery (string), unreadOnly (boolean), markRead (boolean), markUnread (boolean)
 - `PivotOptions`: mode (string), scope (enum: all, categories, documents), start (integer), count (integer), key (list of strings), startsWith (string), column (string), direction (enum: asc, desc)
 
-`EntriesOptions` is the largest options object in the API and is the strongest case for the builder pattern. `PivotOptions` is a strict subset of it. `/bulk/folder` is placed here rather than under `documents().bulk()` because the caller is thinking about the folder, not the documents.
+`ListsGetOptions` is the largest options object in the API and is the strongest case for the builder pattern. `PivotOptions` is a strict subset of it. `/bulk/folder` is placed here rather than under `documents().bulk()` because the caller is thinking about the folder, not the documents.
 
 ### Code execution
 
