@@ -20,12 +20,19 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Class representing the format of rich text content. Used by various APIs.
+ * <p>
+ * Since DRAPI has extensibility in terms of rich text formats, this class allows for both predefined constants and custom formats.
+ *
+ */
 public final class RichTextAs {
 
-    public static final RichTextAs HTML  = new RichTextAs("html");
+    // Predefined constants for known rich text formats
+    public static final RichTextAs HTML = new RichTextAs("html");
     public static final RichTextAs PLAIN = new RichTextAs("plain");
-    public static final RichTextAs MIME  = new RichTextAs("mime");
-    public static final RichTextAs MARKDOWN  = new RichTextAs("markdown");
+    public static final RichTextAs MIME = new RichTextAs("mime");
+    public static final RichTextAs MARKDOWN = new RichTextAs("markdown");
 
     private static final Map<String, RichTextAs> KNOWN = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
@@ -46,6 +53,13 @@ public final class RichTextAs {
         return value;
     }
 
+    /**
+     * Returns a RichTextAs instance for the given value. If the value is known, it returns the corresponding constant; otherwise, it
+     * creates a new instance.
+     *
+     * @param value the string representation of the rich text format
+     * @return a RichTextAs instance corresponding to the given value
+     */
     public static RichTextAs of(String value) {
         return KNOWN.getOrDefault(value, new RichTextAs(value));
     }

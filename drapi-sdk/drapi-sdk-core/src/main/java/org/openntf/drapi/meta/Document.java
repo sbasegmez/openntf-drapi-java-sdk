@@ -32,16 +32,22 @@ public interface Document {
     String form();
 
     /**
+     * Server-supplied metadata, if any, or an empty optional. The metadata is returned in the "@meta" field of the document payload.
+     *
      * @return the server-supplied metadata, absent for user-created document and when the payload doesn't return "@meta".
      */
     Optional<DocumentMeta> meta();
 
     /**
+     * Server-supplied warnings, if any, or an empty list. The warnings are returned in the "@warnings" field of the document payload.
+     *
      * @return the server-supplied warnings as "@warnings", if any, or an empty list
      */
     List<String> warnings();
 
     /**
+     * Returns the names of the data fields in the document, excluding documented metadata keys.
+     *
      * @return the data field names, in case-insensitive order and with the server's original casing, excluding documented metadata keys
      * (e.g. "@meta", "@form", "@warnings")
      */

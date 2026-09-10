@@ -18,10 +18,35 @@ Planned SDK surface is documented in the [API Semantics](docs/api-semantics.md) 
 - [Development](docs/development.md)
 - [Api Semantics](docs/api-semantics.md)
 
-
 ## JSON Serialization
 
 The SDK uses a JSON abstraction and it does not depend on a specific Json library. The initial provide Jakarta Json API (Json-b and Json-p) implementation for serialization and deserialization, but the SDK is designed to be flexible and allow for other JSON libraries to be used if desired. Jackson support is also planned in a later stage.
+
+## Adding the SDK to your project
+
+You can add the SDK to your project using Maven. You can include the following dependency in your `pom.xml` file:
+
+```xml
+<dependency>
+    <groupId>org.openntf.drapi</groupId>
+    <artifactId>drapi-sdk-starter-jakarta</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+This will include the core SDK and the Jakarta JSON implementation. As additional libraries are added, they will be provided as separate dependencies, allowing you to choose the ones that best fit your platform.
+
+Pre-release versions of the SDK are available in the [OpenNTF Maven Repository](https://artifactory.openntf.org/openntf). You can add the repository to your `pom.xml` file as follows:
+
+```xml
+ <repositories>
+    <repository>
+        <id>artifactory.openntf.org</id>
+        <name>artifactory.openntf.org</name>
+        <url>https://artifactory.openntf.org/openntf</url>
+    </repository>
+</repositories>
+```
 
 ## License
 

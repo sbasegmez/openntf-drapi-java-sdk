@@ -19,9 +19,20 @@ import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.util.TypeUtils;
 
+/**
+ * This exception is thrown when authentication fails, such as when the username or password is incorrect.
+ *
+ * It's a subclass of {@link DrapiException}, which is the base exception class for all exceptions in the Drapi SDK.
+ */
 public class AuthenticationException extends DrapiException {
 
-    // This exception is thrown when authentication fails, such as when the username or password is incorrect.
+    /**
+     * This exception is thrown when authentication fails, such as when the username or password is incorrect.
+     *
+     * @param message  the error message
+     * @param request  the DrapiRequest that caused the exception
+     * @param response the DrapiResponse that caused the exception
+     */
     public AuthenticationException(String message, DrapiRequest request, DrapiResponse response) {
         super(message, request, response);
     }

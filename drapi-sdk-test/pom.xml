@@ -16,6 +16,8 @@
     <description>Integration Test Project for Domino REST API Java SDK</description>
 
     <properties>
+        <!-- Skip deploy for this module, as it is intended for testing only -->
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <dependencies>

@@ -15,7 +15,9 @@
  */
 package org.openntf.drapi.api.options;
 
-// Enum representing the direction of sorting, either ascending or descending.
+/**
+ * Enum representing the direction of sorting, either ascending or descending. Used by lists api.
+ */
 public enum Direction {
     ASCENDING("asc"),
     DESCENDING("desc");
@@ -26,10 +28,22 @@ public enum Direction {
         this.value = value;
     }
 
+    /**
+     * Returns the string representation of the direction.
+     *
+     * @return the string representation of the direction
+     */
     public String value() {
         return value;
     }
 
+    /**
+     * Returns the Direction enum corresponding to the given string value.
+     *
+     * @param value the string representation of the direction
+     * @return the corresponding Direction enum
+     * @throws IllegalArgumentException if the value does not match any Direction
+     */
     public static Direction of(String value) {
         for (Direction direction : Direction.values()) {
             if (direction.value.equalsIgnoreCase(value)) {

@@ -19,6 +19,14 @@ package org.openntf.drapi.meta;
  * This record is a Scope data schema. Don't confuse it with the DrapiDataSource interface, which is a representation of an API context
  * on DRAPI and incidentally referred to as Scope in the DRAPI interface. This record is used to define the structure of a scope,
  * including its name, NSF path, schema name, icon name, icon, description, and active status.
+ *
+ * @param apiName The name of the API associated with this scope.
+ * @param nsfPath The NSF path associated with this scope.
+ * @param schemaName The schema name associated with this scope.
+ * @param iconName The name of the icon associated with this scope.
+ * @param icon The icon associated with this scope.
+ * @param description A description of this scope.
+ * @param isActive A boolean indicating whether this scope is active.
  */
 public record Scope(String apiName, String nsfPath, String schemaName, String iconName, String icon, String description,
                     boolean isActive) {

@@ -15,8 +15,6 @@
  */
 package org.openntf.drapi.internal.api;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import org.openntf.drapi.api.ListsApi;

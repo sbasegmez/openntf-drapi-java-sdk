@@ -187,7 +187,7 @@ Options objects:
 | Fluent call                                                                      | Operation                                | Endpoint               |
 |----------------------------------------------------------------------------------|------------------------------------------|------------------------|
 | `ds.lists().all()` / `all(ListsOptions)`                                         | fetchViews                               | GET /lists             |
-| `ds.lists().entries(name)` / `entries(name, EntriesOptions)`                     | fetchViewEntries                         | GET /lists/{name}      |
+| `ds.lists().get(name)` / `get(name, ListsGetOptions)`                            | fetchViewEntries                         | GET /lists/{name}      |
 | `ds.lists().pivot(name, pivotColumn)` / `pivot(name, pivotColumn, PivotOptions)` | pivotViewEntries                         | GET /listspivot/{name} |
 | `ds.lists().folder(name).add(unids)` / `add(unids, mode)`                        | bulkDocumentFolderByUnid (action=add)    | POST /bulk/folder      |
 | `ds.lists().folder(name).remove(unids)` / `remove(unids, mode)`                  | bulkDocumentFolderByUnid (action=remove) | POST /bulk/folder      |
@@ -195,10 +195,10 @@ Options objects:
 Options objects:
 
 - `ListsOptions`: type (enum: all, folders, views), columns (boolean), filter (string)
-- `EntriesOptions`: mode (string), scope (enum: all, categories, documents), start (integer), count (integer), key (list of strings), keyType (enum: text, number, time), keyAllowPartial (boolean), startKey (string), untilKey (string), startsWith (string), category (list of strings), column (string), direction (enum: asc, desc), documents (boolean), meta (boolean), metaAdditional (boolean), richTextAs (RichTextAs), distinctDocuments (boolean), includeEmptyRows (boolean), ftSearchQuery (string), unreadOnly (boolean), markRead (boolean), markUnread (boolean)
+- `ListsGetOptions`: mode (string), scope (enum: all, categories, documents), start (integer), count (integer), key (list of strings), keyType (enum: text, number, time), keyAllowPartial (boolean), startKey (string), untilKey (string), startsWith (string), category (list of strings), column (string), direction (enum: asc, desc), documents (boolean), meta (boolean), metaAdditional (boolean), richTextAs (RichTextAs), distinctDocuments (boolean), includeEmptyRows (boolean), ftSearchQuery (string), unreadOnly (boolean), markRead (boolean), markUnread (boolean)
 - `PivotOptions`: mode (string), scope (enum: all, categories, documents), start (integer), count (integer), key (list of strings), startsWith (string), column (string), direction (enum: asc, desc)
 
-`EntriesOptions` is the largest options object in the API and is the strongest case for the builder pattern. `PivotOptions` is a strict subset of it. `/bulk/folder` is placed here rather than under `documents().bulk()` because the caller is thinking about the folder, not the documents.
+`ListsGetOptions` is the largest options object in the API and is the strongest case for the builder pattern. `PivotOptions` is a strict subset of it. `/bulk/folder` is placed here rather than under `documents().bulk()` because the caller is thinking about the folder, not the documents.
 
 ### Code execution
 

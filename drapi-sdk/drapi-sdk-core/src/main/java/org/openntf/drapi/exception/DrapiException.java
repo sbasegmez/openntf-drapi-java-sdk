@@ -32,6 +32,14 @@ public class DrapiException extends RuntimeException {
     private final int statusCode;
     private final ErrorMessage errorMessage;
 
+    /**
+     * Constructs a new DrapiException with the specified message, request, response, and cause.
+     *
+     * @param message the detail message (which is saved for later retrieval by the getMessage() method)
+     * @param request the DrapiRequest that caused the exception
+     * @param response the DrapiResponse that caused the exception
+     * @param cause the underlying cause of the exception (which is saved for later retrieval by the getCause() method)
+     */
     public DrapiException(String message, DrapiRequest request, DrapiResponse response, Throwable cause) {
         super(message, cause);
 
@@ -52,40 +60,88 @@ public class DrapiException extends RuntimeException {
         this.errorMessage = tmpErrorMsg;
     }
 
+    /**
+     * Constructs a new DrapiException with the specified message, request, and response.
+     *
+     * @param message the detail message (which is saved for later retrieval by the getMessage() method)
+     * @param request the DrapiRequest that caused the exception
+     * @param response the DrapiResponse that caused the exception
+     */
     public DrapiException(String message, DrapiRequest request, DrapiResponse response) {
         this(message, request, response, null);
     }
 
+    /**
+     * Constructs a new DrapiException with the specified message and cause.
+     *
+     * @param message the detail message (which is saved for later retrieval by the getMessage() method)
+     * @param cause the underlying cause of the exception (which is saved for later retrieval by the getCause() method)
+     */
     public DrapiException(String message, Throwable cause) {
         this(message, null, null, cause);
     }
 
+    /**
+     * Constructs a new DrapiException with the specified message.
+     * @param message the detail message (which is saved for later retrieval by the getMessage() method)
+     */
     public DrapiException(String message) {
         this(message, null, null, null);
     }
 
     /* --- We switch to getter style to conform to Exception's own methods --- */
 
+    /**
+     * Returns the HTTP method of the request that caused the exception.
+     * @return the HTTP method of the request that caused the exception
+     */
     public HttpMethod getHttpMethod() {
         return httpMethod;
     }
 
+    /**
+     * Returns the path of the request that caused the exception.
+     *
+     * @return the path of the request that caused the exception
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Returns the HTTP status code of the response that caused the exception.
+     *
+     * @return the HTTP status code of the response that caused the exception
+     */
     public int getStatusCode() {
         return statusCode;
     }
 
+    /**
+     * Returns the error message string from the response that caused the exception.
+     * If the error message is not available, it returns null.
+     *
+     * @return the error message string from the response that caused the exception, or null if not available
+     */
     public String getErrorMessageString() {
         return errorMessage == null ? null : errorMessage.message();
     }
 
+    /**
+     * Returns the ErrorMessage object from the response that caused the exception.
+     * If the error message is not available, it returns null.
+     *
+     * @return the ErrorMessage object from the response that caused the exception, or null if not available
+     */
     public ErrorMessage getErrorMessage() {
         return errorMessage;
     }
 
+    /**
+     * Returns the detail message string of this exception, including the error message string if available.
+     *
+     * @return the detail message string of this exception, including the error message string if available
+     */
     @Override
     public String getMessage() {
         return super.getMessage() + (getErrorMessageString() == null ? "" : " [" + getErrorMessageString() + "]");

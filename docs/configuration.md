@@ -2,47 +2,47 @@
 
 ## Programatic Configuration
 
-Simplest way to configure the application is to use the `DrapiConfig` class. You can create an
-instance of this class and set the desired properties programmatically.
+Simplest way to configure the application is to use the `DrapiConfig` class. You can create an instance of this class and set the desired properties programmatically.
 
 ```java
 DrapiConfig config = DrapiConfig.builder()
-        .baseUrl("https://demo.example.com:8889")
-        .basicAuth("Doctor notes", password) // Automatically switch to default Jwt authentication
-        .userAgent("MyApp/1.0")  // Optional, if not set, default user agent will be used
-        .connectTimeout(Duration.ofSeconds(2)) // Optional, default is 5 seconds.
-        .requestTimeout(10) // Optional, default is 15 seconds.
-        .authScope("$DATA") // Optional, DRAPI sets "MAIL $DATA" as default. 
-        .build();
+                                .baseUrl("https://demo.example.com:8889")
+                                .basicAuth("Doctor notes", password) // Automatically switch to default Jwt authentication
+                                .userAgent("MyApp/1.0")  // Optional, if not set, default user agent will be used
+                                .connectTimeout(Duration.ofSeconds(2)) // Optional, default is 5 seconds.
+                                .requestTimeout(10) // Optional, default is 15 seconds.
+                                .authScope("$DATA") // Optional, DRAPI sets "MAIL $DATA" as default. 
+                                .build();
 ```
 
 ## Properties File
 
-Alternatively, you can configure the application using a properties file. Create a file named `drapi.properties` in your classpath and set the desired properties.
+Alternatively, you can configure the application using a properties file. Create a file named 
+`drapi.properties` in your classpath and set the desired properties.
 
 Remember that the properties file should be in the classpath of your application. Keys are case 
 insensitive, but values are case sensitive. The following is an example of a properties file:
 
 ```properties
-BASEURL=https://api.example.com
-AUTHSCOPE=$DATA
-
+# Base URL for the DRAPI service. This is the only required property.
+BASEURL=https://my-drapi-service.com:8880
+# Authentication scope for the DRAPI service. This is optional and can be set if needed.
+# If omitted, the SDK will use the default scope (MAIL $DATA).
+AUTHSCOPE=MAIL $DATA
 # This will set the authentication method to basic JWT authentication.
-UserName=your_username
-Password=your_password
-
+UserName=Doctor Who
+Password=VeryComplicatedPassword42
 # Alternatively you can supply Token for JWT authentication.
-# Token=your_token
-
-# Alternatively you can supply a OAuth information for JWT authentication.
-# APPID=your_app_id
-# APPSECRET=your_app_secret
-
+Token=your_token
+# Alternatively you can supply a OAuth information for JWT authentication (Not implemented yet).
+APPID=your_app_id
+APPSECRET=your_app_secret
+# You can change the user agent string sent with requests to the DRAPI service. This is optional.
 USERAGENT=your_user_agent
-CONNECTTIMEOUTSECS=13
-
-# This should be ignored by the SDK, as it is not a valid property.
-REQUESTTIMEOUTSECS=ignore
+# You can change the connection timeout in seconds. This is optional. Default: 10
+CONNECTTIMEOUTSECS=10
+# You can change the request timeout in seconds. This is optional. Default: 15
+REQUESTTIMEOUTSECS=15
 ```
 
 Then you can load the configuration from the properties file using the `DrapiConfig` class.
@@ -63,11 +63,13 @@ DrapiConfig config = DrapiConfig.builder()
 
 ## Environment Variables
 
-Finally, you can configure the application using environment variables. You may want to use a prefix for your environment variables to avoid conflicts with other applications. The `applyEnvironmentVariables` method allows you to specify a prefix for the environment variables.
+Finally, you can configure the application using environment variables. You may want to use a 
+prefix for your environment variables to avoid conflicts with other applications. The 
+`applyEnvironmentVariables` method allows you to specify a prefix for the environment variables.
 
 ```java
 DrapiConfig config = DrapiConfig.builder()
-                                .applyEnvironmentVariables("DRAPI_") 
+                                .applyEnvironmentVariables("DRAPI_")
                                 .build();
 ```
 
@@ -86,7 +88,9 @@ The following environment variables are supported (assuming the prefix `DRAPI_`)
 
 ## Notes
 
-- Authentication method will be inferred based on the provided credentials. If both 
-  username/password and token are provided, the SDK will use the default JWT authentication. If 
-  token is given, it will inject token automatically into the Authorization header. If OAuth credentials are provided, it will use OAuth authentication.
-- If you provide both username/password and OAuth credentials, the SDK will fail with `IllegalArgumentException` because it cannot determine which authentication method to use.
+- Authentication method will be inferred based on the provided credentials. If both
+  username/password and token are provided, the SDK will use the default JWT authentication. If
+  token is given, it will inject token automatically into the Authorization header. If OAuth
+  credentials are provided, it will use OAuth authentication.
+- If you provide both username/password and OAuth credentials, the SDK will fail with
+  `IllegalArgumentException` because it cannot determine which authentication method to use.

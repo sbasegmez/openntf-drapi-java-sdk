@@ -19,18 +19,12 @@
     <modules>
         <module>drapi-sdk-core</module>
         <module>drapi-sdk-json-jakarta</module>
+        <module>drapi-sdk-starter-jakarta</module>
     </modules>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-            </plugin>
-        </plugins>
-        <pluginManagement>
-            <plugins>
-            </plugins>
-        </pluginManagement>
-    </build>
+    <properties>
+        <!-- Skip deploy for this module, as it is an aggregator -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
 </project>

@@ -17,16 +17,31 @@ package org.openntf.drapi.api.options;
 
 import java.util.Locale;
 
+/**
+ * Enum representing the scope of a query. Used by lists api.
+ */
 public enum QueryScope {
 
     ALL,
     CATEGORIES,
     DOCUMENTS;
 
+    /**
+     * Returns the string representation of the query scope.
+     *
+     * @return the string representation of the query scope
+     */
     public String value() {
         return name().toLowerCase(Locale.ENGLISH);
     }
 
+    /**
+     * Returns the QueryScope enum corresponding to the given string value.
+     *
+     * @param value the string representation of the query scope
+     * @return the corresponding QueryScope enum
+     * @throws IllegalArgumentException if the value does not match any QueryScope
+     */
     public static QueryScope of(String value) {
         for (QueryScope scope : QueryScope.values()) {
             if (scope.name().equalsIgnoreCase(value)) {
