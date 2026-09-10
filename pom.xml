@@ -30,6 +30,7 @@
 
     <modules>
         <module>drapi-sdk</module>
+        <module>drapi-sdk-parent</module>
         <module>drapi-sdk-samples</module>
         <module>drapi-sdk-test</module>
     </modules>
