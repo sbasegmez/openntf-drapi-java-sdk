@@ -31,7 +31,7 @@ import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.internal.auth.AuthenticationToolkit;
-import org.openntf.drapi.internal.auth.BearerToken;
+import org.openntf.drapi.auth.BearerToken;
 import org.openntf.drapi.internal.auth.TokenAuthenticationProvider;
 import org.openntf.drapi.internal.test.MockableHttpTest;
 

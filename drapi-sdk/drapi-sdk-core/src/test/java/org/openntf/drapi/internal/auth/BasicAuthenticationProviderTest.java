@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.BearerToken;
 import org.openntf.drapi.exception.AuthenticationException;
 import org.openntf.drapi.exception.DrapiException;
 import org.openntf.drapi.exception.ErrorMessage;

@@ -18,6 +18,7 @@ package org.openntf.drapi.internal.auth;
 import static org.openntf.drapi.internal.http.HttpHeaderConstants.APPLICATION_JSON;
 
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.BearerToken;
 import org.openntf.drapi.exception.AuthenticationException;
 import org.openntf.drapi.exception.DrapiException;
 import org.openntf.drapi.http.ApiPath;

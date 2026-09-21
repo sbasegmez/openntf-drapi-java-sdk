@@ -17,6 +17,7 @@ package org.openntf.drapi.internal.auth;
 
 import java.util.Objects;
 import java.util.function.Supplier;
+import org.openntf.drapi.auth.BearerToken;
 
 public final class TokenCache {
 

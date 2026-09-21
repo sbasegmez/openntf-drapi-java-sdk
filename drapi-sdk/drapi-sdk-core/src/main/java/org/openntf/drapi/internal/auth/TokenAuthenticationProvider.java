@@ -17,6 +17,7 @@ package org.openntf.drapi.internal.auth;
 
 import java.util.Map;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.BearerToken;
 
 public final class TokenAuthenticationProvider extends AuthenticationProviderBase {
 

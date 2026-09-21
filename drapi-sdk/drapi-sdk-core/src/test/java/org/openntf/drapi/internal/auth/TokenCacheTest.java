@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.openntf.drapi.auth.BearerToken;
 import org.openntf.drapi.internal.test.TestUtils;
 
 class TokenCacheTest {

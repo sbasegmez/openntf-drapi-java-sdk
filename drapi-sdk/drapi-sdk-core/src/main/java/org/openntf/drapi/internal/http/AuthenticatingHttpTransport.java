@@ -22,7 +22,7 @@ import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.internal.auth.AuthenticationProvider;
 import org.openntf.drapi.internal.auth.AuthenticationToolkit;
-import org.openntf.drapi.internal.auth.BearerToken;
+import org.openntf.drapi.auth.BearerToken;
 import org.openntf.drapi.internal.auth.TokenCache;
 import org.openntf.drapi.internal.log.Log;
 

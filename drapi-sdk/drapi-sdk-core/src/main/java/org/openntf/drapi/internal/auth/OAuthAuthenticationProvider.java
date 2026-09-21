@@ -16,6 +16,7 @@
 package org.openntf.drapi.internal.auth;
 
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.BearerToken;
 
 public final class OAuthAuthenticationProvider extends AuthenticationProviderBase {
 
