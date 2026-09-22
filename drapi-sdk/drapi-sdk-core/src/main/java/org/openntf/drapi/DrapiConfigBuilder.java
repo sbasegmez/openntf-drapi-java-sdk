@@ -21,64 +21,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.TreeMap;
 import org.openntf.drapi.internal.DrapiConfigImpl;
+import org.openntf.drapi.util.ConfigKey;
 import org.openntf.drapi.util.TypeUtils;
 
 public class DrapiConfigBuilder {
 
-    // Baseline
-    URI baseUrl;
-    String authScope;
+    // Required parameters
+    private URI baseUrl;
 
-    // BASIC auth
-    String username;
-    String password;
+    // Optional authentication parameters
+    private String userAgent;
+    private int connectTimeoutSecs = 0;
+    private int requestTimeoutSecs = 0;
 
-    // TOKEN auth
-    String token;
-
-    // OAUTH auth
-    String appId;
-    String appSecret;
-
-    // Others
-    String userAgent;
-    int connectTimeoutSecs = 0;
-    int requestTimeoutSecs = 0;
+    // Extra optional parameters for extensibility
+    private final Map<String, Object> extraParams = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     public DrapiConfigBuilder baseUrl(String baseUrl) {
-        this.baseUrl = URI.create(Objects.requireNonNull(baseUrl));
+        this.baseUrl = URI.create(Objects.requireNonNull(baseUrl, "baseUrl cannot be null"));
         return this;
     }
 
     public DrapiConfigBuilder baseUrl(URI baseUrl) {
-        this.baseUrl = Objects.requireNonNull(baseUrl);
-        return this;
-    }
-
-    public DrapiConfigBuilder authScope(String authScope) {
-        this.authScope = authScope;
-        return this;
-    }
-
-    public DrapiConfigBuilder basic(String username, String password) {
-        this.username = username;
-        this.password = password;
-        return this;
-    }
-
-    public DrapiConfigBuilder token(String token) {
-        this.token = token;
-        return this;
-    }
-
-    public DrapiConfigBuilder oauth(String appId, String appSecret) {
-        this.appId = appId;
-        this.appSecret = appSecret;
+        this.baseUrl = Objects.requireNonNull(baseUrl, "baseUrl cannot be null");
         return this;
     }
 
@@ -103,6 +75,21 @@ public class DrapiConfigBuilder {
 
     public DrapiConfigBuilder requestTimeout(Duration duration) {
         return requestTimeout((int) duration.getSeconds());
+    }
+
+    public DrapiConfigBuilder addExtraParam(String key, Object value) {
+        extraParams.put(key, value);
+        return this;
+    }
+
+    public DrapiConfigBuilder addExtraParams(Map<String, Object> params) {
+        extraParams.putAll(params);
+        return this;
+    }
+
+    public <T> DrapiConfigBuilder addExtraParam(ConfigKey<T> key, T value) {
+        extraParams.put(key.key(), value);
+        return this;
     }
 
     public DrapiConfigBuilder applyEnvironmentVariables(String prefix) {
@@ -141,7 +128,6 @@ public class DrapiConfigBuilder {
     public DrapiConfig build() {
         return new DrapiConfigImpl(this);
     }
-
 
     /**
      * Apply properties from an InputStream to the builder's fields.
@@ -182,12 +168,6 @@ public class DrapiConfigBuilder {
 
             switch (strippedKey) {
                 case "baseurl" -> this.baseUrl(value);
-                case "authscope" -> this.authScope(value);
-                case "username" -> this.username = value;
-                case "password" -> this.password = value;
-                case "token" -> this.token = value;
-                case "appid" -> this.appId = value;
-                case "appsecret" -> this.appSecret = value;
                 case "useragent" -> this.userAgent(value);
                 case "connecttimeoutsecs" -> {
                     if (TypeUtils.isNumeric(value)) {
@@ -199,7 +179,10 @@ public class DrapiConfigBuilder {
                         this.requestTimeout(Integer.parseInt(value));
                     }
                 }
-                default -> {  /* Ignore unknown properties or log a warning if needed */ }
+                default -> {
+                    // For any other keys, we store them in the extraParams map
+                    this.addExtraParam(strippedKey, value);
+                }
             }
         }
         return this;
@@ -207,30 +190,6 @@ public class DrapiConfigBuilder {
 
     public URI baseUrl() {
         return baseUrl;
-    }
-
-    public String authScope() {
-        return authScope;
-    }
-
-    public String username() {
-        return username;
-    }
-
-    public String password() {
-        return password;
-    }
-
-    public String token() {
-        return token;
-    }
-
-    public String appId() {
-        return appId;
-    }
-
-    public String appSecret() {
-        return appSecret;
     }
 
     public String userAgent() {
@@ -243,6 +202,10 @@ public class DrapiConfigBuilder {
 
     public int requestTimeoutSecs() {
         return requestTimeoutSecs;
+    }
+
+    public Map<String, Object> extraParams() {
+        return new HashMap<>(extraParams);
     }
 }
 

@@ -17,8 +17,8 @@ package org.openntf.drapi;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.openntf.drapi.DrapiConfig.AuthType;
 import org.openntf.drapi.internal.DrapiConfigImpl;
 
 class DrapiConfigBuilderTest {
@@ -36,11 +35,11 @@ class DrapiConfigBuilderTest {
     void testDurationTimeouts() {
         DrapiConfig config = DrapiConfig.builder()
                                         .baseUrl("https://example.com")
-                                        .basic("username", "password")
                                         .connectTimeout(java.time.Duration.ofSeconds(10))
                                         .requestTimeout(java.time.Duration.ofMinutes(1))
                                         .build();
 
+        assertEquals("https://example.com", config.baseUrl().toString(), "Base URL should match the builder");
         assertEquals(10, config.connectTimeoutSecs(), "Connect timeout should be 10 seconds");
         assertEquals(60, config.requestTimeoutSecs(), "Request timeout should be 60 seconds");
     }
@@ -53,10 +52,11 @@ class DrapiConfigBuilderTest {
                                         .build();
 
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the properties file");
-        assertEquals("$DATA", config.authScope(), "Auth scope should match the properties file");
-        assertEquals(DrapiConfig.AuthType.BASIC, config.authType(), "Auth type should match the properties file");
-        assertEquals("your_username", config.username(), "Username should match the properties file");
-        assertEquals("your_password", config.password(), "Password should match the properties file");
+
+        assertEquals("$DATA", config.get("authScope", String.class).orElse(null), "Auth scope should match the properties file");
+        assertEquals("your_username", config.get("username", String.class).orElse(null), "Username should match the properties file");
+        assertEquals("your_username", config.get("USERNAME", String.class).orElse(null), "Keys should match even if the case is different");
+        assertEquals("your_password", config.get("password", String.class).orElse(null), "Password should match the properties file");
         assertTrue(config.userAgent().startsWith("your_user_agent"), "User agent should match the properties file");
         assertEquals(13, config.connectTimeoutSecs(), "Connect timeout should match the properties file");
         Assertions.assertEquals(DrapiConfigImpl.DEFAULT_REQUEST_TIMEOUT_SECS, config.requestTimeoutSecs(), "Request timeout should be ignored from invalid property");
@@ -76,9 +76,8 @@ class DrapiConfigBuilderTest {
                                         .build();
 
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the map");
-        assertEquals(DrapiConfig.AuthType.BASIC, config.authType(), "Auth type should match the map");
-        assertEquals("your_username", config.username(), "Username should match the map");
-        assertEquals("your_password", config.password(), "Password should match the map");
+        assertEquals("your_username", config.get("username", String.class).orElse(null), "Username should match the map");
+        assertEquals("your_password", config.get("password", String.class).orElse(null), "Password should match the map");
         assertTrue(config.userAgent()
                          .startsWith(DrapiConfigImpl.DEFAULT_USER_AGENT), "User agent should fallback to default due to blank value");
         assertEquals(DrapiConfigImpl.DEFAULT_CONNECT_TIMEOUT_SECS, config.connectTimeoutSecs(), "Connect timeout should fallback to default due to invalid value");
@@ -86,7 +85,7 @@ class DrapiConfigBuilderTest {
     }
 
     @Test
-    @DisplayName("Test loading configuration from map with Oauth parameters")
+    @DisplayName("Test loading configuration from map with prefix")
     void testLoadFromMapWithOAuth() {
         var config = DrapiConfig.builder()
                                 .applyMap(Map.of(
@@ -98,26 +97,27 @@ class DrapiConfigBuilderTest {
                                 ), "DRAPI_")
                                 .build();
 
-        assertEquals(AuthType.OAUTH, config.authType(), "Auth type should be OAUTH");
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the map");
-        assertEquals("$DATA", config.authScope(), "Auth scope should match the map");
-        assertEquals("your_ap_id", config.appId(), "App ID should match the map");
-        assertEquals("your_secret", config.appSecret(), "App Secret should match the map");
+        assertEquals("$DATA", config.get("AUTHSCOPE", String.class).orElse(null), "Auth scope should match the map");
+        assertEquals("your_ap_id", config.get("APPID", String.class).orElse(null), "App ID should match the map");
+        assertEquals("your_secret", config.get("APPSECRET", String.class).orElse(null), "App Secret should match the map");
         assertEquals("MyApp", config.userAgent(), "User agent should match the map");
     }
 
     @Test
-    @DisplayName("Test loading configuration from map with multiple auth types")
-    void testLoadFromMapWithMultipleAuth() {
-        assertThrows(IllegalArgumentException.class,
-                     () -> DrapiConfig.builder()
-                                      .applyMap(Map.of(
-                                          "DRAPI_BASEURL", "https://api.example.com",
-                                          "DRAPI_USERNAME", "your_username",
-                                          "DRAPI_PASSWORD", "your_password",
-                                          "DRAPI_TOKEN", "your_token" // Both BASIC and TOKEN auth provided
-                                      ), "DRAPI_")
-                                      .build(), "Should throw exception due to multiple auth types");
+    @DisplayName("Test setting and getting arbitrary parameters")
+    void testSetAndGetArbitraryParameters() {
+        DrapiConfig config = DrapiConfig.builder()
+                                        .baseUrl("https://example.com")
+                                        .addExtraParam("customParam", 42)
+                                        .addExtraParam("anotherParam", "value")
+                                        .build();
+
+        assertEquals(42, config.get("customParam", Integer.class).orElse(null), "Custom parameter should match the set value");
+        assertEquals("42", config.get("customParam", String.class).orElse(null), "Parameter types should be lenient");
+        assertEquals("value", config.get("anotherParam", String.class).orElse(null), "Another parameter should match the set value");
+        assertTrue(config.get("nonExistentParam", String.class).isEmpty(), "Non-existent parameter should return empty Optional");
+
     }
 
     @EnabledIfEnvironmentVariable(named = "DRAPI_BASEURL", matches = ".*")
@@ -131,7 +131,7 @@ class DrapiConfigBuilderTest {
                                             .applyEnvironmentVariables("DRAPI_")
                                             .build();
             assertNotNull(config.baseUrl(), "Base URL should be loaded from environment variables");
-            assertNotNull(config.authType(), "Auth type should be determined from environment variables");
+            assertNotNull(config.get("TOKEN", String.class).orElse(null), "Token should be loaded from environment variables");
         }, "Should not throw exception when loading from environment variables");
     }
 

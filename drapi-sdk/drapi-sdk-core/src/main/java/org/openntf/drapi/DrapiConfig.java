@@ -16,24 +16,12 @@
 package org.openntf.drapi;
 
 import java.net.URI;
+import java.util.Optional;
+import org.openntf.drapi.util.ConfigKey;
 
 public interface DrapiConfig {
 
     URI baseUrl();
-    String authScope();
-    AuthType authType();
-
-    // For BASIC auth
-    String username();
-    String password();
-
-    // For TOKEN auth
-    String token();
-
-    // For OAUTH auth
-    String appId();
-
-    String appSecret();
 
     String userAgent();
 
@@ -41,11 +29,9 @@ public interface DrapiConfig {
 
     int requestTimeoutSecs();
 
-    enum AuthType {
-        BASIC,
-        TOKEN,
-        OAUTH
-    }
+    <T> Optional<T> get(ConfigKey<T> key);
+
+    <T> Optional<T> get(String key, Class<T> type);
 
     static DrapiConfigBuilder builder() {
         return new DrapiConfigBuilder();
