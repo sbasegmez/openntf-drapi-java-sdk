@@ -26,13 +26,15 @@ import org.openntf.drapi.util.TypeUtils;
 public class UriBuilder {
 
     private final String baseUrl;
-    private final ApiPath apiPath;
     private final StringBuilder queryString;
+
+    private ApiPath apiPath;
 
     private UriBuilder(String baseUrl, String startPath) {
         this.baseUrl = validate(baseUrl);
-        this.apiPath = ApiPath.of(startPath);
         this.queryString = new StringBuilder();
+
+        this.apiPath = ApiPath.of(startPath);
     }
 
     public static UriBuilder startWith(URI base) {
@@ -44,7 +46,7 @@ public class UriBuilder {
     }
 
     public UriBuilder appendPath(String path) {
-        this.apiPath.append(path);
+        this.apiPath = this.apiPath.append(path);
         return this;
     }
 
