@@ -38,6 +38,19 @@ public class AuthenticationException extends DrapiException {
     }
 
     /**
+     * This exception is thrown when authentication fails, such as when the username or password is incorrect.
+     *
+     * @param message  the error message
+     * @param request  the DrapiRequest that caused the exception
+     * @param response the DrapiResponse that caused the exception
+     * @param cause    the cause of the exception
+     */
+    public AuthenticationException(String message, DrapiRequest request, DrapiResponse response, Throwable cause) {
+        super(message, request, response, cause);
+    }
+
+
+    /**
      * Authentication exceptions should have a specific error message indicating that authentication failed. If it doesn't exist, we
      * need to specify this in the error message string.
      *
