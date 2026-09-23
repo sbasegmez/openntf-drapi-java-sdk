@@ -54,13 +54,6 @@ public class JdkHttpTransport extends HttpTransportBase {
         return builder.build();
     }
 
-    /**
-     * Submits a DrapiRequest asynchronously. Implementations of this method should handle the request submission and return a
-     * CompletableFuture that will be completed with the DrapiResponse when the request is processed.
-     *
-     * @param drapiRequest the DrapiRequest to submit
-     * @return a CompletableFuture that will be completed with the DrapiResponse
-     */
     @Override
     public CompletableFuture<DrapiResponse> submitAsync(DrapiRequest drapiRequest) {
         try {

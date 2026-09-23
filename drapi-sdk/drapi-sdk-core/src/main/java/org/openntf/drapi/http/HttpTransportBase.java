@@ -19,14 +19,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.internal.log.Log;
 
-public abstract class HttpTransportBase implements HttpTransport {
+public abstract non-sealed class HttpTransportBase implements HttpTransport {
+
+    private static final Log LOG = Log.getLogger(HttpTransportBase.class);
 
     private final DrapiConfig config;
     private final Executor executor;
 
     protected HttpTransportBase(DrapiConfig config, Executor executor) {
         this.config = Objects.requireNonNull(config, "config must not be null");
+
+        // executor can be null, in which case the default executor will be picked up by the implementation
         this.executor = executor;
     }
 
@@ -38,4 +43,16 @@ public abstract class HttpTransportBase implements HttpTransport {
         return Optional.ofNullable(executor);
     }
 
+    @Override
+    public void stop() {
+        executor().ifPresent(executor -> {
+            if (executor instanceof AutoCloseable ac) {
+                try {
+                    ac.close();
+                } catch (Exception e) {
+                    LOG.error("Failed to close executor", e);
+                }
+            }
+        });
+    }
 }

@@ -39,7 +39,7 @@ public final class DrapiResponse implements AutoCloseable {
     // The HTTP status code of the response, e.g., 200 for OK, 404 for Not Found, etc.
     private final int statusCode;
 
-    // Basedon HttpResponse, headers are represented as a Map where the key is the header name and the value is a List of header values.
+    // Based on HttpResponse, headers are represented as a Map where the key is the header name and the value is a List of header values.
     private final Map<String, List<String>> headers;
 
     // The body of the response is represented as an InputStream to allow for streaming large responses without loading them entirely into memory.
@@ -55,7 +55,7 @@ public final class DrapiResponse implements AutoCloseable {
         // Deep copy of headers to ensure immutability and case-insensitivity.
         this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        if( givenHeaders != null) {
+        if (givenHeaders != null) {
             givenHeaders.forEach((key, value) -> this.headers.put(key, List.copyOf(value)));
         }
     }
