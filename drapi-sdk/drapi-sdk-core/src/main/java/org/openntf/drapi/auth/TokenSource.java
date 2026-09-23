@@ -1,27 +1,27 @@
 package org.openntf.drapi.auth;
 
 /**
- * Interface for authentication mechanism providing Bearer token for the SDK.
+ * Interface for authentication mechanism providing Token for the SDK.
  */
-public interface BearerTokenSource {
+public sealed interface TokenSource permits TokenSourceBase {
 
     /**
-     * Acquires a bearer token for the given session context.
+     * Acquires a token for the given session context.
      * <p>
      * This is typically used to obtain a token that can be used for making authenticated requests to a service or API. The
-     * implementation of this method should handle the necessary logic to retrieve or generate a valid bearer token based on the
+     * implementation of this method should handle the necessary logic to retrieve or generate a valid token based on the
      * provided session context.
      * <p>
-     * The method is synchronous and should return a valid BearerToken object. It might block but should be short. It's recommended to
+     * The method is synchronous and should return a valid Token object. It might block but should be short. It's recommended to
      * implement caching or token reuse strategies to minimize the overhead of acquiring tokens frequently.
      * <p>
      * The implementation should not rely on ThreadLocal, as the caller thread can change between calls. It should also be thread-safe,
      * as multiple threads may call this method for the same session concurrently.
      *
      * @param sessionContext sessionContext object containing information about the current session
-     * @return a BearerToken representing the acquired access token
+     * @return a Token representing the acquired access token
      */
-    BearerToken acquire(SessionContext sessionContext);
+    Token acquire(SessionContext sessionContext);
 
     /**
      * If provided token is rejected by the server, this method will be called to notify the implementation that (probably-cached) token
@@ -33,9 +33,9 @@ public interface BearerTokenSource {
      * as multiple threads may call this method for the same session concurrently.
      *
      * @param sessionContext sessionContext object containing information about the current session
-     * @param token          the BearerToken that was rejected by the server
+     * @param token          the Token that was rejected by the server
      */
-    void tokenRejected(SessionContext sessionContext, BearerToken token);
+    void tokenRejected(SessionContext sessionContext, Token token);
 
     /**
      * Logs out the user associated with the given session context. This method is called when the user explicitly logs out of the
@@ -46,5 +46,14 @@ public interface BearerTokenSource {
      * @param sessionContext sessionContext object containing information about the current session
      */
     void logout(SessionContext sessionContext);
+
+    /**
+     * Indicates whether the implementation supports token refresh. If this method returns true, the SDK will attempt to refresh the
+     * token when it is rejected by the server. If it returns false, the SDK will not attempt to refresh the token and will instead
+     * treat the rejection as a permanent failure.
+     *
+     * @return true if the implementation supports token refresh, false otherwise
+     */
+    boolean supportsRefresh();
 
 }

@@ -15,6 +15,7 @@
  */
 package org.openntf.drapi.internal;
 
+import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.DocumentsApi;
 import org.openntf.drapi.api.ListsApi;
@@ -23,12 +24,17 @@ import org.openntf.drapi.internal.api.ListsApiImpl;
 
 public class DrapiDataSourceImpl implements DrapiDataSource {
 
+    private final DrapiClient client;
     private final String dataSource;
-    private final DrapiContext context;
 
-    DrapiDataSourceImpl(String dataSource, DrapiContext context) {
+    DrapiDataSourceImpl(DrapiClient client, String dataSource) {
+        this.client = client;
         this.dataSource = dataSource;
-        this.context = context;
+    }
+
+    @Override
+    public DrapiClient client() {
+        return client;
     }
 
     @Override
@@ -38,11 +44,11 @@ public class DrapiDataSourceImpl implements DrapiDataSource {
 
     @Override
     public DocumentsApi documents() {
-        return new DocumentsApiImpl(context, dataSource);
+        return new DocumentsApiImpl(client, dataSource);
     }
 
     @Override
     public ListsApi lists() {
-        return new ListsApiImpl(context, dataSource);
+        return new ListsApiImpl(client, dataSource);
     }
 }

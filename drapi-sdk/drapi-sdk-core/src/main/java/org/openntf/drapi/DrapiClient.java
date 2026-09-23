@@ -15,10 +15,28 @@
  */
 package org.openntf.drapi;
 
+import org.openntf.drapi.auth.SessionContext;
+
 /**
  * The DrapiClient interface provides the gateway to access and interact with the DRAPI (Domino REST Api) system.
  */
 public interface DrapiClient {
+
+    /**
+     * Returns the parent Drapi instance associated with this DrapiClient. This allows access to the configuration, HTTP transport,
+     * and other components of the Drapi system.
+     *
+     * @return the parent Drapi instance
+     */
+    Drapi parent();
+
+    /**
+     * Returns the SessionContext associated with this DrapiClient. The SessionContext contains information about the current session,
+     * including authentication details and session-specific data.
+     *
+     * @return the SessionContext instance
+     */
+    SessionContext sessionContext();
 
     /**
      * Retrieves a DrapiDataSource instance for the specified data source name. This provides gateway to all resources accessed by a
@@ -29,8 +47,10 @@ public interface DrapiClient {
      */
     DrapiDataSource dataSource(String name);
 
-    static DrapiClientBuilder builder(DrapiConfig config) {
-        return new DrapiClientBuilder(config);
-    }
+    /**
+     * Logs out the current session from the DRAPI system, signals TokenSource to invalidate any active session tokens and
+     * clearing any session-related data.
+     */
+    void logout();
 
 }

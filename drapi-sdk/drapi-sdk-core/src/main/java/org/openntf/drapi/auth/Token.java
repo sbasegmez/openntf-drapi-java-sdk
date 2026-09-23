@@ -24,9 +24,9 @@ import org.openntf.drapi.util.TypeUtils;
  * @param bearer the bearer token string
  * @param label  a label associated with the token (for logging and debugging)
  */
-public record BearerToken(String bearer, String label) {
+public record Token(String bearer, String label) {
 
-    public BearerToken {
+    public Token {
         TypeUtils.requireNonEmpty(bearer, "bearer must not be null or empty");
         label = label == null ? "[no-label]" : label;
     }
@@ -38,6 +38,6 @@ public record BearerToken(String bearer, String label) {
      */
     @Override
     public String toString() {
-        return "BearerToken[label=" + label + ", bearer=<redacted>]";
+        return "Token[label=" + label + ", bearer=<redacted>]";
     }
 }
