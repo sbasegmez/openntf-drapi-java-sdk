@@ -3,7 +3,11 @@ package org.openntf.drapi.auth.builtin;
 import java.util.UUID;
 import org.openntf.drapi.auth.SessionContext;
 
-public class PasswordSessionContext implements SessionContext {
+/**
+ * A simple implementation of SessionContext for single-user scenarios.
+ * This class generates a unique session ID upon instantiation and provides a fixed username.
+ */
+public class SingleUserSessionContext implements SessionContext {
 
     // Session ID is generated once per instance and remains constant for the lifetime of the session context.
     private final String sessionId = UUID.randomUUID().toString();
@@ -15,6 +19,6 @@ public class PasswordSessionContext implements SessionContext {
 
     @Override
     public String username() {
-        return "LocalUser"; // Placeholder username; in a real implementation, this would be dynamic.
+        return "single-user"; // Placeholder username; in a real implementation, this would be dynamic.
     }
 }

@@ -25,7 +25,7 @@ import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.DocumentsGetOptions;
 import org.openntf.drapi.api.options.ListsGetOptions;
-import org.openntf.drapi.auth.builtin.PasswordSessionContext;
+import org.openntf.drapi.auth.SessionContext;
 import org.openntf.drapi.auth.builtin.PasswordTokenSourceProvider;
 import org.openntf.drapi.meta.Document;
 import org.openntf.drapi.meta.ListEntry;
@@ -44,7 +44,7 @@ public class FetchSingleDocument {
                            .build();
 
         // Create a scope on your favourite DRAPI server and name it as "projectdb".
-        DrapiDataSource ds = drapi.forSession(new PasswordSessionContext())
+        DrapiDataSource ds = drapi.forSession(SessionContext.singleUser())
                                   .dataSource("projectdb");
 
         // Lookup unid of a document representing "XSnippets" project.

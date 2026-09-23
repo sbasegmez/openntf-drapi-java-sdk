@@ -5,11 +5,11 @@ import org.openntf.drapi.auth.TokenSource;
 import org.openntf.drapi.auth.TokenSourceProvider;
 import org.openntf.drapi.http.HttpTransport;
 
-public final class PasswordTokenSourceProvider implements TokenSourceProvider {
+public final class FixedTokenSourceProvider implements TokenSourceProvider {
 
     @Override
     public TokenSource create(DrapiConfig config, HttpTransport transport) {
-        return new PasswordTokenSource(config, transport);
+        return new FixedTokenSource(config, transport);
     }
 
 }

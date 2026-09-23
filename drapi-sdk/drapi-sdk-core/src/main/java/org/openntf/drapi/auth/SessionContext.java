@@ -1,5 +1,7 @@
 package org.openntf.drapi.auth;
 
+import org.openntf.drapi.auth.builtin.SingleUserSessionContext;
+
 /**
  * Represents the context of a user session in the DRAPI SDK. This interface provides methods to retrieve session-related information
  * such as the session ID and username. The values returned by these methods are primarily intended for logging and debugging purposes,
@@ -31,5 +33,16 @@ public interface SessionContext {
      * @return any string value that can be used to identify the user in logs/debugging
      */
     String username();
+
+    /**
+     * Returns a SessionContext implementation suitable for single-user scenarios. This implementation generates a unique session ID
+     * upon instantiation and provides a fixed username. It is intended for use in applications where there is only one user session,
+     * and the session context does not need to be dynamic or multi-threaded.
+     *
+     * @return a SessionContext implementation suitable for single-user scenarios
+     */
+    static SessionContext singleUser() {
+        return new SingleUserSessionContext();
+    }
 
 }

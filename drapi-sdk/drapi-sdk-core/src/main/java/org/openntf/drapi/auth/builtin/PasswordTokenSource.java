@@ -23,7 +23,7 @@ import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.json.JsonBinding;
 import org.openntf.drapi.util.ConfigKey;
 
-public class PasswordTokenSource extends TokenSourceBase {
+public final class PasswordTokenSource extends TokenSourceBase {
 
     private static final Log LOG = Log.getLogger(PasswordTokenSource.class);
 

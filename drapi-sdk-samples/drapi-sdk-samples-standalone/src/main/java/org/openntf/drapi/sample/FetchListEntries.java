@@ -24,7 +24,7 @@ import org.openntf.drapi.Drapi;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.ListsGetOptions;
-import org.openntf.drapi.auth.builtin.PasswordSessionContext;
+import org.openntf.drapi.auth.SessionContext;
 import org.openntf.drapi.auth.builtin.PasswordTokenSourceProvider;
 import org.openntf.drapi.meta.Column;
 import org.openntf.drapi.meta.ListEntry;
@@ -42,7 +42,7 @@ public class FetchListEntries {
                            .build();
 
         // Create a scope on your favourite DRAPI server and name it as "projectdb".
-        DrapiDataSource ds = drapi.forSession(new PasswordSessionContext())
+        DrapiDataSource ds = drapi.forSession(SessionContext.singleUser())
                                   .dataSource("projectdb");
 
         // Fetch the list entries from the "projects" view, limiting to 20 entries and excluding metadata.
