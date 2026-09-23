@@ -20,11 +20,13 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
-import org.openntf.drapi.DrapiClient;
+import org.openntf.drapi.Drapi;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.DocumentsGetOptions;
 import org.openntf.drapi.api.options.ListsGetOptions;
+import org.openntf.drapi.auth.builtin.PasswordSessionContext;
+import org.openntf.drapi.auth.builtin.PasswordTokenSourceProvider;
 import org.openntf.drapi.meta.Document;
 import org.openntf.drapi.meta.ListEntry;
 import org.openntf.drapi.util.TypeUtils;
@@ -38,16 +40,17 @@ public class FetchSingleDocument {
                                         .applyResourceFile("config/drapi-sdk-sample.properties")
                                         .build();
 
-        DrapiClient client = DrapiClient.builder(config)
-                                        .build();
+        Drapi drapi = Drapi.builder(config, new PasswordTokenSourceProvider())
+                           .build();
 
         // Create a scope on your favourite DRAPI server and name it as "projectdb".
-        DrapiDataSource ds = client.dataSource("projectdb");
+        DrapiDataSource ds = drapi.forSession(new PasswordSessionContext())
+                                  .dataSource("projectdb");
 
         // Lookup unid of a document representing "XSnippets" project.
         Optional<String> unid = findDocumentUnid(ds, "XSnippets");
 
-        if(unid.isEmpty()) {
+        if (unid.isEmpty()) {
             System.out.println("No document found for project 'XSnippets'. Please ensure the project exists in the 'projects' view.");
             return;
         }

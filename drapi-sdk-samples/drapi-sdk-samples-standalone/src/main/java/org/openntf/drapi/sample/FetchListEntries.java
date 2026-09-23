@@ -20,10 +20,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.stream.Stream;
-import org.openntf.drapi.DrapiClient;
+import org.openntf.drapi.Drapi;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.ListsGetOptions;
+import org.openntf.drapi.auth.builtin.PasswordSessionContext;
+import org.openntf.drapi.auth.builtin.PasswordTokenSourceProvider;
 import org.openntf.drapi.meta.Column;
 import org.openntf.drapi.meta.ListEntry;
 
@@ -32,16 +34,16 @@ public class FetchListEntries {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
     public static void main(String[] args) {
-        // Create the configuration for the DRAPI client. You can use the template file "config/drapi-sdk-sample.properties" to configure your DRAPI server connection.
         DrapiConfig config = DrapiConfig.builder()
                                         .applyResourceFile("config/drapi-sdk-sample.properties")
                                         .build();
 
-        DrapiClient client = DrapiClient.builder(config)
-                                        .build();
+        Drapi drapi = Drapi.builder(config, new PasswordTokenSourceProvider())
+                           .build();
 
         // Create a scope on your favourite DRAPI server and name it as "projectdb".
-        DrapiDataSource ds = client.dataSource("projectdb");
+        DrapiDataSource ds = drapi.forSession(new PasswordSessionContext())
+                                  .dataSource("projectdb");
 
         // Fetch the list entries from the "projects" view, limiting to 20 entries and excluding metadata.
         // Do not forget to enable "projects" view in your schema.
