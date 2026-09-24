@@ -65,7 +65,7 @@ class DrapiConfigImplTest {
                      "Null URL should generate NullPointerException");
 
         assertThrows(IllegalArgumentException.class, () -> DrapiConfig.builder()
-                                                                  .baseUrl("-")
+                                                                  .baseUrl("ht!tp://invalid-url")
                                                                   .build(),
                      "Invalid URL should generate IllegalArgumentException");
     }

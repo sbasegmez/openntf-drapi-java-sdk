@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 
 class ApiPathTest {
 
+    // FIXME: Test immutability of ApiPath by checking that append() returns a new instance and does not modify the original instance.
+
     @Test
     @DisplayName("Test that ApiPath.of() correctly constructs an ApiPath with given segments")
     void testApiPathOf() {

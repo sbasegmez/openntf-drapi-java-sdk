@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,18 +27,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.SessionContext;
+import org.openntf.drapi.auth.Token;
+import org.openntf.drapi.auth.TokenSourceBase;
 import org.openntf.drapi.http.DrapiRequest;
+import org.openntf.drapi.http.HttpMethod;
 import org.openntf.drapi.http.HttpTransport;
-import org.openntf.drapi.internal.auth.AuthenticationToolkit;
-import org.openntf.drapi.auth.BearerToken;
-import org.openntf.drapi.internal.auth.TokenAuthenticationProvider;
+import org.openntf.drapi.http.HttpTransportProvider;
 import org.openntf.drapi.internal.test.MockableHttpTest;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticatingHttpTransportTest extends MockableHttpTest {
 
     @Mock
-    TokenAuthenticationProvider authProvider;
+    TokenSourceBase tokenSource;
 
     @Mock
     Responder responder;
@@ -50,10 +51,15 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
     }
 
     protected HttpTransport createTransport(DrapiConfig config) {
-        HttpTransport bareTransport = HttpTransport.defaultTransport(config, null);
+        HttpTransport bareTransport = HttpTransportProvider.defaultTransportProvider()
+                                                           .create(config, null);
 
-        AuthenticationToolkit toolkit = new AuthenticationToolkit(bareTransport);
-        return new AuthenticatingHttpTransport(toolkit, authProvider);
+        return new AuthenticatingHttpTransport(bareTransport, tokenSource);
+    }
+
+    protected DrapiRequest createRequest(HttpMethod method, String path) {
+        return DrapiRequest.create(method, path)
+                           .sessionContext(SessionContext.singleUser());
     }
 
     @Test
@@ -67,12 +73,12 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
-
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(1, requestCount.get(), "The mirror server should have received exactly one request");
-            assertTrue(mirrorRequest.get().containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
+            assertTrue(mirrorRequest.get()
+                                    .containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
             assertEquals(200, response.statusCode(), "The response status code should match the expected status code");
         }
     }
@@ -95,12 +101,12 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider does not support refresh, so it should not retry after a 401 response
-        when(authProvider.supportsRefresh()).thenReturn(false);
+        when(tokenSource.supportsRefresh()).thenReturn(false);
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(1, requestCount.get(), "The mirror server should have received exactly one request");
             assertEquals(401, response.statusCode(), "The response status code should match the expected status code");
         }
@@ -125,12 +131,12 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider supports refresh, so it should retry after a 401 response
-        when(authProvider.supportsRefresh()).thenReturn(true);
+        when(tokenSource.supportsRefresh()).thenReturn(true);
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(2, requestCount.get(), "The mirror server should have received exactly two requests");
             assertEquals(401, response.statusCode(), "The response status code should match the expected status code");
         }
@@ -156,15 +162,16 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider supports refresh, so it should retry after a 401 response
-        when(authProvider.supportsRefresh()).thenReturn(true);
+        when(tokenSource.supportsRefresh()).thenReturn(true);
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(2, requestCount.get(), "The mirror server should have received exactly two requests");
             assertEquals(200, response.statusCode(), "The response status code should match the expected status code");
-            assertTrue(mirrorRequest.get().containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
+            assertTrue(mirrorRequest.get()
+                                    .containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
         }
     }
 

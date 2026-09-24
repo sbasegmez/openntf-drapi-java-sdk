@@ -17,7 +17,7 @@ package org.openntf.drapi;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.openntf.drapi.internal.DrapiConfigImpl;
+import org.openntf.drapi.util.ConfigKey;
 
 class DrapiConfigBuilderTest {
 
@@ -53,13 +54,13 @@ class DrapiConfigBuilderTest {
 
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the properties file");
 
-        assertEquals("$DATA", config.get("authScope", String.class).orElse(null), "Auth scope should match the properties file");
-        assertEquals("your_username", config.get("username", String.class).orElse(null), "Username should match the properties file");
-        assertEquals("your_username", config.get("USERNAME", String.class).orElse(null), "Keys should match even if the case is different");
-        assertEquals("your_password", config.get("password", String.class).orElse(null), "Password should match the properties file");
+        assertEquals("$DATA", config.get("auth.authscope", String.class).orElse(null), "Auth scope should match the properties file");
+        assertEquals("your_username", config.get("auth.username", String.class).orElse(null), "Username should match the properties file");
+        assertEquals("your_username", config.get("auth.USERNAME", String.class).orElse(null), "Keys should match even if the case is different");
+        assertEquals("your_password", config.get("auth.password", String.class).orElse(null), "Password should match the properties file");
         assertTrue(config.userAgent().startsWith("your_user_agent"), "User agent should match the properties file");
         assertEquals(13, config.connectTimeoutSecs(), "Connect timeout should match the properties file");
-        Assertions.assertEquals(DrapiConfigImpl.DEFAULT_REQUEST_TIMEOUT_SECS, config.requestTimeoutSecs(), "Request timeout should be ignored from invalid property");
+        assertEquals(DrapiConfigImpl.DEFAULT_REQUEST_TIMEOUT_SECS, config.requestTimeoutSecs(), "Request timeout should be ignored from invalid property");
     }
 
     @Test
@@ -107,17 +108,21 @@ class DrapiConfigBuilderTest {
     @Test
     @DisplayName("Test setting and getting arbitrary parameters")
     void testSetAndGetArbitraryParameters() {
+        var intKey1 = ConfigKey.of("param1", Integer.class);
+        var strKey1 = ConfigKey.of("param1", String.class);
+
         DrapiConfig config = DrapiConfig.builder()
                                         .baseUrl("https://example.com")
-                                        .addExtraParam("customParam", 42)
+                                        .addExtraParam(intKey1, 42)
                                         .addExtraParam("anotherParam", "value")
+                                        .addExtraParam("param3", null)
                                         .build();
 
-        assertEquals(42, config.get("customParam", Integer.class).orElse(null), "Custom parameter should match the set value");
-        assertEquals("42", config.get("customParam", String.class).orElse(null), "Parameter types should be lenient");
+        assertEquals(42, config.get(intKey1).orElse(null), "Parameter should match the set value");
+        assertNotEquals("42", config.get(strKey1).orElse(null), "Parameter types should not be lenient");
         assertEquals("value", config.get("anotherParam", String.class).orElse(null), "Another parameter should match the set value");
+        assertTrue(config.get("param3", String.class).isEmpty(), "Null parameter should return empty Optional");
         assertTrue(config.get("nonExistentParam", String.class).isEmpty(), "Non-existent parameter should return empty Optional");
-
     }
 
     @EnabledIfEnvironmentVariable(named = "DRAPI_BASEURL", matches = ".*")

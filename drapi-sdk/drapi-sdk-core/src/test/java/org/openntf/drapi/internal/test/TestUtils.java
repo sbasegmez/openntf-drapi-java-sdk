@@ -17,6 +17,7 @@ package org.openntf.drapi.internal.test;
 
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -67,7 +68,7 @@ public class TestUtils {
 
     protected static DrapiRequest createMirrorRequest(HttpExchange exchange) throws IOException {
         var request = DrapiRequest.create(HttpMethod.of(exchange.getRequestMethod()), exchange.getRequestURI().getPath())
-                                  .headers(exchange.getRequestHeaders())
+                                  .headers(exchange.getRequestHeaders(), true)
                                   .body(RequestBody.ofBytes(exchange.getRequestHeaders().getFirst("Content-Type"),
                                                             exchange.getRequestBody().readAllBytes()));
 
@@ -98,6 +99,14 @@ public class TestUtils {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static int findUnusedPort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not reserve a port", e);
         }
     }
 
