@@ -26,6 +26,7 @@ import static org.openntf.drapi.http.HttpMethod.POST;
 import static org.openntf.drapi.internal.http.HttpHeaderConstants.USER_AGENT;
 
 import com.sun.net.httpserver.HttpExchange;
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -232,6 +234,61 @@ class JdkHttpTransportTest extends MockableHttpTest {
             assertEquals(parameter, receivedUri.get().getQuery().substring("param=".length()),
                          "The server should see the original query parameter after decoding the query (raw query was "
                              + receivedUri.get().getRawQuery() + ")");
+        }
+    }
+
+    @ParameterizedTest(name = "{0} without a body")
+    @EnumSource(HttpMethod.class)
+    @DisplayName("A request without a body should not be sent with chunked transfer encoding")
+    void requestWithoutBodyIsNotChunked(HttpMethod method) {
+        var config = buildConfig(null);
+
+        when(responder.respond(any())).thenReturn(response(200, "OK"));
+
+        try (var response = createTransport(config).submit(DrapiRequest.create(method, "/test"))) {
+            DrapiRequest mirroredRequest = mirrorRequest.get();
+
+            assertFalse(mirroredRequest.containsHeader("Transfer-Encoding"), "A request without a body should not be chunked");
+            assertTrue(!mirroredRequest.containsHeader("Content-Length") || mirroredRequest.containsHeader("Content-Length", "0"),
+                       "A request without a body should declare no length or a length of zero");
+        }
+    }
+
+    @Test
+    @DisplayName("A request with a byte-array body should be sent with Content-Length, not chunked")
+    void requestWithBytesBodyDeclaresContentLength() {
+        var config = buildConfig(null);
+        when(responder.respond(any())).thenReturn(response(201, "Created"));
+
+        String json = "{\"name\":\"test\"}";
+        var request = DrapiRequest.create(POST, "/create").body(RequestBody.ofString("application/json", json));
+
+        try (var response = createTransport(config).submit(request)) {
+            DrapiRequest mirroredRequest = mirrorRequest.get();
+
+            mirroredRequest.headers().forEach((key, values) -> System.out.println(key + ": " + values));
+
+            assertFalse(mirroredRequest.containsHeader("Transfer-Encoding"), "A body of known size should not be chunked");
+            assertTrue(mirroredRequest.containsHeader("Content-Length", String.valueOf(json.getBytes(StandardCharsets.UTF_8).length)),
+                       "Content-Length should match the body size");
+            assertEquals(json, new String(((Bytes) mirroredRequest.body()).data(), StandardCharsets.UTF_8), "The body should arrive intact");
+        }
+    }
+
+    @Test
+    @DisplayName("A streaming request body should still arrive intact")
+    void requestWithStreamingBodyArrivesIntact() {
+        var config = buildConfig(null);
+        when(responder.respond(any())).thenReturn(response(201, "Created"));
+
+        byte[] data = "streamed content".getBytes(StandardCharsets.UTF_8);
+        var request = DrapiRequest.create(POST, "/upload")
+                                  .body(RequestBody.ofStreaming("application/octet-stream", () -> new ByteArrayInputStream(data)));
+
+        try (var response = createTransport(config).submit(request)) {
+            // A streaming body has no known length, so chunked encoding is expected here and is not asserted either way.
+            assertEquals("streamed content", new String(((Bytes) mirrorRequest.get().body()).data(), StandardCharsets.UTF_8),
+                         "The streamed body should arrive intact");
         }
     }
 

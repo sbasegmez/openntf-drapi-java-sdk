@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -92,7 +93,25 @@ public class DrapiConfigBuilder {
     }
 
     public DrapiConfigBuilder applyEnvironmentVariables(String prefix) {
-        return applyMap(System.getenv(), prefix);
+        return doApplyEnvironmentVariables(System.getenv(), prefix);
+    }
+
+    // Testable version of applyEnvironmentVariables, which allows passing a custom environment variable map for testing purposes.
+    protected DrapiConfigBuilder doApplyEnvironmentVariables(Map<String, String> envVars, String prefix) {
+        TypeUtils.requireNonEmpty(prefix, "Prefix cannot be null or empty");
+
+        Map<String, String> filteredEnvVars = new HashMap<>();
+
+        envVars.entrySet()
+            .stream()
+            .filter(entry -> TypeUtils.startsWithIgnoreCase(entry.getKey(), prefix))
+            .map(entry -> Map.entry(entry.getKey()
+                                        .toLowerCase(Locale.ENGLISH)
+                                        .replace(prefix.toLowerCase(Locale.ENGLISH), "")
+                                        .replace("_", "."), entry.getValue()))
+            .forEach(entry -> filteredEnvVars.put(entry.getKey(), entry.getValue()));
+
+        return applyMap(filteredEnvVars);
     }
 
     /**
@@ -138,7 +157,7 @@ public class DrapiConfigBuilder {
     private DrapiConfigBuilder applyResourceFile(InputStream inputStream) throws IOException {
         Properties properties = new Properties();
         properties.load(inputStream);
-        applyMap(properties, "");
+        applyMap(properties);
 
         return this;
     }
@@ -152,20 +171,14 @@ public class DrapiConfigBuilder {
      * variable maps.
      *
      * @param map    Map of properties to apply to the builder.
-     * @param prefix Prefix to filter relevant properties
      * @return The current DrapiConfigBuilder instance
      */
-    DrapiConfigBuilder applyMap(Map<?, ?> map, String prefix) {
+    DrapiConfigBuilder applyMap(Map<?, ?> map) {
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             String key = entry.getKey().toString().toLowerCase(Locale.ENGLISH);
-            if (null!=prefix && !TypeUtils.startsWithIgnoreCase(key, prefix)) {
-                continue; // Skip keys that don't match the prefix
-            }
-
-            String strippedKey = TypeUtils.isEmpty(prefix) ? key : key.substring(prefix.length());
             String value = entry.getValue().toString();
 
-            switch (strippedKey) {
+            switch (key) {
                 case "baseurl" -> this.baseUrl(value);
                 case "useragent" -> this.userAgent(value);
                 case "connecttimeoutsecs" -> {
@@ -178,10 +191,8 @@ public class DrapiConfigBuilder {
                         this.requestTimeout(Integer.parseInt(value));
                     }
                 }
-                default -> {
-                    // For any other keys, we store them in the extraParams map
-                    this.addExtraParam(strippedKey, value);
-                }
+                // For any other keys, we store them in the extraParams map
+                default -> this.addExtraParam(key, value);
             }
         }
         return this;

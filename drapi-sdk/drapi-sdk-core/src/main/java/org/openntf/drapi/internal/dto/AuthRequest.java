@@ -24,7 +24,7 @@ public record AuthRequest(String username, String password, String scope) {
 
     public static final String REQ_USERNAME = "username";
     public static final String REQ_PASSWORD = "password";
-    public static final String REQ_SCOPE = "authscope";
+    public static final String REQ_SCOPE = "scope";
 
     public AuthRequest {
         TypeUtils.requireNonEmpty(username, "username must not be null or empty");
@@ -40,5 +40,14 @@ public record AuthRequest(String username, String password, String scope) {
         TypeUtils.ifNotBlank(scope, s -> map.put(REQ_SCOPE, s));
 
         return JsonBinding.get().toJson(map);
+    }
+
+    @Override
+    public String toString() {
+        return "AuthRequest{" +
+            "username='" + username + '\'' +
+            ", password='" + "********" + '\'' +
+            ", scope='" + scope + '\'' +
+            '}';
     }
 }

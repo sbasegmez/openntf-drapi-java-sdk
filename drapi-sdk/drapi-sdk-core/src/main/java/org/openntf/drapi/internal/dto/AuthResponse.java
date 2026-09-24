@@ -75,4 +75,14 @@ public record AuthResponse(String bearer, Map<String, Object> claims, int leeway
         return Optional.empty();
     }
 
+    @Override
+    public String toString() {
+        return "AuthResponse{" +
+            "bearer='" + "********" + '\'' +
+            ", claims=" + claims +
+            ", leeway=" + leeway +
+            ", expSeconds=" + expSeconds +
+            ", issueDate='" + issueDate + '\'' +
+            '}';
+    }
 }

@@ -54,7 +54,7 @@ class DrapiConfigBuilderTest {
 
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the properties file");
 
-        assertEquals("$DATA", config.get("auth.authscope", String.class).orElse(null), "Auth scope should match the properties file");
+        assertEquals("$DATA", config.get("auth.scope", String.class).orElse(null), "Auth scope should match the properties file");
         assertEquals("your_username", config.get("auth.username", String.class).orElse(null), "Username should match the properties file");
         assertEquals("your_username", config.get("auth.USERNAME", String.class).orElse(null), "Keys should match even if the case is different");
         assertEquals("your_password", config.get("auth.password", String.class).orElse(null), "Password should match the properties file");
@@ -73,7 +73,7 @@ class DrapiConfigBuilderTest {
                                             "password", "your_password",
                                             "useragent", " ", // Blank value
                                             "connectTimeoutSecs", "-5" // Invalid value
-                                        ), null)
+                                        ))
                                         .build();
 
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the map");
@@ -89,11 +89,12 @@ class DrapiConfigBuilderTest {
     @DisplayName("Test loading configuration from map with prefix")
     void testLoadFromMapWithOAuth() {
         var config = DrapiConfig.builder()
-                                .applyMap(Map.of(
+                                .doApplyEnvironmentVariables(Map.of(
                                     "DRAPI_BASEURL", "https://api.example.com",
                                     "DRAPI_AUTHSCOPE", "$DATA",
                                     "DRAPI_APPID", "your_ap_id",
-                                    "DRAPI_APPSECRET", "your_secret",
+                                    "DRAPI_APP_SECRET1", "your_secret1",
+                                    "DRAPI_APP.SECRET2", "your_secret2",
                                     "DRAPI_USERAGENT", "MyApp"
                                 ), "DRAPI_")
                                 .build();
@@ -101,7 +102,8 @@ class DrapiConfigBuilderTest {
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the map");
         assertEquals("$DATA", config.get("AUTHSCOPE", String.class).orElse(null), "Auth scope should match the map");
         assertEquals("your_ap_id", config.get("APPID", String.class).orElse(null), "App ID should match the map");
-        assertEquals("your_secret", config.get("APPSECRET", String.class).orElse(null), "App Secret should match the map");
+        assertEquals("your_secret1", config.get("APP.SECRET1", String.class).orElse(null), "Underscores should be converted to dots in keys for env variables");
+        assertEquals("your_secret2", config.get("APP.SECRET2", String.class).orElse(null), "Dots should stay in keys for env variables");
         assertEquals("MyApp", config.userAgent(), "User agent should match the map");
     }
 
