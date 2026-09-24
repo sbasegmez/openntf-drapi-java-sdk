@@ -52,7 +52,7 @@ public class TypeUtils {
     /**
      * If the provided string is not empty, execute the given action with the string as an argument.
      *
-     * @param value the string to check
+     * @param value  the string to check
      * @param action the action to execute if the string is not empty
      */
     public static void ifNotEmpty(String value, Consumer<String> action) {
@@ -86,7 +86,7 @@ public class TypeUtils {
     /**
      * If the provided string is not blank, execute the given action with the string as an argument.
      *
-     * @param value the string to check
+     * @param value  the string to check
      * @param action the action to execute if the string is not blank
      */
     public static void ifNotBlank(String value, Consumer<String> action) {
@@ -175,6 +175,9 @@ public class TypeUtils {
 
     /**
      * Check if a string is numeric.
+     * <p>
+     * FIXME: This method currently only checks for positive whole integers. It does not account for negative numbers, decimals, or
+     *  scientific notation. Consider fixing contract and additional implementations to handle these cases if needed.
      *
      * @param text the string to check
      * @return true if the string is numeric
