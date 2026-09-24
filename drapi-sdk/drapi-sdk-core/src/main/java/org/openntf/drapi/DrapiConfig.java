@@ -33,6 +33,8 @@ public interface DrapiConfig {
 
     <T> Optional<T> get(String key, Class<T> type);
 
+    <T> Optional<T> get(String key, Class<T> type, T defaultValue);
+
     static DrapiConfigBuilder builder() {
         return new DrapiConfigBuilder();
     }

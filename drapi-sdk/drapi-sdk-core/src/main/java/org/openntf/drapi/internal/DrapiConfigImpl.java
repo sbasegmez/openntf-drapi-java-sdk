@@ -21,10 +21,14 @@ import java.util.Objects;
 import java.util.Optional;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiConfigBuilder;
+import org.openntf.drapi.internal.log.Log;
+import org.openntf.drapi.internal.meta.DataTypeUtils;
 import org.openntf.drapi.util.ConfigKey;
 import org.openntf.drapi.util.TypeUtils;
 
 public class DrapiConfigImpl implements DrapiConfig {
+
+    private static final Log LOG = Log.getLogger(DrapiConfigImpl.class);
 
     public static final String DEFAULT_USER_AGENT = "OPENNTF-DRAPI-SDK-JAVA";
     public static final int DEFAULT_CONNECT_TIMEOUT_SECS = 5;
@@ -64,19 +68,29 @@ public class DrapiConfigImpl implements DrapiConfig {
 
     @Override
     public <T> Optional<T> get(String key, Class<T> type) {
+        return get(key, type, null);
+    }
+
+    @Override
+    public <T> Optional<T> get(String key, Class<T> type, T defaultValue) {
         Object value = extraParams.get(key);
         if (value == null) {
-            return Optional.empty();
+            return Optional.ofNullable(defaultValue);
         }
-        if (type.isInstance(value)) {
-            return Optional.of(type.cast(value));
+
+        Optional<T> convertedValue = DataTypeUtils.typedScalar(value, type);
+
+        if(convertedValue.isPresent()) {
+            return convertedValue;
         }
-        throw new IllegalArgumentException("Value for key '" + key + "' is not of type " + type.getName());
+
+        LOG.warn("Value for key '{}' is not of type {}", key, type.getName());
+        return Optional.ofNullable(defaultValue);
     }
 
     @Override
     public <T> Optional<T> get(ConfigKey<T> key) {
-        return get(key.key(), key.type());
+        return get(key.key(), key.type(), key.defaultValue());
     }
 
     @Override

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -205,7 +204,9 @@ public class DrapiConfigBuilder {
     }
 
     public Map<String, Object> extraParams() {
-        return new HashMap<>(extraParams);
+        TreeMap<String, Object> map = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        map.putAll(extraParams);
+        return map;
     }
 }
 
