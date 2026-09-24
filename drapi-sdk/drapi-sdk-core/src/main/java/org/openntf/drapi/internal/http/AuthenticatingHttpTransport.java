@@ -136,6 +136,9 @@ public final class AuthenticatingHttpTransport implements HttpTransport {
             // If another thread has already refreshed the token, we will not invalidate it.
             tokenSource.tokenRejected(sessionContext, currentToken);
 
+            // We need to close the response body to release the connection back to the pool.
+            response.close();
+
             // Now we can attempt to submit again. But this time if it fails, we will not retry again to avoid infinite loops.
             return submitRequestWithToken(request, false);
         }

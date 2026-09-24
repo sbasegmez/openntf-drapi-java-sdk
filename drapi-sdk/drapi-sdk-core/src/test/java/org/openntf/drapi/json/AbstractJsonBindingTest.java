@@ -22,16 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openntf.drapi.exception.JsonBindingException;
+import org.openntf.drapi.util.CloseTrackingInputStream;
 import org.openntf.drapi.util.TypeUtils;
 
 /**
@@ -272,25 +269,6 @@ public abstract class AbstractJsonBindingTest {
     @Nested
     @DisplayName("Test JSON binding streamFromJsonArray method")
     class StreamFromJsonArrayTests {
-
-        static class CloseTrackingInputStream extends FilterInputStream {
-
-            private boolean closed = false;
-
-            public CloseTrackingInputStream(String json) {
-                super(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
-            }
-
-            public boolean isClosed() {
-                return closed;
-            }
-
-            @Override
-            public void close() throws IOException {
-                closed = true;
-                super.close();
-            }
-        }
 
 
         @Test

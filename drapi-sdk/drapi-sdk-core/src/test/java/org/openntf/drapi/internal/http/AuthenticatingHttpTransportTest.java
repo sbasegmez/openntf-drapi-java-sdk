@@ -16,10 +16,15 @@
 package org.openntf.drapi.internal.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,10 +36,13 @@ import org.openntf.drapi.auth.SessionContext;
 import org.openntf.drapi.auth.Token;
 import org.openntf.drapi.auth.TokenSourceBase;
 import org.openntf.drapi.http.DrapiRequest;
+import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.HttpMethod;
 import org.openntf.drapi.http.HttpTransport;
+import org.openntf.drapi.http.HttpTransportBase;
 import org.openntf.drapi.http.HttpTransportProvider;
 import org.openntf.drapi.internal.test.MockableHttpTest;
+import org.openntf.drapi.util.CloseTrackingInputStream;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticatingHttpTransportTest extends MockableHttpTest {
@@ -175,5 +183,39 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         }
     }
 
+    // Added to validate an issue came up with Claude code-review
+    @Test
+    @DisplayName("A rejected 401 response should be closed before the request is retried")
+    void rejectedResponseIsClosedBeforeRetry() {
+        DrapiConfig config = buildConfig(null);
+
+        // A scripted transport: the first call answers 401, every later call answers 200. Each body records whether it was closed.                                                                                  
+        List<CloseTrackingInputStream> bodies = new ArrayList<>();
+        HttpTransport transport = createCountingTransport(config, bodies);
+
+        when(tokenSource.supportsRefresh()).thenReturn(true);
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
+
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
+            assertEquals(200, response.statusCode(), "The retried request should succeed");
+            assertEquals(2, bodies.size(), "The request should have been sent twice");
+            assertTrue(bodies.get(0).isClosed(), "The rejected 401 response should be closed, otherwise its connection is never released");
+            assertFalse(bodies.get(1).isClosed(), "The response handed to the caller should still be open");
+        }
+    }
+
+    private HttpTransport createCountingTransport(DrapiConfig config, List<CloseTrackingInputStream> bodies) {
+        HttpTransport scriptedTransport = new HttpTransportBase(config, null) {
+            @Override
+            public CompletableFuture<DrapiResponse> submitAsync(DrapiRequest request) {
+                int status = bodies.isEmpty() ? 401 : 200;
+                var body = new CloseTrackingInputStream(status == 401 ? "Unauthorized" : "OK");
+                bodies.add(body);
+                return CompletableFuture.completedFuture(new DrapiResponse(status, Map.of(), body));
+            }
+        };
+
+        return new AuthenticatingHttpTransport(scriptedTransport, tokenSource);
+    }
 
 }

@@ -66,6 +66,9 @@ public abstract class AbstractApi {
 
         LOG.debug("Request failed for {}: {}", request.path(), ex.getMessage());
 
+        // Close response to free resources
+        response.close();
+
         return CompletableFuture.failedFuture(ex);
     }
 
