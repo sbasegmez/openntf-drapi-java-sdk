@@ -77,7 +77,7 @@ public class JdkHttpTransport extends HttpTransportBase {
     private HttpRequest toHttpRequest(DrapiRequest drapiRequest) {
 
         URI uri = UriBuilder.startWith(config().baseUrl())
-                            .appendPath(drapiRequest.path())
+                            .setPath(drapiRequest.path(), false) // drapiRequest.path() is already encoded throug ApiPath
                             .appendQueryParams(drapiRequest.queryParams())
                             .build();
 

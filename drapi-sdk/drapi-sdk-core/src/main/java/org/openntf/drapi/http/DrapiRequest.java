@@ -46,9 +46,9 @@ public final class DrapiRequest {
     // Sessuin context is used to mark the request as authenticated.
     private SessionContext sessionContext;
 
-    private DrapiRequest(HttpMethod method, String path) {
+    private DrapiRequest(HttpMethod method, String encodedPath) {
         this.httpMethod = Objects.requireNonNull(method, "HTTP method cannot be null");
-        this.path = Objects.requireNonNull(path, "Path cannot be null");
+        this.path = Objects.requireNonNull(encodedPath, "Encoded path cannot be null");
         this.queryParams = new ArrayList<>();
         this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
@@ -57,7 +57,9 @@ public final class DrapiRequest {
     }
 
     public static DrapiRequest create(HttpMethod method, String path) {
-        return new DrapiRequest(method, path);
+        Objects.requireNonNull(path, "Path cannot be null");
+        // We are passing the path throug the ApiPath.of() method to ensure that it is properly encoded and validated.
+        return new DrapiRequest(method, ApiPath.of(path).toString());
     }
 
     public static DrapiRequest create(HttpMethod method, ApiPath apiPath) {

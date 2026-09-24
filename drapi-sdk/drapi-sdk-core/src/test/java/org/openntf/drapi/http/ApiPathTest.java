@@ -65,11 +65,11 @@ class ApiPathTest {
     }
 
     @Test
-    @DisplayName("Test that segments are URL-encoded correctly")
+    @DisplayName("Test that toString() outputs URL-encoded correctly")
     void testApiPathUrlEncoding() {
         ApiPath path = ApiPath.of("segment with spaces").append("üñîçødê");
 
-        assertEquals("/segment+with+spaces/%C3%BC%C3%B1%C3%AE%C3%A7%C3%B8d%C3%AA", path.toString(), "Segments should be URL-encoded correctly");
+        assertEquals("/segment%20with%20spaces/%C3%BC%C3%B1%C3%AE%C3%A7%C3%B8d%C3%AA", path.toString(), "Segments should be URL-encoded correctly");
     }
 
     @Test

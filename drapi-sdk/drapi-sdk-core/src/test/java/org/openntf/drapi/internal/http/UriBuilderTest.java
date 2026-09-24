@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.openntf.drapi.http.ApiPath;
 
 class UriBuilderTest {
 
@@ -32,12 +33,13 @@ class UriBuilderTest {
 
     private UriBuilder builder(String baseUrl, String... paths) {
         var builder = builder(baseUrl);
+        var apiPath = ApiPath.empty();
 
         for (String path : paths) {
-            builder.appendPath(path);
+            apiPath = apiPath.append(path);
         }
 
-        return builder;
+        return builder.setPath(apiPath.toString(), false);
     }
 
     private String buildWith(String baseUrl) {
@@ -100,6 +102,9 @@ class UriBuilderTest {
         result = buildWith("https://example.com", "v1/api", "scopes");
         assertEquals("https://example.com/v1/api/scopes", result, "Multi-segment paths should be appended correctly");
 
+        result = buildWith("https://example.com", "v1/api", "lists", "by name");
+        assertEquals("https://example.com/v1/api/lists/by%20name", result, "paths should be encoded correctly when they contain spaces");
+
     }
 
     @Test
@@ -121,7 +126,7 @@ class UriBuilderTest {
         assertEquals("https://example.com/v1/api/scopes", result, "Multi-segment paths with leading and trailing slashes should be normalized and appended correctly");
 
         result = buildWith("https://example.com", "/test path");
-        assertEquals("https://example.com/test+path", result, "Paths with spaces should be URL-encoded correctly");
+        assertEquals("https://example.com/test%20path", result, "Paths with spaces should be URL-encoded correctly");
 
     }
 
@@ -148,13 +153,13 @@ class UriBuilderTest {
         String result = builder("https://example.com", "api")
             .appendQueryParam("key1", "value1")
             .appendQueryParam("key2", "value2")
-            .appendQueryParam("key3", "") // This should be ignored
-            .appendQueryParam("key4", null) // This should be ignored
+            .appendQueryParam("key3", "") // This should be added
+            .appendQueryParam("key4", null) // This should be added
             .appendQueryParam(null, null) // This should be ignored
             .build()
             .toString();
 
-        assertEquals("https://example.com/api?key1=value1&key2=value2", result, "Query parameters should be appended correctly");
+        assertEquals("https://example.com/api?key1=value1&key2=value2&key3=&key4=", result, "Query parameters should be appended correctly");
     }
 
     @Test
@@ -179,15 +184,15 @@ class UriBuilderTest {
             .build()
             .toString();
 
-        assertEquals("https://example.com/api?key%2B1=value+1&key%262=value%262&pwd%3F=caf%C3%A9", result, "Query parameters should be URL-encoded correctly");
+        assertEquals("https://example.com/api?key%2B1=value%201&key%262=value%262&pwd%3F=caf%C3%A9", result, "Query parameters should be URL-encoded correctly");
     }
 
     @Test
     @DisplayName("Test UriBuilder to ensure order of paths and query parameters is handled correctly")
     void testUriBuilderWithOrderOfPathsAndQueryParams() {
-        String result = builder("https://example.com", "api")
+        String result = builder("https://example.com")
             .appendQueryParam("key1", "value1")
-            .appendPath("scopes")
+            .setPath("api/scopes", true)
             .appendQueryParam("key2", "value2")
             .build()
             .toString();

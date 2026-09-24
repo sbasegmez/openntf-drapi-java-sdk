@@ -25,18 +25,23 @@ import static org.openntf.drapi.http.HttpMethod.GET;
 import static org.openntf.drapi.http.HttpMethod.POST;
 import static org.openntf.drapi.internal.http.HttpHeaderConstants.USER_AGENT;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.exception.HttpTransportException;
+import org.openntf.drapi.http.ApiPath;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.HttpMethod;
 import org.openntf.drapi.http.HttpTransport;
@@ -174,6 +179,60 @@ class JdkHttpTransportTest extends MockableHttpTest {
                 response.bodyAsString();
             }
         }, "Expected a HttpTransportException due to unresponsive server, but no exception was thrown.");
+    }
+
+    @ParameterizedTest(name = "Path Segment: \"{0}\"")
+    @ValueSource(strings = {"By Name", "C++ Tips", "100% Done", "Ümit's view", "a&b=c?d#e"})
+    @DisplayName("Path segments should reach the server exactly as given, whatever characters they contain")
+    void pathSegmentsRoundTripToServer(String segment) {
+        var config = buildConfig(null);
+        var transport = createTransport(config);
+
+        // Capture the URI the server actually received. The mirror request only keeps the decoded path, which is not enough here.
+        AtomicReference<URI> receivedUri = new AtomicReference<>();
+        when(responder.respond(any())).thenAnswer(invocation -> {
+            HttpExchange exchange = invocation.getArgument(0);
+            receivedUri.set(exchange.getRequestURI());
+            return response(200, "OK");
+        });
+
+        var request = DrapiRequest.create(GET, ApiPath.root("/test").append(segment));
+
+        try (var response = transport.submit(request)) {
+            assertEquals(200, response.statusCode(), "The request should succeed");
+
+            // getPath() decodes percent-escapes only; it does not turn '+' into a space. This matches how DRAPI decodes paths.
+            assertEquals("/api/v1/test/" + segment, receivedUri.get().getPath(),
+                         "The server should see the original path segment after decoding the path (raw path was "
+                             + receivedUri.get().getRawPath() + ")");
+        }
+    }
+
+    @ParameterizedTest(name = "Query Parameter: \"{0}\"")
+    @ValueSource(strings = {"By Name", "C++ Tips", "100% Done", "Ümit's view", "a&b=c?d#e", " ", ""})
+    @DisplayName("Query parameters should reach the server exactly as given, whatever characters they contain")
+    void queryParametersRoundTripToServer(String parameter) {
+        var config = buildConfig(null);
+        var transport = createTransport(config);
+
+        // Capture the URI the server actually received. The mirror request only keeps the decoded path, which is not enough here.
+        AtomicReference<URI> receivedUri = new AtomicReference<>();
+        when(responder.respond(any())).thenAnswer(invocation -> {
+            HttpExchange exchange = invocation.getArgument(0);
+            receivedUri.set(exchange.getRequestURI());
+            return response(200, "OK");
+        });
+
+        var request = DrapiRequest.create(GET, ApiPath.root("/test"))
+                                  .queryParam("param", parameter);
+
+        try (var response = transport.submit(request)) {
+            assertEquals(200, response.statusCode(), "The request should succeed");
+
+            assertEquals(parameter, receivedUri.get().getQuery().substring("param=".length()),
+                         "The server should see the original query parameter after decoding the query (raw query was "
+                             + receivedUri.get().getRawQuery() + ")");
+        }
     }
 
 }
