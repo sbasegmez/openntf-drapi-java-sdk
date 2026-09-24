@@ -45,8 +45,9 @@ public final class DrapiResponse implements AutoCloseable {
     // The body of the response is represented as an InputStream to allow for streaming large responses without loading them entirely into memory.
     private final InputStream bodyStream;
 
-    // Cache for the body as a string to avoid multiple reads errors
+    // Cache for the body to avoid multiple reads errors
     private String bodyStringCache = null;
+    private byte[] bodyBytesCache = null;
 
     public DrapiResponse(int statusCode, Map<String, List<String>> givenHeaders, InputStream bodyStream) {
         this.statusCode = statusCode;
@@ -81,7 +82,10 @@ public final class DrapiResponse implements AutoCloseable {
             return new byte[0];
         }
         try {
-            return bodyStream.readAllBytes();
+            if (bodyBytesCache == null) {
+                bodyBytesCache = bodyStream.readAllBytes();
+            }
+            return bodyBytesCache;
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to read response body", e);
         }

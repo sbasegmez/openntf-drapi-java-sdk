@@ -21,6 +21,10 @@ import java.util.function.Supplier;
 
 public class ServiceRegistry {
 
+    private ServiceRegistry() {
+        // Private constructor to prevent instantiation
+    }
+
     /**
      * Find a service implementation for the given service class. If no implementation is found, throw a ServiceConfigurationError. If
      * multiple implementations are found, throw a ServiceConfigurationError. This method is useful for cases where you want to ensure

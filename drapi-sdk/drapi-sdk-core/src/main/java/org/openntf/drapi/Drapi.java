@@ -22,6 +22,8 @@ public interface Drapi {
     /**
      * Returns the HTTP transport mechanism used for making network requests. This transport is responsible for handling the
      * communication between the SDK and external services or APIs.
+     * <p>
+     * FIXME: This method should be removed from the interface. It's not safe to keep a public reference to the authenticating transport.
      *
      * @return the HttpTransport instance used for network communication
      */
@@ -55,7 +57,7 @@ public interface Drapi {
     /**
      * Creates a new DrapiBuilder instance for constructing a Drapi instance with the specified configuration.
      *
-     * @param config            the DrapiConfig containing configuration settings
+     * @param config              the DrapiConfig containing configuration settings
      * @param tokenSourceProvider the TokenSource used for authentication
      * @return a new DrapiBuilder instance
      */

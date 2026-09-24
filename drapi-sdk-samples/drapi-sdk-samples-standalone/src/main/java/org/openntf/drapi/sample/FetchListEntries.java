@@ -21,6 +21,7 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.stream.Stream;
 import org.openntf.drapi.Drapi;
+import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.ListsGetOptions;
@@ -41,9 +42,10 @@ public class FetchListEntries {
         Drapi drapi = Drapi.builder(config, new PasswordTokenSourceProvider())
                            .build();
 
+        DrapiClient drapiClient = drapi.forSession(SessionContext.singleUser());
+
         // Create a scope on your favourite DRAPI server and name it as "projectdb".
-        DrapiDataSource ds = drapi.forSession(SessionContext.singleUser())
-                                  .dataSource("projectdb");
+        DrapiDataSource ds = drapiClient.dataSource("projectdb");
 
         // Fetch the list entries from the "projects" view, limiting to 20 entries and excluding metadata.
         // Do not forget to enable "projects" view in your schema.
@@ -53,6 +55,9 @@ public class FetchListEntries {
           .exceptionally(FetchListEntries::handleError)
           .join(); // Join the CompletableFuture to ensure the flow waits for completion before proceeding.
 
+        // Logout and shutdown the DRAPI client to clean up resources.
+        drapiClient.logout();
+        drapi.shutdown();
     }
 
     // Consume the stream of ListEntry objects and print their details in a formatted manner.

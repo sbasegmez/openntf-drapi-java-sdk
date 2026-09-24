@@ -44,7 +44,7 @@ public class DocumentsApiImpl extends AbstractDataSourceApi implements Documents
 
         LOG.trace("Submitting request for {}", request.path());
 
-        return submitRequest(request, ResponseParser::toDocument);
+        return submitRequest(request, response -> ResponseParser.toDocument(request, response));
     }
 
 }

@@ -22,6 +22,7 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 import org.openntf.drapi.exception.DrapiException;
 import org.openntf.drapi.exception.JsonBindingException;
+import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.json.JsonBinding;
 import org.openntf.drapi.meta.Document;
@@ -63,7 +64,7 @@ public class ResponseParser {
         // Private constructor to prevent instantiation
     }
 
-    public static Document toDocument(DrapiResponse response) {
+    public static Document toDocument(DrapiRequest request, DrapiResponse response) {
         Objects.requireNonNull(response, "Response cannot be null");
 
         JsonBinding jsonBinding = JsonBinding.get();
@@ -73,7 +74,7 @@ public class ResponseParser {
             // Might throw JsonParsingException if the response body is not valid JSON
             bodyTree = jsonBinding.fromJson(response.bodyAsString());
         } catch (JsonBindingException e) {
-            throw new DrapiException("Failed to parse response body as JSON", null, response, e);
+            throw new DrapiException("Failed to parse response body as JSON", request, response, e);
         }
 
         DocumentMeta meta = null;
@@ -103,7 +104,7 @@ public class ResponseParser {
         }
 
         if (TypeUtils.isEmpty(form)) {
-            throw new DrapiException("Form field is missing in the response body. This is an invalid response.", null, response);
+            throw new DrapiException("Form field is missing in the response body. This is an invalid response.", request, response);
         }
 
         return new DocumentImpl(

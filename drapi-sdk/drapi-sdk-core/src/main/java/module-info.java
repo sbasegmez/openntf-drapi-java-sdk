@@ -21,6 +21,7 @@ module org.openntf.drapi {
     exports org.openntf.drapi.api;
     exports org.openntf.drapi.api.options;
     exports org.openntf.drapi.auth;
+    exports org.openntf.drapi.auth.builtin;
     exports org.openntf.drapi.exception;
     exports org.openntf.drapi.http;
     exports org.openntf.drapi.json;
@@ -32,7 +33,6 @@ module org.openntf.drapi {
     // ErrorMessage needs no such opens: it's a fully public record in an already-exported package, and reflection on public members
     // of an exported type doesn't require it.
     opens org.openntf.drapi.internal.dto;
-    exports org.openntf.drapi.auth.builtin;
 
     uses org.openntf.drapi.json.JsonBindingProvider;
     uses org.openntf.drapi.http.HttpTransportProvider;

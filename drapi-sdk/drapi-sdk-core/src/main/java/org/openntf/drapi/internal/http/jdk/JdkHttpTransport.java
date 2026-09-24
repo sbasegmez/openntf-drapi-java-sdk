@@ -64,8 +64,8 @@ public class JdkHttpTransport extends HttpTransportBase {
             return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofInputStream())
                              .thenApply(this::toDrapiResponse)
                              .exceptionally(ex -> {
-                                 throw new HttpTransportException("Connection failed", (ex instanceof CompletionException
-                                     ? ex.getCause() : ex));
+                                 var cause = (ex instanceof CompletionException && ex.getCause() != null) ? ex.getCause() : ex;
+                                 throw new HttpTransportException("Connection failed", cause);
                              });
 
         } catch (Exception e) {

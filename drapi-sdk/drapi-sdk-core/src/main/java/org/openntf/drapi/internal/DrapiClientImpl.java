@@ -20,6 +20,7 @@ import org.openntf.drapi.Drapi;
 import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.auth.SessionContext;
+import org.openntf.drapi.util.TypeUtils;
 
 public class DrapiClientImpl implements DrapiClient {
 
@@ -43,6 +44,8 @@ public class DrapiClientImpl implements DrapiClient {
 
     @Override
     public DrapiDataSource dataSource(String name) {
+        TypeUtils.requireNonEmpty(name, "Data source name must not be null or empty");
+
         return new DrapiDataSourceImpl(this, name);
     }
 

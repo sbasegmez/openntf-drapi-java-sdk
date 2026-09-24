@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import org.openntf.drapi.Drapi;
+import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
 import org.openntf.drapi.api.options.DocumentsGetOptions;
@@ -43,9 +44,10 @@ public class FetchSingleDocument {
         Drapi drapi = Drapi.builder(config, new PasswordTokenSourceProvider())
                            .build();
 
+        DrapiClient drapiClient = drapi.forSession(SessionContext.singleUser());
+
         // Create a scope on your favourite DRAPI server and name it as "projectdb".
-        DrapiDataSource ds = drapi.forSession(SessionContext.singleUser())
-                                  .dataSource("projectdb");
+        DrapiDataSource ds = drapiClient.dataSource("projectdb");
 
         // Lookup unid of a document representing "XSnippets" project.
         Optional<String> unid = findDocumentUnid(ds, "XSnippets");
@@ -66,6 +68,9 @@ public class FetchSingleDocument {
           .exceptionally(FetchSingleDocument::handleError)
           .join();
 
+        // For convenience, we log out and shutdown the Drapi client at the end of the program.
+        drapiClient.logout();
+        drapi.shutdown();
     }
 
     private static Optional<String> findDocumentUnid(DrapiDataSource ds, String projectName) {

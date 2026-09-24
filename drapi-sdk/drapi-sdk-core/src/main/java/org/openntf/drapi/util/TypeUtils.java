@@ -306,12 +306,12 @@ public class TypeUtils {
             return null == prefix;
         }
 
-        if (key.isEmpty()) {
-            return prefix.isEmpty();
-        }
-
         if (prefix == null) {
             return false;
+        }
+
+        if (key.isEmpty()) {
+            return prefix.isEmpty();
         }
 
         return key.toLowerCase(Locale.ENGLISH).startsWith(prefix.toLowerCase(Locale.ENGLISH));

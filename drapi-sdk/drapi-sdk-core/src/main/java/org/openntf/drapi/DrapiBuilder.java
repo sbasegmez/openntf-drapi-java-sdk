@@ -23,7 +23,14 @@ import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.http.HttpTransportProvider;
 import org.openntf.drapi.internal.DrapiImpl;
 
+/**
+ * Builder class for creating instances of {@link Drapi}.
+ * <p>
+ * This builder allows you to configure the necessary components for creating a Drapi instance, including the configuration, token
+ * source provider, HTTP transport provider, and executor.
+ */
 public class DrapiBuilder {
+
     private final DrapiConfig config;
     private final TokenSourceProvider tokenSourceProvider;
 
@@ -31,21 +38,48 @@ public class DrapiBuilder {
     private HttpTransportProvider httpTransportProvider;
     private Executor httpExecutor;
 
+    /**
+     * Constructs a new DrapiBuilder with the specified configuration and token source provider.
+     *
+     * @param config              The Drapi configuration.
+     * @param tokenSourceProvider The token source provider for authentication.
+     */
     public DrapiBuilder(DrapiConfig config, TokenSourceProvider tokenSourceProvider) {
         this.config = Objects.requireNonNull(config, "Config must not be null");
         this.tokenSourceProvider = Objects.requireNonNull(tokenSourceProvider, "TokenSourceProvider must not be null");
     }
 
+    /**
+     * Sets the HTTP transport provider for the Drapi instance.
+     * <p>
+     * If not set, a default HTTP transport provider will be used.
+     *
+     * @param httpTransportProvider The HTTP transport provider.
+     * @return The current DrapiBuilder instance.
+     */
     public DrapiBuilder httpTransportProvider(HttpTransportProvider httpTransportProvider) {
         this.httpTransportProvider = httpTransportProvider;
         return this;
     }
 
+    /**
+     * Sets the HTTP executor for the Drapi instance.
+     * <p>
+     * If not set, HTTP Transport will use its default executor.
+     *
+     * @param httpExecutor The HTTP executor.
+     * @return The current DrapiBuilder instance.
+     */
     public DrapiBuilder httpExecutor(Executor httpExecutor) {
         this.httpExecutor = httpExecutor;
         return this;
     }
 
+    /**
+     * Builds a new instance of {@link Drapi} with the configured components.
+     *
+     * @return a new Drapi instance
+     */
     public Drapi build() {
 
         if (httpTransportProvider == null) {
@@ -54,10 +88,11 @@ public class DrapiBuilder {
             this.httpTransportProvider = HttpTransportProvider.defaultTransportProvider();
         }
 
-        // This is a bare transport context, which can be used to pass additional information to the transport layer if needed.
+        // This will create the HttpTransport and TokenSource using the provided or default components
         HttpTransport httpTransport = httpTransportProvider.create(config, httpExecutor);
         TokenSource tokenSource = tokenSourceProvider.create(config, httpTransport);
 
+        // DrapiImpl will internally convert httpTransport and tokenSource to AuthenticatedHttpTransport
         return new DrapiImpl(config, httpTransport, tokenSource);
     }
 
