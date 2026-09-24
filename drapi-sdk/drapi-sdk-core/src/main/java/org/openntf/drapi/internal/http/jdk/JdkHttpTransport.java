@@ -64,7 +64,8 @@ public class JdkHttpTransport extends HttpTransportBase {
             return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofInputStream())
                              .thenApply(this::toDrapiResponse)
                              .exceptionally(ex -> {
-                                 throw new HttpTransportException("Connection failed", (ex instanceof CompletionException ? ex.getCause() : ex));
+                                 throw new HttpTransportException("Connection failed", (ex instanceof CompletionException
+                                     ? ex.getCause() : ex));
                              });
 
         } catch (Exception e) {
@@ -87,8 +88,20 @@ public class JdkHttpTransport extends HttpTransportBase {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                                                  .uri(uri)
                                                  .timeout(Duration.ofSeconds(config().requestTimeoutSecs()))
-                                                 .header(USER_AGENT, config().userAgent())
-                                                 .method(drapiRequest.httpMethod().name(), bodyPublisher);
+                                                 .header(USER_AGENT, config().userAgent());
+
+        int contentLength = drapiRequest.body().contentLength();
+
+        // TODO: Consider extracting the body handling logic into a separate method for better readability and testability.
+        // TODO: Consider publishing the body as a bytebuffer for better performance, especially for large requests.
+        //  This would require detecting Bytes variant and using BodyPublishers.ofByteArray() instead of BodyPublishers.ofInputStream().
+        if (contentLength > 0) {
+            builder.method(drapiRequest.httpMethod().name(), BodyPublishers.fromPublisher(bodyPublisher, contentLength));
+        } else if (contentLength == 0) {
+            builder.method(drapiRequest.httpMethod().name(), BodyPublishers.noBody());
+        } else {
+            builder.method(drapiRequest.httpMethod().name(), bodyPublisher);
+        }
 
         drapiRequest.headers()
                     .entrySet()

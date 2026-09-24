@@ -266,8 +266,6 @@ class JdkHttpTransportTest extends MockableHttpTest {
         try (var response = createTransport(config).submit(request)) {
             DrapiRequest mirroredRequest = mirrorRequest.get();
 
-            mirroredRequest.headers().forEach((key, values) -> System.out.println(key + ": " + values));
-
             assertFalse(mirroredRequest.containsHeader("Transfer-Encoding"), "A body of known size should not be chunked");
             assertTrue(mirroredRequest.containsHeader("Content-Length", String.valueOf(json.getBytes(StandardCharsets.UTF_8).length)),
                        "Content-Length should match the body size");
