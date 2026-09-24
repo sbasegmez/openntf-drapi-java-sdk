@@ -17,10 +17,12 @@ package org.openntf.drapi.internal.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.auth.SessionContext;
 import org.openntf.drapi.auth.Token;
 import org.openntf.drapi.auth.TokenSourceBase;
+import org.openntf.drapi.exception.HttpTransportException;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.HttpMethod;
@@ -42,6 +45,7 @@ import org.openntf.drapi.http.HttpTransport;
 import org.openntf.drapi.http.HttpTransportBase;
 import org.openntf.drapi.http.HttpTransportProvider;
 import org.openntf.drapi.internal.test.MockableHttpTest;
+import org.openntf.drapi.internal.test.TestUtils;
 import org.openntf.drapi.util.CloseTrackingInputStream;
 
 @ExtendWith(MockitoExtension.class)
@@ -182,6 +186,25 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
                                     .containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
         }
     }
+
+    @Test
+    @DisplayName("Test TransportException is thrown when the transport fails to submit a request")
+    void transportExceptionIsThrownWhenTransportFails() {
+        // Use an unused port to simulate unresponsiveness
+        var url = URI.create("http://127.0.0.1:" + TestUtils.findUnusedPort()).toString();
+        var config = buildConfig(builder -> builder.baseUrl(url));
+        var transport = createTransport(config);
+
+        // Auth provider automatically returns a token when acquireToken is called
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
+
+        try(var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
+            assertEquals(-1, response.statusCode(), "This line should not be reached, as an exception is expected to be thrown before this point");
+        } catch (HttpTransportException e) {
+            assertInstanceOf(HttpTransportException.class, e, "The exception should contain the type HttpTransportException");
+        }
+    }
+
 
     // Added to validate an issue came up with Claude code-review
     @Test

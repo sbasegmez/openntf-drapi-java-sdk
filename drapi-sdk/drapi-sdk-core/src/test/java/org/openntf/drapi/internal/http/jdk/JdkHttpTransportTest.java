@@ -173,7 +173,7 @@ class JdkHttpTransportTest extends MockableHttpTest {
         var config = buildConfig(builder -> builder.baseUrl(url));
         var transport = createTransport(config);
 
-        assertThrows(HttpTransportException.class, () -> {
+        Throwable t = assertThrows(HttpTransportException.class, () -> {
             try (var response = transport.submit(DrapiRequest.create(GET, "/test"))) {
                 // This line should not be reached due to the unresponsive server
                 response.bodyAsString();

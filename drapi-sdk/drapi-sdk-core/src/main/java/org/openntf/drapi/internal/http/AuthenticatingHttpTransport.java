@@ -17,10 +17,11 @@ package org.openntf.drapi.internal.http;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import org.openntf.drapi.auth.SessionContext;
 import org.openntf.drapi.auth.Token;
 import org.openntf.drapi.auth.TokenSource;
-import org.openntf.drapi.auth.SessionContext;
 import org.openntf.drapi.exception.AuthenticationException;
+import org.openntf.drapi.exception.HttpTransportException;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.HttpTransport;
@@ -68,11 +69,19 @@ public final class AuthenticatingHttpTransport implements HttpTransport {
             }
 
             return token;
-        } catch (Exception e) {
+        } catch (AuthenticationException e) {
+            // AuthenticationException is expected to be thrown by the TokenSource if there is a credential issue or
+            // if the authentication fails for any reason. We rethrow it to propagate the error up the call stack.
+            throw e;
+        } catch (HttpTransportException e) {
+            // HttpTransportException is expected to be thrown by the TokenSource if there is a transport issue while acquiring the token.
+            // This is a specific case of AuthenticationException, so we wrap it in an AuthenticationException to provide more context.
+            throw new AuthenticationException("Failed to acquire token due to transport error", request, null, e);
+        } catch (Exception e) { // Limit by DrapiException?
             // TODO : In case of Oauth, the exception will determine if the app should require a new login.
             //  SDK cannot initiate an OAuth dance, but we can signal to the app-developer that a new login is required.
             //  This can be done by a specific exception (e.g. AuthenticationRequiredException). Revisit with Oauth implementation.
-            LOG.error("Failed to acquire token for {}", sessionContext.username(), e);
+            LOG.debug("Failed to acquire token for {}", sessionContext.username(), e);
             throw new AuthenticationException("Failed to acquire token", request, null, e);
         }
     }
@@ -143,7 +152,7 @@ public final class AuthenticatingHttpTransport implements HttpTransport {
             return submitRequestWithToken(request, false);
         }
 
-        if(! response.isSuccess()) {
+        if (!response.isSuccess()) {
             // If the response is not successful, we log it for debugging purposes.
             LOG.trace("No retry needed for {} request to {}", request.httpMethod(), request.path());
         }

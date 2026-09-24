@@ -43,7 +43,9 @@ public sealed interface HttpTransport permits HttpTransportBase, AuthenticatingH
             return submitAsync(request).join();
         } catch (CompletionException e) {
             Throwable cause = e.getCause() == null ? e : e.getCause();
-            throw new HttpTransportException("Failed to submit request", cause);
+            throw (cause instanceof HttpTransportException) ?
+                (HttpTransportException) cause :
+                new HttpTransportException("Failed to submit request", cause);
         }
     }
 

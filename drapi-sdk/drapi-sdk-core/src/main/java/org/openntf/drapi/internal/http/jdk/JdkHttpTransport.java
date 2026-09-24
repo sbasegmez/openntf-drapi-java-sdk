@@ -26,6 +26,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.exception.HttpTransportException;
@@ -63,7 +64,7 @@ public class JdkHttpTransport extends HttpTransportBase {
             return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofInputStream())
                              .thenApply(this::toDrapiResponse)
                              .exceptionally(ex -> {
-                                 throw new HttpTransportException("Connection failed", ex);
+                                 throw new HttpTransportException("Connection failed", (ex instanceof CompletionException ? ex.getCause() : ex));
                              });
 
         } catch (Exception e) {

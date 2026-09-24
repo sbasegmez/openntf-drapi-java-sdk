@@ -1,5 +1,9 @@
 package org.openntf.drapi.auth;
 
+import org.openntf.drapi.exception.AuthenticationException;
+import org.openntf.drapi.exception.DrapiException;
+import org.openntf.drapi.exception.HttpTransportException;
+
 /**
  * Interface for authentication mechanism providing Token for the SDK.
  */
@@ -20,6 +24,9 @@ public sealed interface TokenSource permits TokenSourceBase {
      *
      * @param sessionContext sessionContext object containing information about the current session
      * @return a Token representing the acquired access token
+     * @throws HttpTransportException if there is a transport error while acquiring the token
+     * @throws AuthenticationException if the authentication fails for any reason
+     * @throws DrapiException for any other unexpected issues that may occur during token acquisition
      */
     Token acquire(SessionContext sessionContext);
 
