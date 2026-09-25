@@ -74,7 +74,7 @@
                     <environmentVariables>
                         <!-- Test environment variables for Integration Tests -->
                         <DRAPI_BASEURL>http://localhost:8089</DRAPI_BASEURL>
-                        <DRAPI_TOKEN>some-token-value</DRAPI_TOKEN>
+                        <DRAPI_AUTH_TOKEN>some-token-value</DRAPI_AUTH_TOKEN>
                     </environmentVariables>
                 </configuration>
             </plugin>

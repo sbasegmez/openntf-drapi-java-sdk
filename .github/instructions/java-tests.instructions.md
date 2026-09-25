@@ -63,7 +63,7 @@ Do not pull in an external HTTP mock library. Extend one of the in-repo base cla
 
 ## Configuration and environment
 
-- Maven Surefire injects `DRAPI_BASEURL` and `DRAPI_TOKEN` for `DrapiConfigBuilderTest`.
+- Maven Surefire injects `DRAPI_BASEURL` and `DRAPI_AUTH_TOKEN` for `DrapiConfigBuilderTest`.
 - Guard environment-dependent tests with `@EnabledIfEnvironmentVariable(named = "DRAPI_BASEURL", matches = ".*")` (stacked annotations are used for multiple variables).
 - Load config fixtures from the classpath: `DrapiConfig.builder().applyResourceFile("config/example.properties")`.
 

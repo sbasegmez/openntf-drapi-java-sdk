@@ -37,6 +37,7 @@ import org.openntf.drapi.internal.http.HttpHeaderConstants;
 import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.json.JsonBinding;
 import org.openntf.drapi.util.ConfigKey;
+import org.openntf.drapi.util.TypeUtils;
 
 public final class PasswordTokenSource extends TokenSourceBase {
 
@@ -45,9 +46,9 @@ public final class PasswordTokenSource extends TokenSourceBase {
     private static final ApiPath AUTH_PATH = ApiPath.root("/auth");
     private static final ApiPath LOGOUT_PATH = AUTH_PATH.append("/logout");
 
-    private static final ConfigKey<String> USERNAME_KEY = ConfigKey.of("auth.username", String.class);
-    private static final ConfigKey<String> PASSWORD_KEY = ConfigKey.of("auth.password", String.class);
-    private static final ConfigKey<String> SCOPE_KEY = ConfigKey.of("auth.scope", String.class);
+    public static final ConfigKey<String> USERNAME_KEY = ConfigKey.of("auth.username", String.class);
+    public static final ConfigKey<String> PASSWORD_KEY = ConfigKey.of("auth.password", String.class);
+    public static final ConfigKey<String> SCOPE_KEY = ConfigKey.of("auth.scope", String.class);
 
     private static final int DEFAULT_SKEW_SECS = 30; // Default skew time in seconds to account for clock differences
 
@@ -62,18 +63,50 @@ public final class PasswordTokenSource extends TokenSourceBase {
     // Also, the Token is a simple element. AuthResponse contains more information, including the expiration time.
     private final AtomicReference<AuthResponse> currentAuthResponse = new AtomicReference<>();
 
+    /**
+     * Creates a PasswordTokenSource with the given DrapiConfig and HttpTransport. Since not provided, the username, password and scope
+     * will be retrieved from the DrapiConfig.
+     * <p>
+     * This is the default constructor for PasswordTokenSource required by the Base class.
+     *
+     * @param config    the DrapiConfig instance to retrieve configuration values
+     * @param transport the HttpTransport instance to use for making HTTP requests
+     */
     public PasswordTokenSource(DrapiConfig config, HttpTransport transport) {
+        this(config, transport, null, null, null);
+    }
+
+    /**
+     * This constructor allows for the creation of a PasswordTokenSource with optional username, password, and scope.
+     * <p>
+     * If the username and password are provided, they will be used for authentication. If they are not provided, the constructor will
+     * attempt to retrieve them from the DrapiConfig.
+     *
+     * @param config    the DrapiConfig instance to retrieve configuration values
+     * @param transport the HttpTransport instance to use for making HTTP requests
+     * @param username  the username to use for authentication (optional)
+     * @param password  the password to use for authentication (optional)
+     * @param scope     the scope to use for authentication (optional)
+     */
+    public PasswordTokenSource(DrapiConfig config, HttpTransport transport, String username, String password, String scope) {
         super(config, transport);
 
-        this.username = config().get(USERNAME_KEY)
-                                .orElseThrow(() -> new IllegalArgumentException("Username is required for PasswordTokenSource"));
-        this.password = config().get(PASSWORD_KEY)
-                                .orElseThrow(() -> new IllegalArgumentException("Password is required for PasswordTokenSource"));
-        this.scope = config().get(SCOPE_KEY).orElse(null); // Scope is optional
+        // Try to use given username and password first. If they are not provided, fall back to configuration.
+        if (TypeUtils.isAllNonEmpty(username, password)) {
+            this.username = username;
+            this.password = password;
+            this.scope = scope; // Scope can be null
+        } else {
+            this.username = config().get(USERNAME_KEY)
+                                    .orElseThrow(() -> new IllegalArgumentException("Username is required for PasswordTokenSource"));
+            this.password = config().get(PASSWORD_KEY)
+                                    .orElseThrow(() -> new IllegalArgumentException("Password is required for PasswordTokenSource"));
+            this.scope = config().get(SCOPE_KEY).orElse(null); // Scope is optional
+        }
     }
 
     private AuthResponse peekCache() {
-        if(currentAuthResponse.get() != null) {
+        if (currentAuthResponse.get() != null) {
             // If we already have a valid token, return it
             AuthResponse authResponse = currentAuthResponse.get();
             if (authResponse != null && !authResponse.isExpired(DEFAULT_SKEW_SECS)) {
@@ -134,13 +167,13 @@ public final class PasswordTokenSource extends TokenSourceBase {
             lastCache = currentAuthResponse.getAndSet(null);
         }
 
-        if(lastCache == null) {
+        if (lastCache == null) {
             // No token to logout, just return
             return;
         }
 
         // We don't need to allow a skew in logout.
-        if(lastCache.isExpired(0)) {
+        if (lastCache.isExpired(0)) {
             // Token is already expired, no need to send logout request
             LOG.debug("Token for user {} is already expired. Clearing cached token.", username);
             return;
@@ -187,7 +220,7 @@ public final class PasswordTokenSource extends TokenSourceBase {
 
         LOG.debug("Unexpected response from authentication for user {}", username);
 
-        if(LOG.isTraceEnabled()) {
+        if (LOG.isTraceEnabled()) {
             LOG.trace("Response body: {}", response.bodyAsString().replaceAll("\\n", " "));
         }
 

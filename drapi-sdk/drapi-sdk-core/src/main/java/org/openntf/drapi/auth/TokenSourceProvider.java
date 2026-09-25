@@ -18,13 +18,21 @@ package org.openntf.drapi.auth;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.http.HttpTransport;
 
+/**
+ * TokenSourceProvider is an interface that defines a method for creating instances of TokenSource.
+ * <p>
+ * Implementations of this interface should provide a concrete implementation of the create method to instantiate and return a
+ * TokenSource based on the provided DrapiConfig and HttpTransport.
+ * <p>
+ * Implementations must have a public no-argument constructor to allow for instantiation.
+ */
 public interface TokenSourceProvider {
 
     /**
      * Creates a TokenSource instance based on the provided DrapiConfig and HttpTransport.
      * <p>
-     * Implementations of any TokenSource should provide a concrete implementation of this method to create and return a
-     * TokenSource instance. So we can guarantee the TokenSource is created with the correct configuration and transport.
+     * Implementations of any TokenSource should provide a concrete implementation of this method to create and return a TokenSource
+     * instance. So we can guarantee the TokenSource is created with the correct configuration and transport.
      *
      * @param config    DrapiConfig containing configuration settings for the TokenSource
      * @param transport HttpTransport used for making network requests

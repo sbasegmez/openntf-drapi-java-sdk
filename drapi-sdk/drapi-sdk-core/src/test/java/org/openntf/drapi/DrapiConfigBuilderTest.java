@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -55,9 +54,12 @@ class DrapiConfigBuilderTest {
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the properties file");
 
         assertEquals("$DATA", config.get("auth.scope", String.class).orElse(null), "Auth scope should match the properties file");
-        assertEquals("your_username", config.get("auth.username", String.class).orElse(null), "Username should match the properties file");
-        assertEquals("your_username", config.get("auth.USERNAME", String.class).orElse(null), "Keys should match even if the case is different");
-        assertEquals("your_password", config.get("auth.password", String.class).orElse(null), "Password should match the properties file");
+        assertEquals("your_username", config.get("auth.username", String.class)
+                                            .orElse(null), "Username should match the properties file");
+        assertEquals("your_username", config.get("auth.USERNAME", String.class)
+                                            .orElse(null), "Keys should match even if the case is different");
+        assertEquals("your_password", config.get("auth.password", String.class)
+                                            .orElse(null), "Password should match the properties file");
         assertTrue(config.userAgent().startsWith("your_user_agent"), "User agent should match the properties file");
         assertEquals(13, config.connectTimeoutSecs(), "Connect timeout should match the properties file");
         assertEquals(DrapiConfigImpl.DEFAULT_REQUEST_TIMEOUT_SECS, config.requestTimeoutSecs(), "Request timeout should be ignored from invalid property");
@@ -102,8 +104,10 @@ class DrapiConfigBuilderTest {
         assertEquals("https://api.example.com", config.baseUrl().toString(), "Base URL should match the map");
         assertEquals("$DATA", config.get("AUTHSCOPE", String.class).orElse(null), "Auth scope should match the map");
         assertEquals("your_ap_id", config.get("APPID", String.class).orElse(null), "App ID should match the map");
-        assertEquals("your_secret1", config.get("APP.SECRET1", String.class).orElse(null), "Underscores should be converted to dots in keys for env variables");
-        assertEquals("your_secret2", config.get("APP.SECRET2", String.class).orElse(null), "Dots should stay in keys for env variables");
+        assertEquals("your_secret1", config.get("APP.SECRET1", String.class)
+                                           .orElse(null), "Underscores should be converted to dots in keys for env variables");
+        assertEquals("your_secret2", config.get("APP.SECRET2", String.class)
+                                           .orElse(null), "Dots should stay in keys for env variables");
         assertEquals("MyApp", config.userAgent(), "User agent should match the map");
     }
 
