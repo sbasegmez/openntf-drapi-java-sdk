@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal.auth;
+package org.openntf.drapi.auth.builtin;
 
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.TokenSource;
+import org.openntf.drapi.auth.TokenSourceProvider;
+import org.openntf.drapi.http.HttpTransport;
 
-public abstract sealed class AuthenticationProviderBase implements AuthenticationProvider
-    permits BasicAuthenticationProvider, TokenAuthenticationProvider, OAuthAuthenticationProvider {
+public final class FixedTokenSourceProvider implements TokenSourceProvider {
 
-    protected final DrapiConfig config;
-
-    protected AuthenticationProviderBase(DrapiConfig config) {
-        this.config = config;
+    @Override
+    public TokenSource create(DrapiConfig config, HttpTransport transport) {
+        return new FixedTokenSource(config, transport);
     }
 
-    protected DrapiConfig config() {
-        return this.config;
-    }
 }

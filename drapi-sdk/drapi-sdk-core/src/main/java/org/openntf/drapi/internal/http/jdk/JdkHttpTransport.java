@@ -26,6 +26,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.exception.HttpTransportException;
@@ -54,13 +55,6 @@ public class JdkHttpTransport extends HttpTransportBase {
         return builder.build();
     }
 
-    /**
-     * Submits a DrapiRequest asynchronously. Implementations of this method should handle the request submission and return a
-     * CompletableFuture that will be completed with the DrapiResponse when the request is processed.
-     *
-     * @param drapiRequest the DrapiRequest to submit
-     * @return a CompletableFuture that will be completed with the DrapiResponse
-     */
     @Override
     public CompletableFuture<DrapiResponse> submitAsync(DrapiRequest drapiRequest) {
         try {
@@ -70,7 +64,8 @@ public class JdkHttpTransport extends HttpTransportBase {
             return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofInputStream())
                              .thenApply(this::toDrapiResponse)
                              .exceptionally(ex -> {
-                                 throw new HttpTransportException("Connection failed", ex);
+                                 var cause = (ex instanceof CompletionException && ex.getCause() != null) ? ex.getCause() : ex;
+                                 throw new HttpTransportException("Connection failed", cause);
                              });
 
         } catch (Exception e) {
@@ -84,7 +79,7 @@ public class JdkHttpTransport extends HttpTransportBase {
     private HttpRequest toHttpRequest(DrapiRequest drapiRequest) {
 
         URI uri = UriBuilder.startWith(config().baseUrl())
-                            .appendPath(drapiRequest.path())
+                            .setPath(drapiRequest.path(), false) // drapiRequest.path() is already encoded throug ApiPath
                             .appendQueryParams(drapiRequest.queryParams())
                             .build();
 
@@ -93,8 +88,20 @@ public class JdkHttpTransport extends HttpTransportBase {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                                                  .uri(uri)
                                                  .timeout(Duration.ofSeconds(config().requestTimeoutSecs()))
-                                                 .header(USER_AGENT, config().userAgent())
-                                                 .method(drapiRequest.httpMethod().name(), bodyPublisher);
+                                                 .header(USER_AGENT, config().userAgent());
+
+        int contentLength = drapiRequest.body().contentLength();
+
+        // TODO: Consider extracting the body handling logic into a separate method for better readability and testability.
+        // TODO: Consider publishing the body as a bytebuffer for better performance, especially for large requests.
+        //  This would require detecting Bytes variant and using BodyPublishers.ofByteArray() instead of BodyPublishers.ofInputStream().
+        if (contentLength > 0) {
+            builder.method(drapiRequest.httpMethod().name(), BodyPublishers.fromPublisher(bodyPublisher, contentLength));
+        } else if (contentLength == 0) {
+            builder.method(drapiRequest.httpMethod().name(), BodyPublishers.noBody());
+        } else {
+            builder.method(drapiRequest.httpMethod().name(), bodyPublisher);
+        }
 
         drapiRequest.headers()
                     .entrySet()

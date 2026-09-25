@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi;
+package org.openntf.drapi.auth.builtin;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.TokenSource;
+import org.openntf.drapi.auth.TokenSourceProvider;
+import org.openntf.drapi.http.HttpTransport;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+public final class PasswordTokenSourceProvider implements TokenSourceProvider {
 
-class DrapiClientBuilderTest {
-
-    @Test
-    @DisplayName("Test DrapiClientBuilder with null config")
-    void testNullConfig() {
-        assertThrows(NullPointerException.class, () -> DrapiClient.builder(null), "Expected NullPointerException for null config");
+    @Override
+    public TokenSource create(DrapiConfig config, HttpTransport transport) {
+        return new PasswordTokenSource(config, transport);
     }
 
 }

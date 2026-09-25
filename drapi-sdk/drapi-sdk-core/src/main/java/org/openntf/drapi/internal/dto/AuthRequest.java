@@ -15,6 +15,39 @@
  */
 package org.openntf.drapi.internal.dto;
 
-public record AuthRequest(String username, String password) {
+import java.util.HashMap;
+import java.util.Map;
+import org.openntf.drapi.json.JsonBinding;
+import org.openntf.drapi.util.TypeUtils;
 
+public record AuthRequest(String username, String password, String scope) {
+
+    public static final String REQ_USERNAME = "username";
+    public static final String REQ_PASSWORD = "password";
+    public static final String REQ_SCOPE = "scope";
+
+    public AuthRequest {
+        TypeUtils.requireNonEmpty(username, "username must not be null or empty");
+        TypeUtils.requireNonEmpty(password, "password must not be null or empty");
+    }
+
+    // We have an optional scope value, so we need to provide hard-coded converter
+    public String toJson() {
+        Map<String, String> map = new HashMap<>();
+        map.put(REQ_USERNAME, username);
+        map.put(REQ_PASSWORD, password);
+
+        TypeUtils.ifNotBlank(scope, s -> map.put(REQ_SCOPE, s));
+
+        return JsonBinding.get().toJson(map);
+    }
+
+    @Override
+    public String toString() {
+        return "AuthRequest{" +
+            "username='" + username + '\'' +
+            ", password='" + "********" + '\'' +
+            ", scope='" + scope + '\'' +
+            '}';
+    }
 }

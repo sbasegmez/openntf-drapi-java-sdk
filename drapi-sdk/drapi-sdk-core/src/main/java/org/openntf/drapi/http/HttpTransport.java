@@ -17,13 +17,10 @@ package org.openntf.drapi.http;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.Executor;
-import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.exception.HttpTransportException;
-import org.openntf.drapi.internal.http.jdk.JdkHttpTransportProvider;
-import org.openntf.drapi.util.ServiceRegistry;
+import org.openntf.drapi.internal.http.AuthenticatingHttpTransport;
 
-public interface HttpTransport {
+public sealed interface HttpTransport permits HttpTransportBase, AuthenticatingHttpTransport {
 
     /**
      * Submits a DrapiRequest asynchronously. Implementations of this method should handle the request submission and return a
@@ -46,20 +43,16 @@ public interface HttpTransport {
             return submitAsync(request).join();
         } catch (CompletionException e) {
             Throwable cause = e.getCause() == null ? e : e.getCause();
-            throw new HttpTransportException("Failed to submit request", cause);
+            throw (cause instanceof HttpTransportException) ?
+                (HttpTransportException) cause :
+                new HttpTransportException("Failed to submit request", cause);
         }
     }
 
-    /**
-     * Checks if there is an SPI-based implementation of HttpTransport available, and returns it if found. Otherwise, it returns the
-     * default implementation (JdkHttpTransport).
-     *
-     * @return the default HttpTransport implementation
-     */
-    static HttpTransport defaultTransport(DrapiConfig config, Executor executor) {
-        var provider = ServiceRegistry.findServiceOrDefault(HttpTransportProvider.class, JdkHttpTransportProvider::new);
 
-        return provider.create(config, executor);
-    }
+    /**
+     * Stops the HttpTransport. Implementations of this method should handle any necessary cleanup or shutdown procedures.
+     */
+    void stop();
 
 }

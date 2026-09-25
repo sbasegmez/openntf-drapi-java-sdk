@@ -66,7 +66,7 @@ class ResponseParserTest {
         void testMetaParsing() {
 
             try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 assertTrue(doc.meta().isPresent(), "Meta data should be present");
                 assertFalse(doc.fieldNames().contains("@meta"), "@meta should be removed from the field names");
@@ -78,7 +78,7 @@ class ResponseParserTest {
         @DisplayName("Test No @meta case")
         void testNoMetaParsing() {
             try (var response = responseFromResource(200, null, "responses/document-response-2.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 assertFalse(doc.meta().isPresent(), "Meta data should not be present");
             }
@@ -89,7 +89,7 @@ class ResponseParserTest {
         @DisplayName("Test Warning Parsing")
         void testWarningParsing() {
             try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 assertFalse(doc.warnings().isEmpty(), "Warnings should not be empty");
                 assertFalse(doc.fieldNames().contains("@warnings"), "@warnings should be removed from the field names");
@@ -100,7 +100,7 @@ class ResponseParserTest {
         @DisplayName("Test No Warning case")
         void testNoWarningParsing() {
             try (var response = responseFromResource(200, null, "responses/document-response-2.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 assertTrue(doc.warnings().isEmpty(), "Warnings should be empty");
             }
@@ -119,7 +119,7 @@ class ResponseParserTest {
             try (var is = new ByteArrayInputStream(jsonData);
                  var response = new DrapiResponse(200, mapWithCt, is)) {
 
-                assertThrows(DrapiException.class, () -> ResponseParser.toDocument(response), "Expected DrapiException due to missing form data");
+                assertThrows(DrapiException.class, () -> ResponseParser.toDocument(null, response), "Expected DrapiException due to missing form data");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -129,7 +129,7 @@ class ResponseParserTest {
         @DisplayName("Test case insensitivity for others fields")
         void testCaseInsensitivityForOtherFields() {
             try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 assertEquals("OpenNTF Domino API", doc.field("NaME").asString()
                                                       .orElse(null), "Field 'name' should be case-insensitive and return the correct value");
@@ -140,7 +140,7 @@ class ResponseParserTest {
         @DisplayName("Test null and empty fields")
         void testNullAndEmptyFields() {
             try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 assertEquals("", doc.field("details").asString()
                                     .orElse(null), "Field 'details' should return an empty string when the field is empty");
@@ -162,7 +162,7 @@ class ResponseParserTest {
         @DisplayName("Test lists")
         void testLists() {
             try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 var chefsField = doc.field("chefs");
                 assertTrue(chefsField.exists(), "Existing list field should be accessible and exists");
@@ -187,7 +187,7 @@ class ResponseParserTest {
         @DisplayName("Test number access")
         void testNumberAccess() {
             try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
-                Document doc = ResponseParser.toDocument(response);
+                Document doc = ResponseParser.toDocument(null, response);
 
                 // Test number given in double format
                 var downloadsDouble = doc.field("downloadsDouble");
@@ -250,7 +250,7 @@ class ResponseParserTest {
         @DisplayName("Test Datetime access")
         void testDatetimeAccess() {
             try (var response = responseFromResource(200, null, "responses/document-response-1.json")) {
-                var doc = ResponseParser.toDocument(response);
+                var doc = ResponseParser.toDocument(null, response);
 
                 var dateField = doc.field("dateField");
                 assertTrue(dateField.exists(), "Existing date field should be accessible and exists");

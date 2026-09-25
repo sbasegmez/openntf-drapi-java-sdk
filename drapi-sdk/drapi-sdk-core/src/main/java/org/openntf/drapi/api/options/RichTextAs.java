@@ -18,6 +18,7 @@ package org.openntf.drapi.api.options;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -68,4 +69,17 @@ public final class RichTextAs {
         return Collections.unmodifiableCollection(KNOWN.values());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RichTextAs that = (RichTextAs) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
+    }
 }

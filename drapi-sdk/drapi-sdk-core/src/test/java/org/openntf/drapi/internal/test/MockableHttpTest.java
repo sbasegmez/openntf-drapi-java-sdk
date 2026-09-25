@@ -19,6 +19,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,8 +29,8 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openntf.drapi.DrapiConfig;
-import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.DrapiConfigBuilder;
+import org.openntf.drapi.http.DrapiRequest;
 
 public class MockableHttpTest {
 
@@ -69,16 +70,11 @@ public class MockableHttpTest {
     }
 
     protected DrapiConfig buildConfig(Consumer<DrapiConfigBuilder> configCustomizer) {
-        return buildConfig(configCustomizer, true);
-    }
-
-    protected DrapiConfig buildConfig(Consumer<DrapiConfigBuilder> configCustomizer, boolean addTokenMethod) {
         var builder = DrapiConfig.builder()
                                  .baseUrl(URI.create("http://127.0.0.1:" + server.getAddress().getPort()).toString());
 
-        if (addTokenMethod) {
-            builder.token("dummy-token");
-        }
+        // Add a dummy token to the configuration if token is required for the test. This is useful for tests that require authentication.
+        builder.addExtraParam("auth.token", "dummy-token");
 
         if (configCustomizer != null) {
             configCustomizer.accept(builder);
@@ -96,7 +92,11 @@ public class MockableHttpTest {
             MockResponse mockResponse = responder.respond(exchange);
 
             if (mockResponse.headers() != null) {
-                mockResponse.headers().forEach((name, value) -> exchange.getResponseHeaders().add(name, value));
+                mockResponse.headers()
+                            .entrySet()
+                            .stream()
+                            .flatMap((entry) -> entry.getValue().stream().map(value -> Map.entry(entry.getKey(), value)))
+                            .forEach((entry) -> exchange.getResponseHeaders().add(entry.getKey(), entry.getValue()));
             }
 
             exchange.sendResponseHeaders(mockResponse.statusCode(), mockResponse.body().getBytes().length);
@@ -109,16 +109,15 @@ public class MockableHttpTest {
         return new MockResponse(statusCode, body, null);
     }
 
-    protected MockResponse response(int statusCode, String body, Map<String, String> headers) {
+    protected MockResponse response(int statusCode, String body, Map<String, List<String>> headers) {
         return new MockResponse(statusCode, body, headers);
     }
 
-    public record MockResponse(int statusCode, String body, Map<String, String> headers) {
+    public record MockResponse(int statusCode, String body, Map<String, List<String>> headers) {
 
     }
 
     public interface Responder {
-
         MockResponse respond(HttpExchange exchange);
     }
 

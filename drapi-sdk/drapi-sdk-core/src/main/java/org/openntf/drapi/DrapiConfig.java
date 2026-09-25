@@ -16,37 +16,75 @@
 package org.openntf.drapi;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.Optional;
+import org.openntf.drapi.util.ConfigKey;
 
 public interface DrapiConfig {
 
+    /**
+     * Returns the base URL for the API.
+     *
+     * @return the base URL
+     */
     URI baseUrl();
-    String authScope();
-    AuthType authType();
 
-    // For BASIC auth
-    String username();
-    String password();
-
-    // For TOKEN auth
-    String token();
-
-    // For OAUTH auth
-    String appId();
-
-    String appSecret();
-
+    /**
+     * Returns the user agent string for the API requests.
+     *
+     * @return the user agent string
+     */
     String userAgent();
 
+    /**
+     * Returns the connection timeout in seconds for the API requests.
+     *
+     * @return the connection timeout in seconds
+     */
     int connectTimeoutSecs();
 
+    /**
+     * Returns the request timeout in seconds for the API requests.
+     *
+     * @return the request timeout in seconds
+     */
     int requestTimeoutSecs();
 
-    enum AuthType {
-        BASIC,
-        TOKEN,
-        OAUTH
-    }
+    /**
+     * Returns the value of the specified configuration key.
+     *
+     * @param key the configuration key
+     * @param <T> the type of the configuration value
+     * @return an Optional containing the value of the configuration key, or an empty Optional if the key is not present
+     */
+    <T> Optional<T> get(ConfigKey<T> key);
 
+    /**
+     * Returns the value of the specified configuration key, or a default value if the key is not present.
+     *
+     * @param key          the configuration key
+     * @param type         the type of the configuration value
+     * @param <T>          the type of the configuration value
+     * @return an Optional containing the value of the configuration key, or an empty Optional if the key is not present
+     */
+    <T> Optional<T> get(String key, Class<T> type);
+
+    /**
+     * Returns the value of the specified configuration key, or a default value if the key is not present.
+     *
+     * @param key          the configuration key
+     * @param type         the type of the configuration value
+     * @param defaultValue the default value to return if the key is not present
+     * @param <T>          the type of the configuration value
+     * @return an Optional containing the value of the configuration key, or an empty Optional if the key is not present
+     */
+    <T> Optional<T> get(String key, Class<T> type, T defaultValue);
+
+    /**
+     * Returns a new instance of the DrapiConfigBuilder.
+     *
+     * @return a new DrapiConfigBuilder instance
+     */
     static DrapiConfigBuilder builder() {
         return new DrapiConfigBuilder();
     }

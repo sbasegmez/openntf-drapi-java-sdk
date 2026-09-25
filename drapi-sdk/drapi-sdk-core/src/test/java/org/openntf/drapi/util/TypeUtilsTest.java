@@ -153,6 +153,7 @@ class TypeUtilsTest {
     void startsWithIgnoreCaseTest() {
         assertTrue(TypeUtils.startsWithIgnoreCase(null, null), "Both null should return true");
         assertFalse(TypeUtils.startsWithIgnoreCase(null, "a"), "Null string should not start with any non-null prefix");
+        assertFalse(TypeUtils.startsWithIgnoreCase("", null), "Any string should not start with null prefix");
         assertTrue(TypeUtils.startsWithIgnoreCase("", ""), "Both empty return true");
         assertFalse(TypeUtils.startsWithIgnoreCase("testing", null), "Any string should not start with null prefix");
         assertTrue(TypeUtils.startsWithIgnoreCase("testing", ""), "String 'testing' should start with prefix ''");

@@ -16,11 +16,17 @@
 package org.openntf.drapi.internal.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,18 +34,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.auth.SessionContext;
+import org.openntf.drapi.auth.Token;
+import org.openntf.drapi.auth.TokenSourceBase;
+import org.openntf.drapi.exception.HttpTransportException;
 import org.openntf.drapi.http.DrapiRequest;
+import org.openntf.drapi.http.DrapiResponse;
+import org.openntf.drapi.http.HttpMethod;
 import org.openntf.drapi.http.HttpTransport;
-import org.openntf.drapi.internal.auth.AuthenticationToolkit;
-import org.openntf.drapi.internal.auth.BearerToken;
-import org.openntf.drapi.internal.auth.TokenAuthenticationProvider;
+import org.openntf.drapi.http.HttpTransportBase;
+import org.openntf.drapi.http.HttpTransportProvider;
 import org.openntf.drapi.internal.test.MockableHttpTest;
+import org.openntf.drapi.internal.test.TestUtils;
+import org.openntf.drapi.util.CloseTrackingInputStream;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticatingHttpTransportTest extends MockableHttpTest {
 
     @Mock
-    TokenAuthenticationProvider authProvider;
+    TokenSourceBase tokenSource;
 
     @Mock
     Responder responder;
@@ -50,10 +63,15 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
     }
 
     protected HttpTransport createTransport(DrapiConfig config) {
-        HttpTransport bareTransport = HttpTransport.defaultTransport(config, null);
+        HttpTransport bareTransport = HttpTransportProvider.defaultTransportProvider()
+                                                           .create(config, null);
 
-        AuthenticationToolkit toolkit = new AuthenticationToolkit(bareTransport);
-        return new AuthenticatingHttpTransport(toolkit, authProvider);
+        return new AuthenticatingHttpTransport(bareTransport, tokenSource);
+    }
+
+    protected DrapiRequest createRequest(HttpMethod method, String path) {
+        return DrapiRequest.create(method, path)
+                           .sessionContext(SessionContext.singleUser());
     }
 
     @Test
@@ -67,12 +85,12 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
-
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(1, requestCount.get(), "The mirror server should have received exactly one request");
-            assertTrue(mirrorRequest.get().containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
+            assertTrue(mirrorRequest.get()
+                                    .containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
             assertEquals(200, response.statusCode(), "The response status code should match the expected status code");
         }
     }
@@ -95,12 +113,12 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider does not support refresh, so it should not retry after a 401 response
-        when(authProvider.supportsRefresh()).thenReturn(false);
+        when(tokenSource.supportsRefresh()).thenReturn(false);
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(1, requestCount.get(), "The mirror server should have received exactly one request");
             assertEquals(401, response.statusCode(), "The response status code should match the expected status code");
         }
@@ -125,12 +143,12 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider supports refresh, so it should retry after a 401 response
-        when(authProvider.supportsRefresh()).thenReturn(true);
+        when(tokenSource.supportsRefresh()).thenReturn(true);
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(2, requestCount.get(), "The mirror server should have received exactly two requests");
             assertEquals(401, response.statusCode(), "The response status code should match the expected status code");
         }
@@ -156,17 +174,71 @@ class AuthenticatingHttpTransportTest extends MockableHttpTest {
         );
 
         // Auth provider supports refresh, so it should retry after a 401 response
-        when(authProvider.supportsRefresh()).thenReturn(true);
+        when(tokenSource.supportsRefresh()).thenReturn(true);
 
         // Auth provider automatically returns a token when acquireToken is called
-        when(authProvider.acquireToken(any())).thenReturn(new BearerToken("test-token", Map.of()));
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
 
-        try (var response = transport.submit(DrapiRequest.get("/test"))) {
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
             assertEquals(2, requestCount.get(), "The mirror server should have received exactly two requests");
             assertEquals(200, response.statusCode(), "The response status code should match the expected status code");
-            assertTrue(mirrorRequest.get().containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
+            assertTrue(mirrorRequest.get()
+                                    .containsHeader("Authorization", "Bearer test-token"), "The mirrored request should contain the correct Authorization header");
         }
     }
 
+    @Test
+    @DisplayName("Test TransportException is thrown when the transport fails to submit a request")
+    void transportExceptionIsThrownWhenTransportFails() {
+        // Use an unused port to simulate unresponsiveness
+        var url = URI.create("http://127.0.0.1:" + TestUtils.findUnusedPort()).toString();
+        var config = buildConfig(builder -> builder.baseUrl(url));
+        var transport = createTransport(config);
+
+        // Auth provider automatically returns a token when acquireToken is called
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
+
+        try(var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
+            assertEquals(-1, response.statusCode(), "This line should not be reached, as an exception is expected to be thrown before this point");
+        } catch (HttpTransportException e) {
+            assertInstanceOf(HttpTransportException.class, e, "The exception should contain the type HttpTransportException");
+        }
+    }
+
+
+    // Added to validate an issue came up with Claude code-review
+    @Test
+    @DisplayName("A rejected 401 response should be closed before the request is retried")
+    void rejectedResponseIsClosedBeforeRetry() {
+        DrapiConfig config = buildConfig(null);
+
+        // A scripted transport: the first call answers 401, every later call answers 200. Each body records whether it was closed.                                                                                  
+        List<CloseTrackingInputStream> bodies = new ArrayList<>();
+        HttpTransport transport = createCountingTransport(config, bodies);
+
+        when(tokenSource.supportsRefresh()).thenReturn(true);
+        when(tokenSource.acquire(any())).thenReturn(new Token("test-token", "test"));
+
+        try (var response = transport.submit(createRequest(HttpMethod.GET, "/test"))) {
+            assertEquals(200, response.statusCode(), "The retried request should succeed");
+            assertEquals(2, bodies.size(), "The request should have been sent twice");
+            assertTrue(bodies.get(0).isClosed(), "The rejected 401 response should be closed, otherwise its connection is never released");
+            assertFalse(bodies.get(1).isClosed(), "The response handed to the caller should still be open");
+        }
+    }
+
+    private HttpTransport createCountingTransport(DrapiConfig config, List<CloseTrackingInputStream> bodies) {
+        HttpTransport scriptedTransport = new HttpTransportBase(config, null) {
+            @Override
+            public CompletableFuture<DrapiResponse> submitAsync(DrapiRequest request) {
+                int status = bodies.isEmpty() ? 401 : 200;
+                var body = new CloseTrackingInputStream(status == 401 ? "Unauthorized" : "OK");
+                bodies.add(body);
+                return CompletableFuture.completedFuture(new DrapiResponse(status, Map.of(), body));
+            }
+        };
+
+        return new AuthenticatingHttpTransport(scriptedTransport, tokenSource);
+    }
 
 }

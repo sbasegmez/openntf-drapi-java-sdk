@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.openntf.drapi.http.HttpMethod.GET;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class DrapiRequestTest {
     @Test
     @DisplayName("No query parameters should result in an empty list, not null")
     void testNoQueryParameters() {
-        DrapiRequest request = DrapiRequest.get("/test");
+        DrapiRequest request = DrapiRequest.create(GET, "/test");
 
         assertNotNull(request.queryParams(), "Query parameters should not be null");
         assertTrue(request.queryParams().isEmpty(), "Query parameters should be empty when none are added");
@@ -39,7 +40,7 @@ class DrapiRequestTest {
     @Test
     @DisplayName("No headers should result in an empty map, not null")
     void testNoHeaders() {
-        DrapiRequest request = DrapiRequest.get("/test");
+        DrapiRequest request = DrapiRequest.create(GET, "/test");
 
         assertNotNull(request.headers(), "Headers should not be null");
         assertTrue(request.headers().isEmpty(), "Headers should be empty when none are added");
@@ -48,7 +49,7 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Adding a single query parameter should be reflected in the request")
     void testSingleQueryParameter() {
-        DrapiRequest request = DrapiRequest.get("/test")
+        DrapiRequest request = DrapiRequest.create(GET, "/test")
                                            .queryParam("key", "value");
 
         assertEquals(1, request.queryParams().size(), "There should be one query parameter");
@@ -59,8 +60,8 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Adding a single header should be reflected in the request")
     void testSingleHeader() {
-        DrapiRequest request = DrapiRequest.get("/test")
-                                           .header("Content-Type", "application/json");
+        DrapiRequest request = DrapiRequest.create(GET, "/test")
+                                           .header("Content-Type", "application/json", false);
 
         assertEquals(1, request.headers().size(), "There should be one header");
         assertTrue(request.headers().containsKey("Content-Type"), "Headers should contain 'Content-Type'");
@@ -70,9 +71,9 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Adding multiple headers with the same key should be reflected in the request")
     void testMultipleHeadersSameKey() {
-        DrapiRequest request = DrapiRequest.get("/test")
-                                           .header("Accept", "application/json")
-                                           .header("Accept", "application/xml");
+        DrapiRequest request = DrapiRequest.create(GET, "/test")
+                                           .header("Accept", "application/json", false)
+                                           .header("Accept", "application/xml", false);
 
         assertEquals(1, request.headers().size(), "There should be one header key");
         assertTrue(request.headers().containsKey("Accept"), "Headers should contain 'Accept'");
@@ -84,7 +85,7 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Adding multiple query parameters with the same key should be reflected in the request")
     void testMultipleQueryParametersSameKey() {
-        DrapiRequest request = DrapiRequest.get("/test")
+        DrapiRequest request = DrapiRequest.create(GET, "/test")
                                            .queryParam("key", "value1")
                                            .queryParam("key", "value2");
 
@@ -98,7 +99,7 @@ class DrapiRequestTest {
     @Test
     @DisplayName("null values for query parameters should be ignored")
     void testNullQueryParameterValues() {
-        DrapiRequest request = DrapiRequest.get("/test")
+        DrapiRequest request = DrapiRequest.create(GET, "/test")
                                            .queryParam("key1", "value1")
                                            .queryParam("key2", null); // This should be ignored
 
@@ -110,9 +111,9 @@ class DrapiRequestTest {
     @Test
     @DisplayName("null values for headers should be ignored")
     void testNullHeaderValues() {
-        DrapiRequest request = DrapiRequest.get("/test")
-                                           .header("Content-Type", "application/json")
-                                           .header("Authorization", (String) null); // This should be ignored
+        DrapiRequest request = DrapiRequest.create(GET, "/test")
+                                           .header("Content-Type", "application/json", false)
+                                           .header("Authorization", (String) null, false); // This should be ignored
 
         assertEquals(1, request.headers().size(), "There should be one header");
         assertTrue(request.headers().containsKey("Content-Type"), "Headers should contain 'Content-Type'");
@@ -122,15 +123,15 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Building a request with null method or path should throw an exception")
     void testBuildingRequestNullInputs() {
-        assertThrows(NullPointerException.class, () -> DrapiRequest.create(HttpMethod.GET, (String) null));
-        assertThrows(NullPointerException.class, () -> DrapiRequest.create(HttpMethod.GET, (ApiPath) null));
+        assertThrows(NullPointerException.class, () -> DrapiRequest.create(GET, (String) null));
+        assertThrows(NullPointerException.class, () -> DrapiRequest.create(GET, (ApiPath) null));
         assertThrows(NullPointerException.class, () -> DrapiRequest.create(null, "/test"));
     }
 
     @Test
     @DisplayName("No body should result in an empty body")
     void testNoBodyResultsInEmptyBody() {
-        DrapiRequest request = DrapiRequest.get("/test");
+        DrapiRequest request = DrapiRequest.create(GET, "/test");
 
         assertNotNull(request.body(), "Body should not be null");
         assertInstanceOf(Bytes.class, request.body(), "Body should be of type RequestBody.Bytes");
@@ -140,9 +141,9 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Header names should be case insensitive")
     void testCaseSensitivityForHeaderNames() {
-        DrapiRequest request = DrapiRequest.get("/test")
-                                           .header("Accept", "application/json")
-                                           .header("ACCEPT", "application/xml");
+        DrapiRequest request = DrapiRequest.create(GET, "/test")
+                                           .header("Accept", "application/json", false)
+                                           .header("ACCEPT", "application/xml", false);
 
         assertEquals(1, request.headers().size(), "There should be one header key");
         assertTrue(request.headers().containsKey("Accept"), "Headers should contain 'Accept'");
@@ -155,20 +156,8 @@ class DrapiRequestTest {
     @Test
     @DisplayName("Test paths working with string or ApiPath")
     void testPathsWithStringOrApiPath() {
-        assertEquals("/test", DrapiRequest.get("/test").path(), "Path should match the string input");
-        assertEquals("/test", DrapiRequest.get(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
-
-        assertEquals("/test", DrapiRequest.patch("/test").path(), "Path should match the string input");
-        assertEquals("/test", DrapiRequest.patch(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
-
-        assertEquals("/test", DrapiRequest.post("/test").path(), "Path should match the string input");
-        assertEquals("/test", DrapiRequest.post(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
-
-        assertEquals("/test", DrapiRequest.put("/test").path(), "Path should match the string input");
-        assertEquals("/test", DrapiRequest.put(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
-
-        assertEquals("/test", DrapiRequest.delete("/test").path(), "Path should match the string input");
-        assertEquals("/test", DrapiRequest.delete(ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
+        assertEquals("/test", DrapiRequest.create(GET, "/test").path(), "Path should match the string input");
+        assertEquals("/test", DrapiRequest.create(GET, ApiPath.of("/test")).path(), "Paths should be equal when using ApiPath");
     }
 
 }

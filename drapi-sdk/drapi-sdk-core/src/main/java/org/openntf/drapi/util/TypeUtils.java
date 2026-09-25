@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class TypeUtils {
@@ -49,6 +50,18 @@ public class TypeUtils {
     }
 
     /**
+     * If the provided string is not empty, execute the given action with the string as an argument.
+     *
+     * @param value  the string to check
+     * @param action the action to execute if the string is not empty
+     */
+    public static void ifNotEmpty(String value, Consumer<String> action) {
+        if (isNotEmpty(value)) {
+            action.accept(value);
+        }
+    }
+
+    /**
      * Check if a string is null or blank.
      * <p>
      * null -> true, "" -> true, " " -> true
@@ -68,6 +81,18 @@ public class TypeUtils {
      */
     public static boolean isNotBlank(String value) {
         return !isBlank(value);
+    }
+
+    /**
+     * If the provided string is not blank, execute the given action with the string as an argument.
+     *
+     * @param value  the string to check
+     * @param action the action to execute if the string is not blank
+     */
+    public static void ifNotBlank(String value, Consumer<String> action) {
+        if (isNotBlank(value)) {
+            action.accept(value);
+        }
     }
 
     /**
@@ -150,6 +175,9 @@ public class TypeUtils {
 
     /**
      * Check if a string is numeric.
+     * <p>
+     * FIXME: This method currently only checks for positive whole integers. It does not account for negative numbers, decimals, or
+     *  scientific notation. Consider fixing contract and additional implementations to handle these cases if needed.
      *
      * @param text the string to check
      * @return true if the string is numeric
@@ -278,12 +306,12 @@ public class TypeUtils {
             return null == prefix;
         }
 
-        if (key.isEmpty()) {
-            return prefix.isEmpty();
-        }
-
         if (prefix == null) {
             return false;
+        }
+
+        if (key.isEmpty()) {
+            return prefix.isEmpty();
         }
 
         return key.toLowerCase(Locale.ENGLISH).startsWith(prefix.toLowerCase(Locale.ENGLISH));

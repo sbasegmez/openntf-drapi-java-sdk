@@ -24,6 +24,14 @@ import org.openntf.drapi.api.ListsApi;
 public interface DrapiDataSource {
 
     /**
+     * The DrapiClient instance associated with this data source. This allows access to the configuration, HTTP transport, and other
+     * components of the Drapi system.
+     *
+     * @return the DrapiClient instance
+     */
+    DrapiClient client();
+
+    /**
      * The name of the data source representation. Also known as the "scope" or "apiName" in some contexts. This is the name that will
      * be used to identify the data source in the API.
      *
@@ -40,8 +48,8 @@ public interface DrapiDataSource {
     DocumentsApi documents();
 
     /**
-     * Provides access to the Lists API for this data source. This allows for operations related to lists within the specified
-     * data source.
+     * Provides access to the Lists API for this data source. This allows for operations related to lists within the specified data
+     * source.
      *
      * @return an instance of ListsApi for interacting with lists in this data source
      */

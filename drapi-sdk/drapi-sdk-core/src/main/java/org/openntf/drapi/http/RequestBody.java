@@ -41,6 +41,15 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
     InputStream createStream();
 
     /**
+     * Returns the length of the request body in bytes.
+     * <p>
+     * For streaming request bodies, this method should return -1 if the length is unknown.
+     *
+     * @return the length of the request body in bytes, or -1 if unknown
+     */
+    int contentLength();
+
+    /**
      * Create a RequestBody from a byte array.
      * <p>
      * For long requests, consider using the Streaming variant to avoid loading the entire request body into memory.
@@ -53,6 +62,11 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
         @Override
         public InputStream createStream() {
             return new ByteArrayInputStream(data);
+        }
+
+        @Override
+        public int contentLength() {
+            return data.length;
         }
     }
 
@@ -85,6 +99,11 @@ public sealed interface RequestBody permits RequestBody.Bytes, RequestBody.Strea
                 // This is a common pattern when dealing with functional interfaces that don't allow checked exceptions.
                 throw new UncheckedIOException(e);
             }
+        }
+
+        @Override
+        public int contentLength() {
+            return -1;
         }
     }
 

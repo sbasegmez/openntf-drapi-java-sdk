@@ -20,6 +20,8 @@ module org.openntf.drapi {
     exports org.openntf.drapi;
     exports org.openntf.drapi.api;
     exports org.openntf.drapi.api.options;
+    exports org.openntf.drapi.auth;
+    exports org.openntf.drapi.auth.builtin;
     exports org.openntf.drapi.exception;
     exports org.openntf.drapi.http;
     exports org.openntf.drapi.json;

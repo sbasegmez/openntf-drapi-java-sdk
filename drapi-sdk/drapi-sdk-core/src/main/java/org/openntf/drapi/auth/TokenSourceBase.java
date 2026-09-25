@@ -13,24 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openntf.drapi.internal.auth;
+package org.openntf.drapi.auth;
 
 import org.openntf.drapi.DrapiConfig;
+import org.openntf.drapi.http.HttpTransport;
 
-public final class OAuthAuthenticationProvider extends AuthenticationProviderBase {
+public abstract non-sealed class TokenSourceBase implements TokenSource {
 
-    public OAuthAuthenticationProvider(DrapiConfig config) {
-        super(config);
-        throw new UnsupportedOperationException("OAuth authentication is not yet implemented.");
+    protected final DrapiConfig config;
+    protected final HttpTransport transport;
+
+    protected TokenSourceBase(DrapiConfig config, HttpTransport transport) {
+        this.config = config;
+        this.transport = transport;
     }
 
-    @Override
-    public BearerToken acquireToken(AuthenticationToolkit toolkit) {
-        return null;
+    protected DrapiConfig config() {
+        return this.config;
     }
 
-    @Override
-    public boolean supportsRefresh() {
-        return false;
+    protected HttpTransport transport() {
+        return this.transport;
     }
+
 }

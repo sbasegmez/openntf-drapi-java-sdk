@@ -7,12 +7,13 @@ Design draft mapping every operation in `openapi.basis.json` (v1.42.6) to a flue
 Every operation that requires a `dataSource` parameter lives under `client.dataSource(name)`. Everything else lives directly under `client`. The spec has no exceptions to this rule.
 
 ```java
-DrapiClient client = DrapiClient.builder(config).build();
-DrapiDataSource ds = client.dataSource("projects");
+Drapi drapi = Drapi.builder(config, tokenSourceProvider).build(); // App-scope - Mother of all objects
+DrapiClient client = Drapi.forSession(sessionContext);  // Short-lived, storeable, lightweight layer for a specific user session.
+DrapiDataSource ds = client.dataSource("projects"); // Thin layer from Client to all services with "dataSource" query parameter
 
-ds.documents().get(unid);
+ds.documents().get(unid); // => CompletableFuture<Document>
 ds.documents().update(unid, document);
-client.server().info();
+client.server().info();   // Services without "dataSource" are accessible using Client
 ```
 
 Conventions used below:
@@ -25,31 +26,31 @@ Conventions used below:
 
 ## Client level
 
-| Fluent call                                                     | Operation                 | Endpoint                      |
-|-----------------------------------------------------------------|---------------------------|-------------------------------|
-| `client.dataSource(name)`                                       | (handle, no call)         |                               |
-| `client.logout()`                                               | authLogout                | POST /auth/logout             |
-| `client.server().info()`                                        | getInfo                   | GET /info                     |
-| `client.server().userInfo()` / `userInfo(UserInfoOptions)`      | getUserInfo               | GET /userinfo                 |
-| `client.server().userInfo(UserInfoRequest)`                     | getUserInfoPost           | POST /userinfo                |
-| `client.server().richTextProcessors()`                          | getRichtextProcessors     | GET /richtextprocessors       |
-| `client.server().previewFeatures()`                             | getPreviewFeatures        | GET /preview                  |
-| `client.server().operationConstraints()`                        | getOperationConstrains    | GET /operations               |
-| `client.scopes().list()` / `list(ScopeListOptions)`             | fetchScopes               | GET /scopes                   |
-| `client.oauth().consents()`                                     | getCurrentUserConsents    | GET /consents                 |
-| `client.oauth().revokeAllConsents()`                            | deleteCurrentUserConsents | DELETE /consents              |
+| Fluent call                                                  | Operation                 | Endpoint                      |
+| ------------------------------------------------------------ | ------------------------- | ----------------------------- |
+| `client.dataSource(name)`                                    | (handle, no call)         |                               |
+| `client.logout()`                                            | authLogout                | GET /auth/logout              |
+| `client.server().info()`                                     | getInfo                   | GET /info                     |
+| `client.server().userInfo()` / `userInfo(UserInfoOptions)`   | getUserInfo               | GET /userinfo                 |
+| `client.server().userInfo(UserInfoRequest)`                  | getUserInfoPost           | POST /userinfo                |
+| `client.server().richTextProcessors()`                       | getRichtextProcessors     | GET /richtextprocessors       |
+| `client.server().previewFeatures()`                          | getPreviewFeatures        | GET /preview                  |
+| `client.server().operationConstraints()`                     | getOperationConstrains    | GET /operations               |
+| `client.scopes().list()` / `list(ScopeListOptions)`          | fetchScopes               | GET /scopes                   |
+| `client.oauth().consents()`                                  | getCurrentUserConsents    | GET /consents                 |
+| `client.oauth().revokeAllConsents()`                         | deleteCurrentUserConsents | DELETE /consents              |
 | `client.oauth().consent(clientId)` / `consent(clientId, scope)` | getCurrUserConsent        | GET /consent/{client_id}      |
-| `client.oauth().revokeConsent(unid)`                            | deleteCurrUserConsent     | DELETE /consent/revoke/{unid} |
-| `client.oauth().apps()`                                         | fetchApps                 | GET /apps                     |
-| `client.oauth().updateAppCallbackUrl(AppCallbackRequest)`       | updateCallbackUrl         | POST /apps                    |
-| `client.dominoIq().completion(CompletionRequest)`               | DominoIQCompletion        | POST /dominoiq/completion     |
-| `client.odata().scopes()`                                       | fetchOdataList            | GET /odata                    |
-| (internal: AuthenticationProvider)                              | authLogin                 | POST /auth                    |
-| (internal: AuthenticationProvider)                              | authRenewJwt              | POST /auth/extend             |
-| (internal: AuthenticationProvider)                              | authLocal                 | GET /auth/local               |
-| (internal: AuthenticationProvider)                              | loginForOAuthFlow         | POST /authforoauthflow        |
-| (not exposed; `server().userInfo()` covers it)                  | authLoginBasic            | GET /auth/basic               |
-| (not exposed; login-page concern)                               | getExternalIdp            | GET /auth/idpList             |
+| `client.oauth().revokeConsent(unid)`                         | deleteCurrUserConsent     | DELETE /consent/revoke/{unid} |
+| `client.oauth().apps()`                                      | fetchApps                 | GET /apps                     |
+| `client.oauth().updateAppCallbackUrl(AppCallbackRequest)`    | updateCallbackUrl         | POST /apps                    |
+| `client.dominoIq().completion(CompletionRequest)`            | DominoIQCompletion        | POST /dominoiq/completion     |
+| `client.odata().scopes()`                                    | fetchOdataList            | GET /odata                    |
+| (internal: AuthenticationProvider)                           | authLogin                 | POST /auth                    |
+| (internal: AuthenticationProvider)                           | authRenewJwt              | POST /auth/extend             |
+| (internal: AuthenticationProvider)                           | authLocal                 | GET /auth/local               |
+| (internal: AuthenticationProvider)                           | loginForOAuthFlow         | POST /authforoauthflow        |
+| (not exposed; `server().userInfo()` covers it)               | authLoginBasic            | GET /auth/basic               |
+| (not exposed; login-page concern)                            | getExternalIdp            | GET /auth/idpList             |
 
 Options and request objects:
 

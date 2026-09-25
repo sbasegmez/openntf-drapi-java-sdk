@@ -16,11 +16,11 @@
 package org.openntf.drapi.internal.api;
 
 import java.util.concurrent.CompletableFuture;
+import org.openntf.drapi.DrapiClient;
 import org.openntf.drapi.api.DocumentsApi;
 import org.openntf.drapi.api.options.DocumentsGetOptions;
 import org.openntf.drapi.http.ApiPath;
 import org.openntf.drapi.http.DrapiRequest;
-import org.openntf.drapi.internal.DrapiContext;
 import org.openntf.drapi.internal.log.Log;
 import org.openntf.drapi.internal.meta.ResponseParser;
 import org.openntf.drapi.meta.Document;
@@ -30,14 +30,13 @@ public class DocumentsApiImpl extends AbstractDataSourceApi implements Documents
     private static final Log LOG = Log.getLogger(DocumentsApiImpl.class);
     public static final ApiPath DOCUMENT_API_PATH = ApiPath.root("/document");
 
-    public DocumentsApiImpl(DrapiContext context, String dataSource) {
-        super(context, dataSource);
+    public DocumentsApiImpl(DrapiClient client, String dataSource) {
+        super(client, dataSource);
     }
 
     @Override
     public CompletableFuture<Document> get(String documentId, DocumentsGetOptions options) {
-        DrapiRequest request = DrapiRequest.get(DOCUMENT_API_PATH.append(documentId))
-                                           .queryParam(QS_DATASOURCE, dataSource());
+        DrapiRequest request = newRequestGet(DOCUMENT_API_PATH.append(documentId));
 
         if (options != null) {
             options.toParameterList().forEach(request::queryParam);
@@ -45,7 +44,7 @@ public class DocumentsApiImpl extends AbstractDataSourceApi implements Documents
 
         LOG.trace("Submitting request for {}", request.path());
 
-        return submitRequest(request, ResponseParser::toDocument);
+        return submitRequest(request, response -> ResponseParser.toDocument(request, response));
     }
 
 }

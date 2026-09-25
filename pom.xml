@@ -63,6 +63,9 @@
                                         <exclude>**/LICENSE.*</exclude>
                                         <exclude>**/NOTICE</exclude>
                                         <exclude>docs/**</exclude>
+
+                                        <!-- Exclude classes that are third-party or generated -->
+                                        <exclude>**/org/openntf/drapi/internal/http/UrlEncoder.java</exclude>
                                     </excludes>
                                 </licenseSet>
                             </licenseSets>

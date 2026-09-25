@@ -16,29 +16,41 @@
 package org.openntf.drapi.internal;
 
 import java.util.Objects;
+import org.openntf.drapi.Drapi;
 import org.openntf.drapi.DrapiClient;
-import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.DrapiDataSource;
+import org.openntf.drapi.auth.SessionContext;
+import org.openntf.drapi.util.TypeUtils;
 
 public class DrapiClientImpl implements DrapiClient {
 
-    private final DrapiContext context;
+    private final Drapi parent;
+    private final SessionContext sessionContext;
 
-    public DrapiClientImpl(DrapiContext context) {
-        this.context = Objects.requireNonNull(context, "Context must not be null");
+    public DrapiClientImpl(Drapi parent, SessionContext sessionContext) {
+        this.parent = Objects.requireNonNull(parent, "Drapi must not be null");
+        this.sessionContext = Objects.requireNonNull(sessionContext, "SessionContext must not be null");
     }
 
-    public DrapiContext context() {
-        return context;
+    @Override
+    public Drapi parent() {
+        return parent;
     }
 
-    public DrapiConfig config() {
-        return context.config();
+    @Override
+    public SessionContext sessionContext() {
+        return sessionContext;
     }
 
     @Override
     public DrapiDataSource dataSource(String name) {
-        return new DrapiDataSourceImpl(name, context);
+        TypeUtils.requireNonEmpty(name, "Data source name must not be null or empty");
+
+        return new DrapiDataSourceImpl(this, name);
     }
 
+    @Override
+    public void logout() {
+        parent.logout(sessionContext);
+    }
 }

@@ -18,6 +18,7 @@ package org.openntf.drapi.exception;
 import org.openntf.drapi.http.DrapiRequest;
 import org.openntf.drapi.http.DrapiResponse;
 import org.openntf.drapi.http.HttpMethod;
+import org.openntf.drapi.util.TypeUtils;
 
 /**
  * DrapiException is a custom exception class that extends RuntimeException.
@@ -144,6 +145,16 @@ public class DrapiException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        return super.getMessage() + (getErrorMessageString() == null ? "" : " [" + getErrorMessageString() + "]");
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(super.getMessage());
+
+        TypeUtils.ifNotBlank(getErrorMessageString(), errorMsg -> sb.append(" [").append(errorMsg).append("]"));
+
+        if(getStatusCode() != 0) {
+            sb.append(" (HTTP ").append(getStatusCode()).append(")");
+        }
+
+        return sb.toString();
     }
 }

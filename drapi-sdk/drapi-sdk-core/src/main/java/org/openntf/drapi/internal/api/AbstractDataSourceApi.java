@@ -15,7 +15,10 @@
  */
 package org.openntf.drapi.internal.api;
 
-import org.openntf.drapi.internal.DrapiContext;
+import org.openntf.drapi.DrapiClient;
+import org.openntf.drapi.http.ApiPath;
+import org.openntf.drapi.http.DrapiRequest;
+import org.openntf.drapi.http.HttpMethod;
 
 public abstract class AbstractDataSourceApi extends AbstractApi {
 
@@ -23,8 +26,8 @@ public abstract class AbstractDataSourceApi extends AbstractApi {
 
     private final String dataSource;
 
-    protected AbstractDataSourceApi(DrapiContext context, String dataSource) {
-        super(context);
+    protected AbstractDataSourceApi(DrapiClient client, String dataSource) {
+        super(client);
         this.dataSource = dataSource;
     }
 
@@ -32,4 +35,10 @@ public abstract class AbstractDataSourceApi extends AbstractApi {
         return dataSource;
     }
 
+    // Override the newRequest method to include the dataSource query parameter
+    @Override
+    protected DrapiRequest newRequest(HttpMethod method, ApiPath apiPath) {
+        return super.newRequest(method, apiPath)
+                    .queryParam(QS_DATASOURCE, dataSource());
+    }
 }
