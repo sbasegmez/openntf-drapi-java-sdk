@@ -47,7 +47,6 @@ class DrapiBuilderTest {
                                         .build();
 
         TokenSourceProvider tokenSourceProvider = new FixedTokenSourceProvider();
-        HttpTransport httpTransport = HttpTransportProvider.defaultTransportProvider().create(config, null);
 
         assertDoesNotThrow(() -> Drapi.builder(config, tokenSourceProvider).build(), "Expected no exception for valid parameters");
     }

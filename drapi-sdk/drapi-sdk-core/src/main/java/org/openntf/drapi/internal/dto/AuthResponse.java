@@ -19,8 +19,13 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import org.openntf.drapi.auth.Token;
+import org.openntf.drapi.util.TypeUtils;
 
 public record AuthResponse(String bearer, Map<String, Object> claims, int leeway, int expSeconds, String issueDate) {
+
+    public AuthResponse {
+        claims = TypeUtils.defaultIfEmpty(claims, Map.of());
+    }
 
     /**
      * Reports whether the token should be replaced now.

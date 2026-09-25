@@ -87,7 +87,7 @@ public class DrapiConfigBuilder {
      * @return The current DrapiConfigBuilder instance
      */
     public DrapiConfigBuilder connectTimeout(int seconds) {
-        if(seconds <= 0) {
+        if (seconds <= 0) {
             throw new IllegalArgumentException("Connect timeout cannot be negative or zero");
         }
 
@@ -112,7 +112,7 @@ public class DrapiConfigBuilder {
      * @return The current DrapiConfigBuilder instance
      */
     public DrapiConfigBuilder requestTimeout(int seconds) {
-        if(seconds <= 0) {
+        if (seconds <= 0) {
             throw new IllegalArgumentException("Request timeout cannot be negative or zero");
         }
 
@@ -201,6 +201,7 @@ public class DrapiConfigBuilder {
                .stream()
                .filter(entry -> TypeUtils.startsWithIgnoreCase(entry.getKey(), prefix))
                .map(entry -> Map.entry(entry.getKey()
+                                            .substring(prefix.length())
                                             .toLowerCase(Locale.ENGLISH)
                                             .replace(prefix.toLowerCase(Locale.ENGLISH), "")
                                             .replace("_", "."), entry.getValue()))

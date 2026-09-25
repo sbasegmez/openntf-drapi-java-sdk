@@ -72,7 +72,7 @@ public final class PasswordTokenSource extends TokenSourceBase {
         this.scope = config().get(SCOPE_KEY).orElse(null); // Scope is optional
     }
 
-    private AuthResponse popCache() {
+    private AuthResponse peekCache() {
         if(currentAuthResponse.get() != null) {
             // If we already have a valid token, return it
             AuthResponse authResponse = currentAuthResponse.get();
@@ -87,14 +87,14 @@ public final class PasswordTokenSource extends TokenSourceBase {
 
     @Override
     public Token acquire(SessionContext sessionContext) {
-        AuthResponse cachedAuthResponse = popCache();
+        AuthResponse cachedAuthResponse = peekCache();
         if (cachedAuthResponse != null) {
             return cachedAuthResponse.toToken();
         }
 
         synchronized (lock) {
             // Double-check locking to ensure that we don't acquire a new token if another thread has already done so
-            cachedAuthResponse = popCache();
+            cachedAuthResponse = peekCache();
             if (cachedAuthResponse != null) {
                 return cachedAuthResponse.toToken();
             }
