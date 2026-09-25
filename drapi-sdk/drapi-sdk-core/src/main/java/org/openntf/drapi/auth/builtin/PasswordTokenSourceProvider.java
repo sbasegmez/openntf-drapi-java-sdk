@@ -55,8 +55,8 @@ public final class PasswordTokenSourceProvider implements TokenSourceProvider {
      */
     public static PasswordTokenSourceProvider withCredentials(String username, String password, String scope) {
         // We want to give a clear error message if username or password is blank, so we check them here.
-        TypeUtils.requireNonBlank(username, "username");
-        TypeUtils.requireNonBlank(password, "password");
+        TypeUtils.requireNonBlank(username, "username cannot be blank or null");
+        TypeUtils.requireNonBlank(password, "password cannot be blank or null");
 
         PasswordTokenSourceProvider provider = new PasswordTokenSourceProvider();
         provider.username = username;

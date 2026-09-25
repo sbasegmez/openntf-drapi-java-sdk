@@ -39,7 +39,7 @@ public final class FixedTokenSourceProvider implements TokenSourceProvider {
      */
     public static FixedTokenSourceProvider withToken(String tokenValue) {
         // We want to give a clear error message if tokenValue is blank, so we check it here.
-        TypeUtils.requireNonBlank(tokenValue, "tokenValue");
+        TypeUtils.requireNonBlank(tokenValue, "tokenValue cannot be blank or null");
 
         FixedTokenSourceProvider provider = new FixedTokenSourceProvider();
         provider.tokenValue = tokenValue;

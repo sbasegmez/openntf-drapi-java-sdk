@@ -132,7 +132,7 @@ class DrapiConfigBuilderTest {
     }
 
     @EnabledIfEnvironmentVariable(named = "DRAPI_BASEURL", matches = ".*")
-    @EnabledIfEnvironmentVariable(named = "DRAPI_TOKEN", matches = ".*")
+    @EnabledIfEnvironmentVariable(named = "DRAPI_AUTH_TOKEN", matches = ".*")
     @Test
     @DisplayName("Test loading configuration from environment variables")
     void testLoadFromEnvironmentVariables() {
