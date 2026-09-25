@@ -142,7 +142,7 @@ class DrapiConfigBuilderTest {
                                             .applyEnvironmentVariables("DRAPI_")
                                             .build();
             assertNotNull(config.baseUrl(), "Base URL should be loaded from environment variables");
-            assertNotNull(config.get("TOKEN", String.class).orElse(null), "Token should be loaded from environment variables");
+            assertNotNull(config.get("auth.token", String.class).orElse(null), "Token should be loaded from environment variables");
         }, "Should not throw exception when loading from environment variables");
     }
 
