@@ -73,7 +73,7 @@ public interface Drapi {
      * Creates a new DrapiBuilder instance for constructing a Drapi instance with the specified configuration.
      *
      * @param config              the DrapiConfig containing configuration settings
-     * @param tokenSourceProvider the TokenSource used for authentication
+     * @param tokenSourceProvider the TokenSourceProvider used for authentication
      * @return a new DrapiBuilder instance
      */
     static DrapiBuilder builder(DrapiConfig config, TokenSourceProvider tokenSourceProvider) {

@@ -16,7 +16,6 @@
 package org.openntf.drapi;
 
 import java.net.URI;
-import java.util.Map;
 import java.util.Optional;
 import org.openntf.drapi.util.ConfigKey;
 
@@ -62,9 +61,9 @@ public interface DrapiConfig {
     /**
      * Returns the value of the specified configuration key, or a default value if the key is not present.
      *
-     * @param key          the configuration key
-     * @param type         the type of the configuration value
-     * @param <T>          the type of the configuration value
+     * @param key  the configuration key
+     * @param type the type of the configuration value
+     * @param <T>  the type of the configuration value
      * @return an Optional containing the value of the configuration key, or an empty Optional if the key is not present
      */
     <T> Optional<T> get(String key, Class<T> type);

@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.openntf.drapi.auth.TokenSourceProvider;
 import org.openntf.drapi.auth.builtin.FixedTokenSourceProvider;
 import org.openntf.drapi.auth.builtin.PasswordTokenSourceProvider;
-import org.openntf.drapi.http.HttpTransport;
-import org.openntf.drapi.http.HttpTransportProvider;
 
 class DrapiBuilderTest {
 

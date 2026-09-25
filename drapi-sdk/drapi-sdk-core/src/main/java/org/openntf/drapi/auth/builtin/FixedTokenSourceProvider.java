@@ -19,12 +19,30 @@ import org.openntf.drapi.DrapiConfig;
 import org.openntf.drapi.auth.TokenSource;
 import org.openntf.drapi.auth.TokenSourceProvider;
 import org.openntf.drapi.http.HttpTransport;
+import org.openntf.drapi.util.TypeUtils;
 
 public final class FixedTokenSourceProvider implements TokenSourceProvider {
 
+    private String tokenValue = null;
+
     @Override
     public TokenSource create(DrapiConfig config, HttpTransport transport) {
-        return new FixedTokenSource(config, transport);
+        return new FixedTokenSource(config, transport, tokenValue);
     }
 
+    /**
+     * Creates a FixedTokenSourceProvider with the given token value.
+     *
+     * @param tokenValue the token value to use for authentication
+     * @return a FixedTokenSourceProvider instance
+     * @throws IllegalArgumentException if tokenValue is blank
+     */
+    public static FixedTokenSourceProvider withToken(String tokenValue) {
+        // We want to give a clear error message if tokenValue is blank, so we check it here.
+        TypeUtils.requireNonBlank(tokenValue, "tokenValue cannot be blank or null");
+
+        FixedTokenSourceProvider provider = new FixedTokenSourceProvider();
+        provider.tokenValue = tokenValue;
+        return provider;
+    }
 }

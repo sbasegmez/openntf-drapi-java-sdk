@@ -1,15 +1,17 @@
 # API Surface Semantics (draft)
 
-Design draft mapping every operation in `openapi.basis.json` (v1.42.6) to a fluent Java call. Not yet implemented; this is the target shape for the SDK surface.
+Design draft mapping every operation in `openapi.basis.json` (v1.42.6) to a fluent Java call. This is the target shape for the SDK surface.
+
+Rows marked ✔ are implemented. Everything else in this document is planned.
 
 ## Root rule
 
 Every operation that requires a `dataSource` parameter lives under `client.dataSource(name)`. Everything else lives directly under `client`. The spec has no exceptions to this rule.
 
 ```java
-Drapi drapi = Drapi.builder(config, tokenSourceProvider).build(); // App-scope - Mother of all objects
-DrapiClient client = Drapi.forSession(sessionContext);  // Short-lived, storeable, lightweight layer for a specific user session.
-DrapiDataSource ds = client.dataSource("projects"); // Thin layer from Client to all services with "dataSource" query parameter
+Drapi drapi = Drapi.builder(config, tokenSourceProvider).build(); // Application scope, built once
+DrapiClient client = drapi.forSession(sessionContext);             // Session scope, cheap to create
+DrapiDataSource ds = client.dataSource("projects");               // Thin handle for all services taking a "dataSource" parameter
 
 ds.documents().get(unid); // => CompletableFuture<Document>
 ds.documents().update(unid, document);
@@ -22,14 +24,14 @@ Conventions used below:
 - Optional parameters are collected in an `XxxOptions` value object with a builder, so every operation has a short overload and a full overload. Only the short one is listed.
 - Request bodies with many fields are `XxxRequest` value objects with a builder; required fields are marked with `*`.
 - Endpoints that are duplicates (GET and POST `/auth/logout`) are mapped once.
-- `richTextAs` is an enum (`RichTextAs`, already in `org.openntf.drapi.meta`).
+- `richTextAs` is `RichTextAs` in `org.openntf.drapi.api.options`: a value class with `HTML`, `PLAIN`, `MIME` and `MARKDOWN` constants, open to values the server adds later.
 
 ## Client level
 
 | Fluent call                                                  | Operation                 | Endpoint                      |
 | ------------------------------------------------------------ | ------------------------- | ----------------------------- |
-| `client.dataSource(name)`                                    | (handle, no call)         |                               |
-| `client.logout()`                                            | authLogout                | GET /auth/logout              |
+| `client.dataSource(name)` ✔                                  | (handle, no call)         |                               |
+| `client.logout()` ✔                                          | authLogout                | GET /auth/logout              |
 | `client.server().info()`                                     | getInfo                   | GET /info                     |
 | `client.server().userInfo()` / `userInfo(UserInfoOptions)`   | getUserInfo               | GET /userinfo                 |
 | `client.server().userInfo(UserInfoRequest)`                  | getUserInfoPost           | POST /userinfo                |
@@ -45,10 +47,10 @@ Conventions used below:
 | `client.oauth().updateAppCallbackUrl(AppCallbackRequest)`    | updateCallbackUrl         | POST /apps                    |
 | `client.dominoIq().completion(CompletionRequest)`            | DominoIQCompletion        | POST /dominoiq/completion     |
 | `client.odata().scopes()`                                    | fetchOdataList            | GET /odata                    |
-| (internal: AuthenticationProvider)                           | authLogin                 | POST /auth                    |
-| (internal: AuthenticationProvider)                           | authRenewJwt              | POST /auth/extend             |
-| (internal: AuthenticationProvider)                           | authLocal                 | GET /auth/local               |
-| (internal: AuthenticationProvider)                           | loginForOAuthFlow         | POST /authforoauthflow        |
+| (`TokenSource` implementation) ✔                             | authLogin                 | POST /auth                    |
+| (`TokenSource` implementation)                               | authRenewJwt              | POST /auth/extend             |
+| (`TokenSource` implementation)                               | authLocal                 | GET /auth/local               |
+| (`TokenSource` implementation)                               | loginForOAuthFlow         | POST /authforoauthflow        |
 | (not exposed; `server().userInfo()` covers it)               | authLoginBasic            | GET /auth/basic               |
 | (not exposed; login-page concern)                            | getExternalIdp            | GET /auth/idpList             |
 
@@ -62,8 +64,8 @@ Options and request objects:
 
 Notes:
 
-- There is no public `AuthApi`. Login and renewal are handled automatically by the `AuthenticationProvider`; `/auth/basic` duplicates `/userinfo`; `/auth/idpList` serves login pages, not server-side clients.
-- `client.logout()` asks the provider to release its session. Providers that obtained the JWT themselves (basic, OAuth) call `/auth/logout` and clear the token cache; the token provider was handed a token it did not create and must not invalidate it. Whether `close()` (AutoCloseable) should also call logout is open.
+- There is no public `AuthApi`. Obtaining and renewing tokens is the job of the `TokenSource` (see [Authentication](03-authentication.md)); `/auth/basic` duplicates `/userinfo`; `/auth/idpList` serves login pages, not server-side clients.
+- `client.logout()` is implemented. It passes the client's session to `TokenSource.logout(SessionContext)`. `PasswordTokenSource` obtained its JWT itself, so it clears its cache and calls `/auth/logout`; `FixedTokenSource` was handed a token it did not create and does nothing. Whether `Drapi` should become `AutoCloseable`, and whether closing should log sessions out, is open.
 - `/operations` and `/preview` describe the server, not a database, so they sit under `server()`.
 
 ## Data source level
@@ -74,7 +76,7 @@ Notes:
 
 | Fluent call                                                                                 | Operation            | Endpoint                          |
 |---------------------------------------------------------------------------------------------|----------------------|-----------------------------------|
-| `ds.documents().get(unid)` / `get(unid, GetOptions)`                                        | getDocument          | GET /document/{unid}              |
+| `ds.documents().get(unid)` / `get(unid, DocumentsGetOptions)` ✔                             | getDocument          | GET /document/{unid}              |
 | `ds.documents().create(document)` / `create(document, CreateOptions)`                       | createDocument       | POST /document                    |
 | `ds.documents().update(unid, document)` / `update(unid, document, UpdateOptions)`           | updateDocument       | PUT /document/{unid}              |
 | `ds.documents().patch(unid, changes)` / `patch(unid, changes, UpdateOptions)`               | patchDocument        | PATCH /document/{unid}            |
@@ -85,7 +87,7 @@ Notes:
 
 Options objects:
 
-- `GetOptions`: mode (string), meta (boolean), richTextAs (RichTextAs), markRead (boolean), markUnread (boolean)
+- `DocumentsGetOptions` (implemented): mode (string), meta (boolean), richTextAs (RichTextAs), markRead (boolean), markUnread (boolean)
 - `CreateOptions`: richTextAs (RichTextAs), parentUnid (string)
 - `UpdateOptions`: mode (string), parentUnid (string), revision (string), richTextAs (RichTextAs), markUnread (boolean)
 - `RichTextOptions`: mode (string), item (string)
@@ -188,7 +190,7 @@ Options objects:
 | Fluent call                                                                      | Operation                                | Endpoint               |
 |----------------------------------------------------------------------------------|------------------------------------------|------------------------|
 | `ds.lists().all()` / `all(ListsOptions)`                                         | fetchViews                               | GET /lists             |
-| `ds.lists().get(name)` / `get(name, ListsGetOptions)`                            | fetchViewEntries                         | GET /lists/{name}      |
+| `ds.lists().get(name)` / `get(name, ListsGetOptions)` ✔                          | fetchViewEntries                         | GET /lists/{name}      |
 | `ds.lists().pivot(name, pivotColumn)` / `pivot(name, pivotColumn, PivotOptions)` | pivotViewEntries                         | GET /listspivot/{name} |
 | `ds.lists().folder(name).add(unids)` / `add(unids, mode)`                        | bulkDocumentFolderByUnid (action=add)    | POST /bulk/folder      |
 | `ds.lists().folder(name).remove(unids)` / `remove(unids, mode)`                  | bulkDocumentFolderByUnid (action=remove) | POST /bulk/folder      |
@@ -252,7 +254,7 @@ Options objects:
 
 ## Coverage
 
-All 77 operations are accounted for. Four are internal to the authentication provider and two (`authLoginBasic`, `getExternalIdp`) are deliberately not exposed. Two paths (`/auth/logout` GET and POST) collapse into one call.
+All 77 operations are accounted for. Four belong to `TokenSource` implementations rather than the public API (the bundled `PasswordTokenSource` uses `/auth` and `/auth/logout`), and two (`authLoginBasic`, `getExternalIdp`) are deliberately not exposed. Two paths (`/auth/logout` GET and POST) collapse into one call.
 
 ## Resulting interfaces
 
