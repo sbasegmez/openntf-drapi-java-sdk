@@ -1,8 +1,10 @@
 # Drapi SDK Samples
 
-This directory contains sample code demonstrating how to use the Drapi SDK to interact with the HCL Domino REST API. The samples cover common use cases and provide practical examples for developers to get started quickly.
+Sample code for the Drapi SDK and the HCL Domino REST API.
 
-## Sample Projects
+## Sample projects
 
 - **[Standalone Java Application](drapi-sdk-samples-standalone/README.md)**
-  Runnable examples covering basic authentication, fetching a list view, and reading a single document through the `Document` interface.
+  Single-user examples using password authentication: reading a view as a stream, and finding and reading a single document.
+
+Servlet and Spring samples will follow once the matching support modules exist. Until then, [Writing a Custom Token Source](../docs/04-custom-token-source.md) shows the multi-user patterns.

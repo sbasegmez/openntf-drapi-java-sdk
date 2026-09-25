@@ -1,45 +1,42 @@
 # OpenNTF Java SDK for HCL Domino REST API
 
-The OpenNTF Java SDK for HCL Domino REST API is a Java library that provides a convenient way to interact with the HCL Domino REST API. It simplifies making HTTP requests, handling responses, and working with JSON data.
+A Java library for the [HCL Domino REST API](https://opensource.hcltechsw.com/Domino-rest-api/index.html) (DRAPI). It handles HTTP, authentication and JSON so that your code works with documents and views rather than requests and responses.
 
-HCL provides SDK implementations for Go and Node.js, which can be found in the [OpenNTF Domino REST API SDKs](https://opensource.hcltechsw.com/Domino-rest-api/references/sdk.html). This Java SDK is intended for Java applications that need to communicate with HCL Domino servers via the REST API and is designed to be simple, lightweight, and easy to use.
+HCL provides official SDKs for [Go and Node.js](https://opensource.hcltechsw.com/Domino-rest-api/references/sdk.html). This SDK fills the gap for Java applications.
 
-This SDK targets Java developers building applications that need to interact with HCL Domino servers. It provides a set of classes and methods that abstract the complexities of working with the REST API, allowing developers to focus on building their applications. The SDK is also designed to be compatible with various Java frameworks and libraries, making it easy to integrate into existing projects.
+## Status
 
-## Planned implementation
+The SDK is at an early stage. Version `0.2.0` (in development) replaces the authentication model of `0.1.0` and is not backwards compatible with it.
 
-This SDK targets Java 17 and above, and is designed to be modular and extensible. The core implementation targets minimal/no dependencies, but additional modules may be provided to support specific frameworks or libraries. The SDK is designed to be easy to use and understand, with clear documentation and examples provided.
+What works today:
 
-Planned SDK surface is documented in the [API Semantics](docs/api-semantics.md) document. You might check [drapi-sdk-samples](drapi-sdk-samples/README.md) for usage examples.
+- Reading a document: `ds.documents().get(unid)`
+- Reading view and folder entries as a stream: `ds.lists().get(viewName)`
+- Password authentication against `/api/v1/auth`, a fixed bearer token, or your own token source
 
-## Documentation
+The planned API surface is described in [API Semantics](docs/05-api-semantics.md).
 
-- [Configuration](docs/configuration.md)
-- [Development](docs/development.md)
-- [Api Semantics](docs/api-semantics.md)
+## Requirements
 
-## JSON Serialization
-
-The SDK uses a JSON abstraction and it does not depend on a specific Json library. The initial provide Jakarta Json API (Json-b and Json-p) implementation for serialization and deserialization, but the SDK is designed to be flexible and allow for other JSON libraries to be used if desired. Jackson support is also planned in a later stage.
+- Java 17 or later
+- A Domino REST API server
 
 ## Adding the SDK to your project
-
-You can add the SDK to your project using Maven. You can include the following dependency in your `pom.xml` file:
 
 ```xml
 <dependency>
     <groupId>org.openntf.drapi</groupId>
     <artifactId>drapi-sdk-starter-jakarta</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0-SNAPSHOT</version>
 </dependency>
 ```
 
-This will include the core SDK and the Jakarta JSON implementation. As additional libraries are added, they will be provided as separate dependencies, allowing you to choose the ones that best fit your platform.
+The starter brings in the core SDK, the Jakarta JSON binding and a working Jakarta JSON implementation (Parsson and Yasson).
 
-Pre-release versions of the SDK are available in the [OpenNTF Maven Repository](https://artifactory.openntf.org/openntf). You can add the repository to your `pom.xml` file as follows:
+Pre-release versions are published to the OpenNTF Maven repository:
 
 ```xml
- <repositories>
+<repositories>
     <repository>
         <id>artifactory.openntf.org</id>
         <name>artifactory.openntf.org</name>
@@ -48,6 +45,61 @@ Pre-release versions of the SDK are available in the [OpenNTF Maven Repository](
 </repositories>
 ```
 
+## Quick start
+
+```java
+DrapiConfig config = DrapiConfig.builder()
+                                .baseUrl("https://drapi.example.com:8880")
+                                .build();
+
+// Build once per application
+Drapi drapi = Drapi.builder(config, PasswordTokenSourceProvider.withCredentials("Jane Doe", password))
+                   .build();
+
+// One client per user session. Cheap to create.
+DrapiClient client = drapi.forSession(SessionContext.singleUser());
+
+client.dataSource("projectdb")
+      .documents()
+      .get(unid)
+      .thenAccept(doc -> System.out.println(doc.field("name").asString().orElse("-")))
+      .join();
+
+client.logout();
+drapi.shutdown();
+```
+
+[Getting Started](docs/01-getting-started.md) walks through the same code step by step.
+
+## Main types
+
+| Type               | Scope               | Role                                                                    |
+|--------------------|---------------------|-------------------------------------------------------------------------|
+| `Drapi`            | Application         | Holds configuration, HTTP transport and the token source. Build once.   |
+| `DrapiClient`      | User session        | Binds a `SessionContext` to the `Drapi` instance. Create per session.   |
+| `DrapiDataSource`  | DRAPI scope         | Entry point to documents, lists and other APIs for one scope.           |
+| `SessionContext`   | User session        | Identifies the session. Implemented by your application.                |
+| `TokenSource`      | Application         | Supplies the bearer token for a session. Bundled or your own.           |
+
+## Documentation
+
+1. [Getting Started](docs/01-getting-started.md)
+2. [Configuration](docs/02-configuration.md)
+3. [Authentication](docs/03-authentication.md)
+4. [Writing a Custom Token Source](docs/04-custom-token-source.md)
+5. [API Semantics](docs/05-api-semantics.md)
+6. [Development](docs/06-development.md)
+
+See also the [Samples](drapi-sdk-samples/README.md).
+
+## JSON serialisation
+
+The core module does not depend on a JSON library. It finds a `JsonBindingProvider` through `ServiceLoader` at runtime. The Jakarta JSON-P/JSON-B binding is available now; a Jackson binding is planned.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [AI Use Policy](AI_Use_Policy.md).
+
 ## License
 
-This project is licensed under the Apache License 2.0.
+Apache License 2.0. See [LICENSE](LICENSE).
